@@ -66,163 +66,215 @@ const Admin = () => {
   const [currentRate, setCurrentRate] = useState<ExchangeRate | null>(null);
 
   useEffect(() => {
-    checkAdminAccess();
+    loadMockData();
   }, []);
 
-  const checkAdminAccess = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth");
-      return;
-    }
+  const loadMockData = () => {
+    // Mock Transactions Data
+    const mockTransactions: Transaction[] = [
+      {
+        id: "1",
+        sender_id: "user1",
+        receiver_name: "John Kabwe",
+        receiver_phone: "+260977123456",
+        amount: 500,
+        fee: 5,
+        status: "pending",
+        payout_method: "Mobile Money",
+        proof_of_payment_url: "https://example.com/proof1.pdf",
+        created_at: new Date(Date.now() - 3600000).toISOString(),
+        profiles: { full_name: "Alice Mwansa", phone_number: "+260966789012" }
+      },
+      {
+        id: "2",
+        sender_id: "user2",
+        receiver_name: "Mary Phiri",
+        receiver_phone: "+260955987654",
+        amount: 250,
+        fee: 2.5,
+        status: "completed",
+        payout_method: "Bank Transfer",
+        admin_notes: "Verified and processed successfully",
+        created_at: new Date(Date.now() - 86400000).toISOString(),
+        profiles: { full_name: "David Banda", phone_number: "+260977456789" }
+      },
+      {
+        id: "3",
+        sender_id: "user3",
+        receiver_name: "Joseph Tembo",
+        receiver_phone: "+260965432109",
+        amount: 1000,
+        fee: 10,
+        status: "pending",
+        payout_method: "Cash Pickup",
+        proof_of_payment_url: "https://example.com/proof3.pdf",
+        created_at: new Date(Date.now() - 7200000).toISOString(),
+        profiles: { full_name: "Grace Lungu", phone_number: "+260966111222" }
+      },
+      {
+        id: "4",
+        sender_id: "user4",
+        receiver_name: "Ruth Chanda",
+        receiver_phone: "+260977888999",
+        amount: 750,
+        fee: 7.5,
+        status: "completed",
+        payout_method: "Mobile Money",
+        admin_notes: "Processed on time",
+        created_at: new Date(Date.now() - 172800000).toISOString(),
+        profiles: { full_name: "Peter Zulu", phone_number: "+260955333444" }
+      }
+    ];
 
-    // Check if user has admin role
-    const { data: roles } = await supabase
-      .from("user_roles" as any)
-      .select("role")
-      .eq("user_id", session.user.id)
-      .eq("role", "admin")
-      .single();
+    // Mock Users Data
+    const mockUsers: User[] = [
+      {
+        id: "user1",
+        full_name: "Alice Mwansa",
+        email: "alice.mwansa@example.com",
+        phone_number: "+260966789012",
+        country: "Zambia",
+        balance: 1500,
+        verified: true,
+        created_at: new Date(Date.now() - 2592000000).toISOString()
+      },
+      {
+        id: "user2",
+        full_name: "David Banda",
+        email: "david.banda@example.com",
+        phone_number: "+260977456789",
+        country: "Zambia",
+        balance: 500,
+        verified: true,
+        created_at: new Date(Date.now() - 5184000000).toISOString()
+      },
+      {
+        id: "user3",
+        full_name: "Grace Lungu",
+        email: "grace.lungu@example.com",
+        phone_number: "+260966111222",
+        country: "Zambia",
+        balance: 2000,
+        verified: false,
+        created_at: new Date(Date.now() - 1296000000).toISOString()
+      },
+      {
+        id: "user4",
+        full_name: "Peter Zulu",
+        email: "peter.zulu@example.com",
+        phone_number: "+260955333444",
+        country: "Zambia",
+        balance: 800,
+        verified: true,
+        created_at: new Date(Date.now() - 7776000000).toISOString()
+      }
+    ];
 
-    if (!roles) {
-      toast.error("Access denied. Admin privileges required.");
-      navigate("/dashboard");
-      return;
-    }
+    // Mock Settings Data
+    const mockSettings: Setting[] = [
+      {
+        id: "1",
+        key: "min_transfer_amount",
+        value: "10",
+        description: "Minimum transfer amount in USD"
+      },
+      {
+        id: "2",
+        key: "max_transfer_amount",
+        value: "5000",
+        description: "Maximum transfer amount in USD"
+      },
+      {
+        id: "3",
+        key: "transaction_fee_percentage",
+        value: "1",
+        description: "Transaction fee as percentage"
+      },
+      {
+        id: "4",
+        key: "support_email",
+        value: "support@turapay.com",
+        description: "Customer support email address"
+      }
+    ];
+
+    // Mock Exchange Rate
+    const mockRate: ExchangeRate = {
+      id: "rate1",
+      from_currency: "USD",
+      to_currency: "ZMW",
+      rate: 26.5,
+      is_active: true,
+      created_at: new Date().toISOString()
+    };
+
+    setTransactions(mockTransactions);
+    setUsers(mockUsers);
+    setSettings(mockSettings);
+    setCurrentRate(mockRate);
+
+    // Calculate stats
+    const total = mockTransactions.length;
+    const pending = mockTransactions.filter(t => t.status === "pending").length;
+    const completed = mockTransactions.filter(t => t.status === "completed").length;
+    const revenue = mockTransactions.reduce((sum, t) => sum + t.fee, 0);
+    
+    setStats({
+      total,
+      pending,
+      completed,
+      revenue,
+      totalUsers: mockUsers.length
+    });
 
     setIsAdmin(true);
-    loadDashboardData();
-  };
-
-  const loadDashboardData = async () => {
-    // Load transactions with sender info
-    const { data: txData, error: txError } = await supabase
-      .from("transactions")
-      .select(`
-        *,
-        profiles:sender_id (full_name, phone_number)
-      `)
-      .order("created_at", { ascending: false });
-
-    if (!txError && txData) {
-      setTransactions(txData);
-
-      // Calculate stats
-      const total = txData.length;
-      const pending = txData.filter(t => t.status === "pending").length;
-      const completed = txData.filter(t => t.status === "completed").length;
-      const revenue = txData.reduce((sum, t) => sum + (t.fee || 0), 0);
-
-      setStats((prev) => ({ ...prev, total, pending, completed, revenue }));
-    }
-
-    // Load users
-    const { data: usersData } = await supabase
-      .from("profiles")
-      .select("id, full_name, phone_number, country, balance, verified, created_at");
-
-    if (usersData) {
-      const usersWithEmails = await Promise.all(
-        usersData.map(async (user) => {
-          const { data: authData } = await supabase.auth.admin.getUserById(user.id);
-          return {
-            ...user,
-            email: authData?.user?.email || "N/A",
-          };
-        })
-      );
-      setUsers(usersWithEmails as User[]);
-      setStats((prev) => ({ ...prev, totalUsers: usersData.length }));
-    }
-
-    // Load settings
-    const { data: settingsData } = await supabase
-      .from("settings" as any)
-      .select("*");
-
-    if (settingsData) {
-      setSettings(settingsData as any);
-    }
-
-    // Load current exchange rate
-    const { data: rateData } = await supabase
-      .from("exchange_rates" as any)
-      .select("*")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
-
-    if (rateData) {
-      setCurrentRate(rateData as any);
-    }
-
     setLoading(false);
   };
 
-  const updateTransactionStatus = async (
+  const updateTransactionStatus = (
     transactionId: string,
     status: string,
     notes?: string
   ) => {
-    const updateData: any = {
-      status,
-      admin_notes: notes,
-    };
+    // Update transaction status in mock data
+    setTransactions(prev => 
+      prev.map(tx => 
+        tx.id === transactionId 
+          ? { ...tx, status, admin_notes: notes }
+          : tx
+      )
+    );
 
-    if (status === "completed") {
-      updateData.completed_at = new Date().toISOString();
-    }
+    // Recalculate stats
+    setTimeout(() => {
+      const pending = transactions.filter(t => t.status === "pending").length;
+      const completed = transactions.filter(t => t.status === "completed").length;
+      setStats(prev => ({ ...prev, pending, completed }));
+    }, 100);
 
-    const { error } = await supabase
-      .from("transactions")
-      .update(updateData)
-      .eq("id", transactionId);
-
-    if (error) {
-      toast.error("Failed to update transaction");
-      console.error(error);
-    } else {
-      toast.success(`Transaction marked as ${status}`);
-      loadDashboardData();
-    }
+    toast.success(`Transaction marked as ${status}`);
   };
 
-  const updateExchangeRate = async () => {
+  const updateExchangeRate = () => {
     const rate = parseFloat(newRate);
     if (isNaN(rate) || rate <= 0) {
       toast.error("Please enter a valid rate");
       return;
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-
-    // Deactivate current rate
-    if (currentRate) {
-      await supabase
-        .from("exchange_rates" as any)
-        .update({ is_active: false })
-        .eq("id", currentRate.id);
-    }
-
-    // Insert new rate
-    const { error } = await supabase.from("exchange_rates" as any).insert({
+    // Update mock exchange rate
+    const newMockRate: ExchangeRate = {
+      id: `rate${Date.now()}`,
       from_currency: "USD",
       to_currency: "ZMW",
       rate,
-      created_by: session.user.id,
       is_active: true,
-    });
+      created_at: new Date().toISOString()
+    };
 
-    if (error) {
-      toast.error("Failed to update rate");
-      console.error(error);
-    } else {
-      toast.success("Exchange rate updated");
-      setNewRate("");
-      loadDashboardData();
-    }
+    setCurrentRate(newMockRate);
+    setNewRate("");
+    toast.success("Exchange rate updated");
   };
 
   if (loading) {
