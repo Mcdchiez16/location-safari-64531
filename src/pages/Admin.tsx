@@ -460,8 +460,9 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="transactions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            <TabsTrigger value="kyc">KYC Verification</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="exchange">Exchange Rates</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -661,6 +662,151 @@ const Admin = () => {
                           )}
                         </div>
                       )}
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))
+            )}
+          </TabsContent>
+
+          <TabsContent value="kyc" className="space-y-4">
+            <Card className="shadow-xl">
+              <CardHeader>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-2xl flex items-center gap-3">
+                      <Shield className="h-6 w-6 text-primary" />
+                      KYC Verification
+                    </CardTitle>
+                    <CardDescription>Review and verify user identity documents</CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary" className="text-lg px-4 py-2">
+                      {transactions.filter(tx => !tx.kyc_verified).length} Pending
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {transactions.filter(tx => !tx.kyc_verified).length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                  <p className="text-muted-foreground text-lg">All KYC verifications completed</p>
+                  <p className="text-sm text-muted-foreground mt-2">Great job! There are no pending verifications.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              transactions.filter(tx => !tx.kyc_verified).map((tx) => (
+                <Card key={tx.id} className="hover:shadow-lg transition-all border-l-4 border-l-warning">
+                  <CardHeader>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <CardTitle className="text-lg">
+                              {tx.profiles?.full_name} → {tx.receiver_name}
+                            </CardTitle>
+                            <Badge variant="secondary" className="gap-1 bg-warning/10 text-warning hover:bg-warning/20">
+                              <Clock className="h-3 w-3" />
+                              KYC Pending
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{tx.profiles?.email}</p>
+                          <p className="text-sm text-muted-foreground">Phone: {tx.profiles?.phone_number}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (USD)</p>
+                          <p className="text-2xl font-bold text-primary">${tx.amount.toFixed(2)}</p>
+                        </div>
+                        <div className="p-4 bg-gradient-to-br from-accent/5 to-accent/10 rounded-lg border border-accent/20">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (ZMW)</p>
+                          <p className="text-2xl font-bold text-accent">
+                            K {(tx.amount * (currentRate?.rate || 26.5)).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">Rate: {currentRate?.rate || 26.5}</p>
+                        </div>
+                        <div className="p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-lg border border-secondary/20">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Transaction Date</p>
+                          <p className="text-sm font-bold">{new Date(tx.created_at).toLocaleDateString()}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{new Date(tx.created_at).toLocaleTimeString()}</p>
+                        </div>
+                      </div>
+
+                      <div className="p-6 bg-gradient-to-br from-warning/5 to-warning/10 rounded-lg border-2 border-warning/30">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 bg-warning/20 rounded-lg">
+                            <Shield className="h-5 w-5 text-warning" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-lg">Identity Verification Required</p>
+                            <p className="text-sm text-muted-foreground">Review the submitted KYC documents carefully</p>
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-3 text-sm mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-muted-foreground">Sender:</span>
+                            <span className="font-semibold">{tx.profiles?.full_name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-muted-foreground">Receiver:</span>
+                            <span className="font-semibold">{tx.receiver_name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-muted-foreground">Receiver Phone:</span>
+                            <span className="font-mono">{tx.receiver_phone}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-muted-foreground">Payout Method:</span>
+                            <Badge variant="outline">{tx.payout_method || "Not specified"}</Badge>
+                          </div>
+                        </div>
+
+                        {tx.kyc_document_url && (
+                          <Button
+                            variant="outline"
+                            className="w-full gap-2 mb-4"
+                            onClick={() => window.open(tx.kyc_document_url, "_blank")}
+                          >
+                            <Eye className="h-4 w-4" />
+                            View KYC Document
+                          </Button>
+                        )}
+
+                        <div className="flex gap-3 pt-4 border-t border-warning/20">
+                          <Button
+                            size="lg"
+                            className="gap-2 flex-1 bg-success hover:bg-success/90"
+                            onClick={() => {
+                              updateKYCStatus(tx.id, true);
+                              toast.success(`KYC verified for ${tx.profiles?.full_name}`);
+                            }}
+                          >
+                            <CheckCircle className="h-5 w-5" />
+                            Verify KYC
+                          </Button>
+                          <Button
+                            size="lg"
+                            variant="destructive"
+                            className="gap-2 flex-1"
+                            onClick={() => {
+                              const reason = prompt("Enter rejection reason:");
+                              if (reason) {
+                                updateKYCStatus(tx.id, false);
+                                toast.error(`KYC rejected: ${reason}`);
+                              }
+                            }}
+                          >
+                            <XCircle className="h-5 w-5" />
+                            Reject KYC
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </CardHeader>
                 </Card>
