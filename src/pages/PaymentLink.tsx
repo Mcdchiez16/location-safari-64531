@@ -94,112 +94,162 @@ const PaymentLink = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 pb-8">
-      <div className="container mx-auto px-4 py-6 md:py-8 max-w-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary via-primary/90 to-secondary relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-accent/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-700"></div>
+      </div>
+
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-3xl relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Button variant="ghost" onClick={() => navigate('/settings')} className="gap-2 hover:bg-primary/10">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/dashboard')} 
+            className="gap-2 text-primary-foreground hover:bg-white/10 backdrop-blur-sm"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
         </div>
 
-        {/* Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex h-16 w-16 rounded-3xl bg-gradient-to-br from-primary to-primary/80 items-center justify-center mb-4 shadow-lg">
-            <svg className="h-8 w-8 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        {/* Stylish Title Section */}
+        <div className="text-center mb-12 relative">
+          <div className="inline-flex h-20 w-20 rounded-3xl bg-white/10 backdrop-blur-xl items-center justify-center mb-6 shadow-2xl border border-white/20 animate-float">
+            <svg className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Your Payment Link
+          <h1 className="text-4xl md:text-5xl font-black mb-3 text-white drop-shadow-lg">
+            Get Paid Easily
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base">
-            Share this with anyone to receive money
+          <p className="text-white/80 text-base md:text-lg font-medium">
+            Share your unique payment link or QR code
           </p>
         </div>
 
-        {/* QR Code Card */}
-        <Card className="mb-6 shadow-2xl rounded-3xl border-0 overflow-hidden">
+        {/* Main Card with Glass Effect */}
+        <Card className="mb-6 shadow-2xl rounded-3xl border-0 overflow-hidden bg-white/95 backdrop-blur-xl">
           <CardContent className="p-8 md:p-12">
             <div className="flex flex-col items-center">
-              <div className="p-6 bg-white rounded-3xl shadow-xl mb-6">
-                <QRCode 
-                  value={`${window.location.origin}/send?link=${profile?.payment_link_id || ''}`} 
-                  size={220} 
-                />
+              {/* QR Code with Animated Border */}
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-secondary rounded-3xl blur-xl opacity-50 animate-pulse"></div>
+                <div className="relative p-8 bg-white rounded-3xl shadow-2xl">
+                  <QRCode 
+                    value={`${window.location.origin}/send?link=${profile?.payment_link_id || ''}`} 
+                    size={240} 
+                  />
+                </div>
               </div>
-              <p className="text-center text-sm text-muted-foreground mb-6 max-w-xs">
-                Scan this QR code to instantly send money to your account
+              
+              <h3 className="text-xl font-bold mb-2 text-foreground">Scan & Pay</h3>
+              <p className="text-center text-sm text-muted-foreground mb-8 max-w-md">
+                Anyone can scan this code with their phone camera to send you money instantly through TuraPay
               </p>
               
-              {/* Action Buttons */}
-              <div className="flex gap-3 w-full max-w-sm">
+              {/* Modern Action Buttons */}
+              <div className="grid grid-cols-2 gap-4 w-full max-w-md">
                 <Button
                   onClick={copyPaymentLink}
                   variant="outline"
-                  className="flex-1 h-12 rounded-full border-2 gap-2 hover:bg-primary/5"
+                  className="h-14 rounded-2xl border-2 gap-2 hover:bg-primary/5 hover:border-primary transition-all"
                 >
                   {copied ? (
                     <>
-                      <Check className="h-4 w-4" />
-                      Copied!
+                      <Check className="h-5 w-5" />
+                      <span className="font-semibold">Copied!</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="h-4 w-4" />
-                      Copy
+                      <Copy className="h-5 w-5" />
+                      <span className="font-semibold">Copy Link</span>
                     </>
                   )}
                 </Button>
                 <Button
                   onClick={sharePaymentLink}
-                  className="flex-1 h-12 rounded-full gap-2 shadow-lg"
+                  className="h-14 rounded-2xl gap-2 shadow-xl bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:scale-[1.02] transition-all font-semibold"
                 >
-                  <Share2 className="h-4 w-4" />
-                  Share
+                  <Share2 className="h-5 w-5" />
+                  Share Now
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Payment ID Card */}
-        <Card className="shadow-xl rounded-3xl border-0 overflow-hidden">
-          <CardContent className="p-6">
+        {/* Payment ID Section */}
+        <Card className="shadow-xl rounded-3xl border-0 overflow-hidden bg-white/95 backdrop-blur-xl mb-6">
+          <CardContent className="p-8">
             <div className="text-center">
-              <p className="text-sm font-semibold text-muted-foreground mb-3">Your Payment ID</p>
-              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-4 mb-4">
-                <p className="font-mono text-lg md:text-xl font-bold text-foreground break-all">
+              <div className="inline-flex items-center gap-2 mb-4">
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
+                <p className="text-sm font-bold text-foreground uppercase tracking-wider">Your Payment ID</p>
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
+              </div>
+              <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 rounded-2xl p-6 mb-3 border-2 border-primary/20">
+                <p className="font-mono text-xl md:text-2xl font-bold text-foreground break-all tracking-wide">
                   {profile?.payment_link_id}
                 </p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Share this ID for manual entry
+                People can also use this ID to send you money manually
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Info Card */}
-        <Card className="mt-6 shadow-lg rounded-2xl border-0 bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-          <CardContent className="p-6">
-            <div className="flex gap-3">
-              <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
+        {/* Info Cards Grid */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="shadow-lg rounded-2xl border-0 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="flex gap-3">
+                <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-sm text-foreground mb-1">Secure & Safe</p>
+                  <p className="text-xs text-muted-foreground">
+                    All transactions are encrypted and protected
+                  </p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="font-semibold text-sm text-foreground mb-1">How it works</p>
-                <p className="text-xs text-muted-foreground">
-                  Senders can scan your QR code or enter your Payment ID to send money directly to your TuraPay account
-                </p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg rounded-2xl border-0 bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="flex gap-3">
+                <div className="h-12 w-12 rounded-2xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-sm text-foreground mb-1">Instant Transfer</p>
+                  <p className="text-xs text-muted-foreground">
+                    Receive money in seconds, anytime
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };
