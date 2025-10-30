@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, UserCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, UserCircle, AlertCircle, Search, Download, Filter, Shield, Clock, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 
 interface Transaction {
@@ -24,7 +25,9 @@ interface Transaction {
   proof_of_payment_url?: string;
   admin_notes?: string;
   created_at: string;
-  profiles?: { full_name: string; phone_number: string };
+  kyc_verified?: boolean;
+  kyc_document_url?: string;
+  profiles?: { full_name: string; phone_number: string; email?: string };
 }
 
 interface ExchangeRate {
@@ -64,6 +67,8 @@ const Admin = () => {
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, revenue: 0, totalUsers: 0 });
   const [newRate, setNewRate] = useState("");
   const [currentRate, setCurrentRate] = useState<ExchangeRate | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   useEffect(() => {
     loadMockData();
@@ -82,8 +87,10 @@ const Admin = () => {
         status: "pending",
         payout_method: "Mobile Money",
         proof_of_payment_url: "https://example.com/proof1.pdf",
+        kyc_verified: false,
+        kyc_document_url: "https://example.com/kyc1.pdf",
         created_at: new Date(Date.now() - 3600000).toISOString(),
-        profiles: { full_name: "Alice Mwansa", phone_number: "+260966789012" }
+        profiles: { full_name: "Alice Mwansa", phone_number: "+260966789012", email: "alice.mwansa@example.com" }
       },
       {
         id: "2",
@@ -95,8 +102,9 @@ const Admin = () => {
         status: "completed",
         payout_method: "Bank Transfer",
         admin_notes: "Verified and processed successfully",
+        kyc_verified: true,
         created_at: new Date(Date.now() - 86400000).toISOString(),
-        profiles: { full_name: "David Banda", phone_number: "+260977456789" }
+        profiles: { full_name: "David Banda", phone_number: "+260977456789", email: "david.banda@example.com" }
       },
       {
         id: "3",
@@ -108,8 +116,10 @@ const Admin = () => {
         status: "pending",
         payout_method: "Cash Pickup",
         proof_of_payment_url: "https://example.com/proof3.pdf",
+        kyc_verified: false,
+        kyc_document_url: "https://example.com/kyc3.pdf",
         created_at: new Date(Date.now() - 7200000).toISOString(),
-        profiles: { full_name: "Grace Lungu", phone_number: "+260966111222" }
+        profiles: { full_name: "Grace Lungu", phone_number: "+260966111222", email: "grace.lungu@example.com" }
       },
       {
         id: "4",
@@ -121,8 +131,9 @@ const Admin = () => {
         status: "completed",
         payout_method: "Mobile Money",
         admin_notes: "Processed on time",
+        kyc_verified: true,
         created_at: new Date(Date.now() - 172800000).toISOString(),
-        profiles: { full_name: "Peter Zulu", phone_number: "+260955333444" }
+        profiles: { full_name: "Peter Zulu", phone_number: "+260955333444", email: "peter.zulu@example.com" }
       }
     ];
 
@@ -254,6 +265,51 @@ const Admin = () => {
 
     toast.success(`Transaction marked as ${status}`);
   };
+
+  const updateKYCStatus = (transactionId: string, verified: boolean) => {
+    setTransactions(prev => 
+      prev.map(tx => 
+        tx.id === transactionId 
+          ? { ...tx, kyc_verified: verified }
+          : tx
+      )
+    );
+    toast.success(`KYC ${verified ? "verified" : "rejected"} successfully`);
+  };
+
+  const exportTransactions = () => {
+    const csvContent = [
+      ["ID", "Sender", "Receiver", "Amount (USD)", "Amount (ZMW)", "Fee", "Status", "KYC Status", "Date"],
+      ...filteredTransactions.map(tx => [
+        tx.id,
+        tx.profiles?.full_name || "Unknown",
+        tx.receiver_name,
+        tx.amount,
+        (tx.amount * (currentRate?.rate || 26.5)).toFixed(2),
+        tx.fee,
+        tx.status,
+        tx.kyc_verified ? "Verified" : "Pending",
+        new Date(tx.created_at).toLocaleString()
+      ])
+    ].map(row => row.join(",")).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `transactions-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    toast.success("Transactions exported successfully");
+  };
+
+  const filteredTransactions = transactions.filter(tx => {
+    const matchesSearch = 
+      tx.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tx.profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tx.receiver_phone.includes(searchQuery);
+    const matchesFilter = filterStatus === "all" || tx.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   const updateExchangeRate = () => {
     const rate = parseFloat(newRate);
@@ -396,86 +452,197 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="transactions" className="space-y-4">
-            <Card>
+            <Card className="shadow-xl">
               <CardHeader>
-                <CardTitle>Transaction Management</CardTitle>
-                <CardDescription>Review and manage all platform transactions</CardDescription>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-2xl">Transaction Management</CardTitle>
+                    <CardDescription>Review and manage all platform transactions</CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={exportTransactions} className="gap-2">
+                      <Download className="h-4 w-4" />
+                      Export CSV
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col md:flex-row gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by sender, receiver, or phone..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <Select value={filterStatus} onValueChange={setFilterStatus}>
+                    <SelectTrigger className="w-full md:w-[180px]">
+                      <Filter className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="failed">Failed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
             </Card>
-            {transactions.length === 0 ? (
+            {filteredTransactions.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <p className="text-muted-foreground">No transactions yet</p>
                 </CardContent>
               </Card>
             ) : (
-              transactions.map((tx) => (
-                <Card key={tx.id} className="hover:shadow-md transition-shadow">
+              filteredTransactions.map((tx) => (
+                <Card key={tx.id} className="hover:shadow-lg transition-all border-l-4 border-l-primary/20 hover:border-l-primary">
                   <CardHeader>
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                      <div className="space-y-3 flex-1">
-                        <div className="flex items-start justify-between">
-                          <CardTitle className="text-lg">
-                            {tx.profiles?.full_name} → {tx.receiver_name}
-                          </CardTitle>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-bold ${
-                              tx.status === "completed"
-                                ? "bg-success/10 text-success"
-                                : tx.status === "pending"
-                                ? "bg-warning/10 text-warning"
-                                : "bg-destructive/10 text-destructive"
-                            }`}
-                          >
-                            {tx.status.toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-2 text-sm text-muted-foreground">
-                          <p><span className="font-medium">Amount:</span> ${tx.amount}</p>
-                          <p><span className="font-medium">Fee:</span> ${tx.fee}</p>
-                          <p><span className="font-medium">Receiver:</span> {tx.receiver_phone}</p>
-                          <p><span className="font-medium">Method:</span> {tx.payout_method || "Not specified"}</p>
-                          <p className="md:col-span-2"><span className="font-medium">Date:</span> {new Date(tx.created_at).toLocaleString()}</p>
-                        </div>
-                        {tx.proof_of_payment_url && (
-                          <a
-                            href={tx.proof_of_payment_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                          >
-                            📄 View Proof of Payment
-                          </a>
-                        )}
-                        {tx.admin_notes && (
-                          <div className="p-3 bg-muted rounded-lg">
-                            <p className="text-xs font-medium mb-1">Admin Notes:</p>
-                            <p className="text-sm text-muted-foreground italic">{tx.admin_notes}</p>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <CardTitle className="text-lg">
+                              {tx.profiles?.full_name} → {tx.receiver_name}
+                            </CardTitle>
+                            <Badge
+                              variant={tx.status === "completed" ? "default" : tx.status === "pending" ? "secondary" : "destructive"}
+                              className="uppercase"
+                            >
+                              {tx.status}
+                            </Badge>
+                            {tx.kyc_verified ? (
+                              <Badge variant="default" className="gap-1 bg-success/10 text-success hover:bg-success/20">
+                                <Shield className="h-3 w-3" />
+                                KYC Verified
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="gap-1 bg-warning/10 text-warning hover:bg-warning/20">
+                                <Clock className="h-3 w-3" />
+                                KYC Pending
+                              </Badge>
+                            )}
                           </div>
+                          <p className="text-sm text-muted-foreground">{tx.profiles?.email}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (USD)</p>
+                          <p className="text-2xl font-bold text-primary">${tx.amount.toFixed(2)}</p>
+                        </div>
+                        <div className="p-4 bg-gradient-to-br from-accent/5 to-accent/10 rounded-lg border border-accent/20">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (ZMW)</p>
+                          <p className="text-2xl font-bold text-accent">
+                            K {(tx.amount * (currentRate?.rate || 26.5)).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">Rate: {currentRate?.rate || 26.5}</p>
+                        </div>
+                        <div className="p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-lg border border-secondary/20">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Transaction Fee</p>
+                          <p className="text-2xl font-bold">${tx.fee.toFixed(2)}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-muted-foreground">Receiver Phone:</span>
+                          <span className="font-mono">{tx.receiver_phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-muted-foreground">Payout Method:</span>
+                          <Badge variant="outline">{tx.payout_method || "Not specified"}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2 md:col-span-2">
+                          <span className="font-medium text-muted-foreground">Transaction Date:</span>
+                          <span>{new Date(tx.created_at).toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {tx.proof_of_payment_url && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => window.open(tx.proof_of_payment_url, "_blank")}
+                          >
+                            <Eye className="h-4 w-4" />
+                            View Payment Proof
+                          </Button>
+                        )}
+                        {tx.kyc_document_url && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => window.open(tx.kyc_document_url, "_blank")}
+                          >
+                            <Eye className="h-4 w-4" />
+                            View KYC Document
+                          </Button>
                         )}
                       </div>
+
+                      {tx.admin_notes && (
+                        <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Admin Notes</p>
+                          <p className="text-sm italic">{tx.admin_notes}</p>
+                        </div>
+                      )}
+
                       {tx.status === "pending" && (
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => updateTransactionStatus(tx.id, "completed")}
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                            Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="gap-2"
-                            onClick={() => {
-                              const notes = prompt("Enter rejection reason:");
-                              if (notes) updateTransactionStatus(tx.id, "failed", notes);
-                            }}
-                          >
-                            <XCircle className="h-4 w-4" />
-                            Reject
-                          </Button>
+                        <div className="flex flex-col gap-3 pt-3 border-t border-border">
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              className="gap-2 flex-1"
+                              onClick={() => updateTransactionStatus(tx.id, "completed", "Transaction approved and completed")}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                              Approve Transaction
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="gap-2 flex-1"
+                              onClick={() => {
+                                const notes = prompt("Enter rejection reason:");
+                                if (notes) updateTransactionStatus(tx.id, "failed", notes);
+                              }}
+                            >
+                              <XCircle className="h-4 w-4" />
+                              Reject Transaction
+                            </Button>
+                          </div>
+                          {!tx.kyc_verified && (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-2 flex-1"
+                                onClick={() => updateKYCStatus(tx.id, true)}
+                              >
+                                <Shield className="h-4 w-4" />
+                                Verify KYC
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-2 flex-1 text-destructive hover:text-destructive"
+                                onClick={() => updateKYCStatus(tx.id, false)}
+                              >
+                                <XCircle className="h-4 w-4" />
+                                Reject KYC
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
