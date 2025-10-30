@@ -247,6 +247,9 @@ const Admin = () => {
     status: string,
     notes?: string
   ) => {
+    // Find the transaction to notify users
+    const transaction = transactions.find(tx => tx.id === transactionId);
+    
     // Update transaction status in mock data
     setTransactions(prev => 
       prev.map(tx => 
@@ -263,7 +266,20 @@ const Admin = () => {
       setStats(prev => ({ ...prev, pending, completed }));
     }, 100);
 
-    toast.success(`Transaction marked as ${status}`);
+    // Send notifications to both sender and receiver when payment is completed
+    if (status === "completed" && transaction) {
+      // Notify sender
+      toast.success(`Payment completed! ${transaction.profiles?.full_name} (sender) has been notified.`);
+      
+      // Notify receiver
+      toast.success(`${transaction.receiver_name} (receiver) has been notified of the payment.`);
+      
+      // In a real app, this would trigger email/SMS notifications
+      console.log(`Notification sent to sender: ${transaction.profiles?.email}`);
+      console.log(`Notification sent to receiver: ${transaction.receiver_phone}`);
+    } else {
+      toast.success(`Transaction marked as ${status}`);
+    }
   };
 
   const updateKYCStatus = (transactionId: string, verified: boolean) => {
