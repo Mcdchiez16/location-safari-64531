@@ -171,7 +171,12 @@ const Dashboard = () => {
               Send Money
             </Button>
             <Button 
-              onClick={() => window.scrollTo({ top: document.getElementById('transactions-section')?.offsetTop || 0, behavior: 'smooth' })} 
+              onClick={() => {
+                const element = document.getElementById('transactions-section');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }} 
               className="h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg rounded-2xl shadow-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-bold"
             >
               View Transactions

@@ -79,8 +79,6 @@ const Admin = () => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [selectedKyc, setSelectedKyc] = useState<UserProfile | null>(null);
   const [kycDialogOpen, setKycDialogOpen] = useState(false);
-  const [paymentReference, setPaymentReference] = useState("");
-  const [paymentProofUrl, setPaymentProofUrl] = useState("");
   const [manualTid, setManualTid] = useState("");
   const [senderName, setSenderName] = useState("");
   const [paymentRecipientName, setPaymentRecipientName] = useState("");
@@ -238,8 +236,6 @@ const Admin = () => {
       if (error) throw error;
 
       toast.success(`Transaction marked as ${status}. TID: ${tid}`);
-      setPaymentReference("");
-      setPaymentProofUrl("");
       setManualTid("");
       setSenderName("");
       setSelectedTransaction(null);
@@ -381,9 +377,9 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[hsl(220,15%,12%)]">
       {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-50">
+      <header className="bg-[hsl(220,15%,14%)] border-b border-white/10 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -391,14 +387,14 @@ const Admin = () => {
                 <span className="text-white font-bold">T</span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">TuraPay Admin</h1>
-                <p className="text-sm text-muted-foreground">Dashboard & Management</p>
+                <h1 className="text-2xl font-bold text-white">TuraPay Admin</h1>
+                <p className="text-sm text-white/60">Dashboard & Management</p>
               </div>
             </div>
             <Button 
               variant="outline" 
               onClick={() => navigate('/dashboard')} 
-              className="gap-2"
+              className="gap-2 border-white/20 text-white hover:bg-white/10"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
@@ -410,89 +406,89 @@ const Admin = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
-          <Card>
+          <Card className="bg-[hsl(220,15%,16%)] border-white/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-white/80">Total Transactions</CardTitle>
+              <TrendingUp className="h-4 w-4 text-blue-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-2xl font-bold text-white">{stats.total}</div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-[hsl(220,15%,16%)] border-white/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
-              <DollarSign className="h-4 w-4 text-yellow-500" />
+              <CardTitle className="text-sm font-medium text-white/80">Pending</CardTitle>
+              <DollarSign className="h-4 w-4 text-yellow-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-500">{stats.pending}</div>
+              <div className="text-2xl font-bold text-yellow-400">{stats.pending}</div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-[hsl(220,15%,16%)] border-white/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CardTitle className="text-sm font-medium text-white/80">Completed</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-500">{stats.completed}</div>
+              <div className="text-2xl font-bold text-green-400">{stats.completed}</div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-[hsl(220,15%,16%)] border-white/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-white/80">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-indigo-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
+              <div className="text-2xl font-bold text-white">{stats.totalUsers}</div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-[hsl(220,15%,16%)] border-white/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending KYC</CardTitle>
-              <FileText className="h-4 w-4 text-orange-500" />
+              <CardTitle className="text-sm font-medium text-white/80">Pending KYC</CardTitle>
+              <FileText className="h-4 w-4 text-orange-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-500">{stats.pendingKyc}</div>
+              <div className="text-2xl font-bold text-orange-400">{stats.pendingKyc}</div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-[hsl(220,15%,16%)] border-white/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Revenue (Fees)</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-500" />
+              <CardTitle className="text-sm font-medium text-white/80">Revenue (Fees)</CardTitle>
+              <DollarSign className="h-4 w-4 text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.revenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-white">${stats.revenue.toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Tabs */}
         <Tabs defaultValue="pending" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
-            <TabsTrigger value="pending" className="gap-2">
-              <Badge className="bg-yellow-500">{stats.pending}</Badge>
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto bg-[hsl(220,15%,16%)] border border-white/10">
+            <TabsTrigger value="pending" className="gap-2 data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">
+              <Badge className="bg-yellow-500/20 text-yellow-400 border-0">{stats.pending}</Badge>
               Pending
             </TabsTrigger>
-            <TabsTrigger value="all">All Transactions</TabsTrigger>
-            <TabsTrigger value="kyc">KYC Verification</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="all" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">All Transactions</TabsTrigger>
+            <TabsTrigger value="kyc" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">KYC Verification</TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">Users</TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">Settings</TabsTrigger>
           </TabsList>
 
           {/* Pending Transactions Tab */}
           <TabsContent value="pending" className="space-y-6">
-            <Card className="border-yellow-500/50 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950 dark:to-orange-950">
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-yellow-600" />
+            <Card className="border-yellow-500/30 shadow-lg bg-[hsl(220,15%,16%)] border-white/10">
+              <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-white/10">
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <DollarSign className="h-5 w-5 text-yellow-400" />
                   Pending Transactions
                 </CardTitle>
-                <CardDescription>Transactions awaiting approval and payment</CardDescription>
+                <CardDescription className="text-white/60">Transactions awaiting approval and payment</CardDescription>
                 
                 {/* Search */}
                 <div className="mt-4">
@@ -674,8 +670,8 @@ const Admin = () => {
                                 onClick={() => setSelectedTransaction(transaction)}
                                 className="bg-green-500 hover:bg-green-600"
                               >
-                                <CheckCircle className="h-4 w-4 mr-2" />
-                                Mark as Paid
+                               <CheckCircle className="h-4 w-4 mr-2" />
+                                Mark as Deposited
                               </Button>
                             )}
                             {transaction.status !== "pending" && transaction.admin_payment_proof_url && (
@@ -932,49 +928,14 @@ const Admin = () => {
                 />
                 <p className="text-xs text-muted-foreground mt-1">This TID will be sent to the sender and receiver</p>
               </div>
-              <div>
-                <Label htmlFor="payment_reference">Payment Reference</Label>
-                <Input
-                  id="payment_reference"
-                  placeholder="Enter payment reference number (optional)"
-                  value={paymentReference}
-                  onChange={(e) => setPaymentReference(e.target.value)}
-                  className="mt-2"
-                />
-              </div>
-              <div>
-                <Label htmlFor="payment_proof">Payment Proof URL (Optional)</Label>
-                <Input
-                  id="payment_proof"
-                  placeholder="URL to payment proof"
-                  value={paymentProofUrl}
-                  onChange={(e) => setPaymentProofUrl(e.target.value)}
-                  className="mt-2"
-                />
-              </div>
               <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={() => updateTransactionStatus(
-                    selectedTransaction.id,
-                    "paid",
-                    undefined,
-                    paymentReference,
-                    paymentProofUrl,
-                    manualTid,
-                    senderName
-                  )}
-                  className="flex-1 bg-green-500 hover:bg-green-600 h-12 text-base"
-                >
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Mark as Paid
-                </Button>
                 <Button
                   onClick={() => updateTransactionStatus(
                     selectedTransaction.id,
                     "deposited",
                     undefined,
-                    paymentReference,
-                    paymentProofUrl,
+                    "",
+                    "",
                     manualTid,
                     senderName
                   )}
@@ -987,8 +948,6 @@ const Admin = () => {
                   variant="outline"
                   onClick={() => {
                     setSelectedTransaction(null);
-                    setPaymentReference("");
-                    setPaymentProofUrl("");
                     setManualTid("");
                     setSenderName("");
                   }}

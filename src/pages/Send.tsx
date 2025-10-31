@@ -519,7 +519,7 @@ const Send = () => {
                       <Input
                         id="transactionId"
                         type="text"
-                        placeholder="e.g., ABC123XYZ"
+                        placeholder="e.g., CO250822.1552.F38050 or F38050"
                         value={transactionId}
                         onChange={(e) => setTransactionId(e.target.value)}
                         className="h-12 text-base"
