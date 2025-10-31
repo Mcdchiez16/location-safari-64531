@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, History, Download } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, History, Download } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -41,6 +41,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'received' | 'sent'>('received');
   const [totalSent, setTotalSent] = useState(0);
+  const [totalReceived, setTotalReceived] = useState(0);
+  const [userCurrency, setUserCurrency] = useState('');
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
@@ -80,17 +82,21 @@ const Dashboard = () => {
   };
 
   const loadTransactions = async (userId: string) => {
-    // Get current user's phone
+    // Get current user's phone and country
     const { data: profileData } = await supabase
       .from("profiles")
-      .select("phone_number")
+      .select("phone_number, country")
       .eq("id", userId)
       .maybeSingle();
+
+    // Set user currency based on country
+    const currency = profileData?.country === 'Zambia' ? 'ZMW' : 'USD';
+    setUserCurrency(currency);
 
     // Load only pending transactions (both sent and received)
     const { data: received, error: receivedError } = await supabase
       .from("transactions")
-      .select("*, profiles(full_name, phone_number)")
+      .select("*, profiles!transactions_sender_id_fkey(full_name, phone_number)")
       .eq("receiver_phone", profileData?.phone_number || '')
       .eq("status", "pending")
       .order("created_at", { ascending: false })
@@ -115,15 +121,25 @@ const Dashboard = () => {
     setTransactions(allPending);
     setMode(allPending.length > 0 && allPending[0].sender_id === userId ? 'sent' : 'received');
 
-    // Calculate total sent amount
+    // Calculate total sent amount in user's currency
     const { data: allSent } = await supabase
       .from("transactions")
-      .select("amount, status")
+      .select("amount, currency")
       .eq("sender_id", userId)
       .in("status", ["paid", "deposited", "completed"]);
 
-    const total = allSent?.reduce((sum, tx) => sum + tx.amount, 0) || 0;
-    setTotalSent(total);
+    const sentTotal = allSent?.filter(tx => tx.currency === currency).reduce((sum, tx) => sum + tx.amount, 0) || 0;
+    setTotalSent(sentTotal);
+
+    // Calculate total received amount in user's currency
+    const { data: allReceived } = await supabase
+      .from("transactions")
+      .select("amount, currency")
+      .eq("receiver_phone", profileData?.phone_number || '')
+      .in("status", ["paid", "deposited", "completed"]);
+
+    const receivedTotal = allReceived?.filter(tx => tx.currency === currency).reduce((sum, tx) => sum + tx.amount, 0) || 0;
+    setTotalReceived(receivedTotal);
   };
 
   const getStatusColor = (status: string) => {
@@ -221,8 +237,8 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-primary-foreground">Received Money</h1>
-            <p className="text-primary-foreground/80 text-sm">View money received from senders</p>
+            <h1 className="text-2xl font-bold text-primary-foreground">Dashboard</h1>
+            <p className="text-primary-foreground/80 text-sm">Track your payments and transfers</p>
           </div>
         </div>
 
@@ -234,9 +250,36 @@ const Dashboard = () => {
           <p className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
             {isReceiver 
               ? `${profile?.country === 'Zambia' ? 'ZMW' : 'USD'} ${Number(profile?.balance || 0).toFixed(2)}`
-              : `USD ${totalSent.toFixed(2)}`
+              : `${userCurrency} ${totalSent.toFixed(2)}`
             }
           </p>
+          
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 p-3 md:p-4 rounded-xl border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 bg-blue-500 rounded-lg">
+                  <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4 text-white" />
+                </div>
+                <p className="text-xs md:text-sm font-medium text-blue-900 dark:text-blue-100">Total Sent</p>
+              </div>
+              <p className="text-lg md:text-2xl font-bold text-blue-900 dark:text-blue-100">
+                {userCurrency} {totalSent.toFixed(2)}
+              </p>
+            </div>
+            
+            <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 p-3 md:p-4 rounded-xl border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 bg-green-500 rounded-lg">
+                  <ArrowDownRight className="h-3 w-3 md:h-4 md:w-4 text-white" />
+                </div>
+                <p className="text-xs md:text-sm font-medium text-green-900 dark:text-green-100">Total Received</p>
+              </div>
+              <p className="text-lg md:text-2xl font-bold text-green-900 dark:text-green-100">
+                {userCurrency} {totalReceived.toFixed(2)}
+              </p>
+            </div>
+          </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             <Button 
@@ -249,7 +292,7 @@ const Dashboard = () => {
               onClick={() => navigate("/transactions")} 
               className="h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg rounded-2xl shadow-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-bold"
             >
-              View All Transactions
+              Payment History
             </Button>
           </div>
         </div>
