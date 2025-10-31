@@ -115,8 +115,12 @@ const Dashboard = () => {
     if (sentError) console.error("Error loading sent:", sentError);
     if (receivedError) console.error("Error loading received:", receivedError);
 
-    // Combine and sort by date, showing only pending
-    const allPending = [...(sent || []), ...(received || [])]
+    // Combine and deduplicate by transaction ID, then sort by date
+    const combinedTransactions = [...(sent || []), ...(received || [])];
+    const uniqueTransactions = Array.from(
+      new Map(combinedTransactions.map(tx => [tx.id, tx])).values()
+    );
+    const allPending = uniqueTransactions
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 10);
 
