@@ -248,15 +248,16 @@ const Dashboard = () => {
 
         {/* Balance Card */}
         <div className="bg-primary-foreground rounded-3xl p-6 md:p-8 mb-6 shadow-xl">
-          <p className="text-sm md:text-base text-muted-foreground mb-2">
-            {isReceiver ? 'Zambian Kwacha Balance' : 'Total Amount Sent'}
-          </p>
-          <p className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
-            {isReceiver 
-              ? `${profile?.country === 'Zambia' ? 'ZMW' : 'USD'} ${Number(profile?.balance || 0).toFixed(2)}`
-              : `${userCurrency} ${totalSent.toFixed(2)}`
-            }
-          </p>
+          {isReceiver && (
+            <>
+              <p className="text-sm md:text-base text-muted-foreground mb-2">
+                Zambian Kwacha Balance
+              </p>
+              <p className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
+                {`${profile?.country === 'Zambia' ? 'ZMW' : 'USD'} ${Number(profile?.balance || 0).toFixed(2)}`}
+              </p>
+            </>
+          )}
           
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">

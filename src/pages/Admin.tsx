@@ -218,9 +218,36 @@ const Admin = () => {
     reference?: string,
     proofUrl?: string,
     tid?: string,
-    sender?: string
+    sender?: string,
+    rejectionReason?: string
   ) => {
     try {
+      if (status === "rejected") {
+        if (!rejectionReason || !rejectionReason.trim()) {
+          toast.error("Please enter a rejection reason");
+          return;
+        }
+        
+        const updateData: any = { 
+          status,
+          rejection_reason: rejectionReason
+        };
+        if (notes) updateData.admin_notes = notes;
+
+        const { error } = await supabase
+          .from("transactions")
+          .update(updateData)
+          .eq("id", transactionId);
+
+        if (error) throw error;
+
+        toast.success("Payment rejected successfully");
+        setRejectionReason("");
+        setSelectedTransaction(null);
+        loadData();
+        return;
+      }
+
       if (!tid || !tid.trim()) {
         toast.error("Please enter a TID number");
         return;
@@ -941,6 +968,17 @@ const Admin = () => {
                 />
                 <p className="text-xs text-muted-foreground mt-1">This TID will be sent to the sender and receiver</p>
               </div>
+              <div>
+                <Label htmlFor="rejection_reason" className="text-base font-semibold">Rejection Reason (Optional)</Label>
+                <Textarea
+                  id="rejection_reason"
+                  placeholder="Enter reason for rejection if rejecting this payment..."
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  className="mt-2 min-h-[80px]"
+                />
+                <p className="text-xs text-muted-foreground mt-1">This will be visible to the sender</p>
+              </div>
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={() => updateTransactionStatus(
@@ -958,11 +996,29 @@ const Admin = () => {
                   Mark as Deposited
                 </Button>
                 <Button
+                  onClick={() => updateTransactionStatus(
+                    selectedTransaction.id,
+                    "rejected",
+                    undefined,
+                    "",
+                    "",
+                    "",
+                    "",
+                    rejectionReason
+                  )}
+                  variant="destructive"
+                  className="flex-1 h-12 text-base"
+                >
+                  <XCircle className="h-5 w-5 mr-2" />
+                  Reject Payment
+                </Button>
+                <Button
                   variant="outline"
                   onClick={() => {
                     setSelectedTransaction(null);
                     setManualTid("");
                     setSenderName("");
+                    setRejectionReason("");
                   }}
                   className="h-12"
                 >
