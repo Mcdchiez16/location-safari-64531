@@ -257,8 +257,16 @@ const Send = () => {
 
     const transferFee = calculateFee(parseFloat(amount));
 
+    // Fetch sender name from current user's profile
+    const { data: senderProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .single();
+
     const { error, data } = await supabase.from("transactions").insert({
       sender_id: userId,
+      sender_name: senderProfile?.full_name || "",
       receiver_name: receiverProfile.full_name,
       receiver_phone: receiverProfile.phone_number,
       receiver_country: "Zambia",

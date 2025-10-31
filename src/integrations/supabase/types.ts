@@ -197,6 +197,7 @@ export type Database = {
           receiver_phone: string
           rejection_reason: string | null
           sender_id: string
+          sender_name: string | null
           sender_number: string | null
           status: string | null
           tid: string | null
@@ -222,6 +223,7 @@ export type Database = {
           receiver_phone: string
           rejection_reason?: string | null
           sender_id: string
+          sender_name?: string | null
           sender_number?: string | null
           status?: string | null
           tid?: string | null
@@ -247,6 +249,7 @@ export type Database = {
           receiver_phone?: string
           rejection_reason?: string | null
           sender_id?: string
+          sender_name?: string | null
           sender_number?: string | null
           status?: string | null
           tid?: string | null

@@ -22,6 +22,7 @@ interface Profile {
 interface Transaction {
   id: string;
   sender_id: string;
+  sender_name?: string;
   receiver_name: string;
   receiver_phone: string;
   amount: number;
@@ -97,10 +98,7 @@ const Dashboard = () => {
     // Load only pending transactions (both sent and received)
     const { data: received, error: receivedError } = await supabase
       .from("transactions")
-      .select(`
-        *,
-        sender_profile:profiles!sender_id(full_name, phone_number)
-      `)
+      .select("*")
       .eq("receiver_phone", profileData?.phone_number || '')
       .eq("status", "pending")
       .order("created_at", { ascending: false })
@@ -193,7 +191,7 @@ const Dashboard = () => {
     const tableData = transactions.map((tx) => {
       const isSender = tx.sender_id === session?.user.id;
       const type = isSender ? 'Sent' : 'Received';
-      const name = isSender ? tx.receiver_name : (tx.sender_profile?.full_name || 'Unknown');
+      const name = isSender ? tx.receiver_name : (tx.sender_name || 'Unknown');
       const phone = isSender ? tx.receiver_phone : (tx.sender_profile?.phone_number || '');
       
       return [
@@ -348,7 +346,7 @@ const Dashboard = () => {
                   >
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-xs md:text-base text-foreground truncate">
-                        {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.sender_profile?.full_name || 'Unknown'}`}
+                        {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.sender_name || 'Unknown'}`}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
