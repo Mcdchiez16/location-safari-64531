@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ArrowDownRight, History, Download } from "lucide-react";
+import { History, Download } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -43,8 +43,6 @@ const Dashboard = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'received' | 'sent'>('received');
-  const [totalSent, setTotalSent] = useState(0);
-  const [totalReceived, setTotalReceived] = useState(0);
   const [userCurrency, setUserCurrency] = useState('');
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -131,26 +129,6 @@ const Dashboard = () => {
 
     setTransactions(allPending);
     setMode(allPending.length > 0 && allPending[0].sender_id === userId ? 'sent' : 'received');
-
-    // Calculate total sent amount in user's currency
-    const { data: allSent } = await supabase
-      .from("transactions")
-      .select("amount, currency")
-      .eq("sender_id", userId)
-      .in("status", ["paid", "deposited", "completed"]);
-
-    const sentTotal = allSent?.filter(tx => tx.currency === currency).reduce((sum, tx) => sum + tx.amount, 0) || 0;
-    setTotalSent(sentTotal);
-
-    // Calculate total received amount in user's currency
-    const { data: allReceived } = await supabase
-      .from("transactions")
-      .select("amount, currency")
-      .eq("receiver_phone", profileData?.phone_number || '')
-      .in("status", ["paid", "deposited", "completed"]);
-
-    const receivedTotal = allReceived?.filter(tx => tx.currency === currency).reduce((sum, tx) => sum + tx.amount, 0) || 0;
-    setTotalReceived(receivedTotal);
   };
 
   const getStatusColor = (status: string) => {
@@ -269,33 +247,6 @@ const Dashboard = () => {
             </>
           )}
           
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 p-3 md:p-4 rounded-xl border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 bg-blue-500 rounded-lg">
-                  <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4 text-white" />
-                </div>
-                <p className="text-xs md:text-sm font-medium text-blue-900 dark:text-blue-100">Total Sent</p>
-              </div>
-              <p className="text-lg md:text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {userCurrency} {totalSent.toFixed(2)}
-              </p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 p-3 md:p-4 rounded-xl border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="p-1.5 bg-green-500 rounded-lg">
-                  <ArrowDownRight className="h-3 w-3 md:h-4 md:w-4 text-white" />
-                </div>
-                <p className="text-xs md:text-sm font-medium text-green-900 dark:text-green-100">Total Received</p>
-              </div>
-              <p className="text-lg md:text-2xl font-bold text-green-900 dark:text-green-100">
-                {userCurrency} {totalReceived.toFixed(2)}
-              </p>
-            </div>
-          </div>
-          
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             <Button 
               onClick={() => navigate("/send")} 
@@ -370,7 +321,7 @@ const Dashboard = () => {
                           </p>
                         )}
                       </div>
-                      {transaction.rejection_reason && (
+                      {transaction.rejection_reason && isSender && (
                         <div className="mt-2 p-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg">
                           <p className="text-xs font-semibold text-red-800 dark:text-red-400 mb-1">Rejection Reason:</p>
                           <p className="text-xs text-red-700 dark:text-red-300">{transaction.rejection_reason}</p>
