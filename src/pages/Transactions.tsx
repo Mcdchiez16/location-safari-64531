@@ -14,6 +14,7 @@ import autoTable from "jspdf-autotable";
 interface Transaction {
   id: string;
   sender_id: string;
+  sender_name?: string;
   receiver_name: string;
   receiver_phone: string;
   amount: number;
@@ -60,18 +61,46 @@ const Transactions = () => {
       .eq("id", userId)
       .maybeSingle();
 
-    // Load all transactions (both sent and received)
+    // Load sent transactions with receiver info
     const { data: sent, error: sentError } = await supabase
       .from("transactions")
-      .select("*, profiles(full_name, phone_number)")
+      .select("*")
       .eq("sender_id", userId)
       .order("created_at", { ascending: false });
 
+    // Load received transactions
     const { data: received, error: receivedError } = await supabase
       .from("transactions")
-      .select("*, profiles(full_name, phone_number)")
+      .select("*")
       .eq("receiver_phone", profileData?.phone_number || '')
       .order("created_at", { ascending: false });
+
+    // For each transaction, fetch sender name
+    if (sent) {
+      for (const tx of sent) {
+        const { data: senderProfile } = await supabase
+          .from("profiles")
+          .select("full_name, phone_number")
+          .eq("id", tx.sender_id)
+          .maybeSingle();
+        if (senderProfile) {
+          (tx as any).sender_profile = senderProfile;
+        }
+      }
+    }
+
+    if (received) {
+      for (const tx of received) {
+        const { data: senderProfile } = await supabase
+          .from("profiles")
+          .select("full_name, phone_number")
+          .eq("id", tx.sender_id)
+          .maybeSingle();
+        if (senderProfile) {
+          (tx as any).sender_profile = senderProfile;
+        }
+      }
+    }
 
     if (sentError) console.error("Error loading sent:", sentError);
     if (receivedError) console.error("Error loading received:", receivedError);
@@ -235,14 +264,20 @@ const Transactions = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <p className="font-semibold text-sm md:text-base text-gray-900 truncate">
-                            {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.profiles?.full_name || 'Unknown'}`}
+                            {isSender 
+                              ? `To: ${transaction.receiver_name}` 
+                              : `From: ${(transaction as any).sender_profile?.full_name || transaction.sender_name || 'Unknown'}`
+                            }
                           </p>
                           <Badge className={`${getStatusColor(transaction.status)} text-white border-0 text-xs`}>
                             {getStatusLabel(transaction.status)}
                           </Badge>
                         </div>
                         <p className="text-xs md:text-sm text-gray-600 truncate">
-                          {isSender ? transaction.receiver_phone : transaction.profiles?.phone_number}
+                          {isSender 
+                            ? transaction.receiver_phone 
+                            : ((transaction as any).sender_profile?.phone_number || 'N/A')
+                          }
                         </p>
                         {transaction.tid && (
                           <p className="text-xs font-semibold text-blue-600 mt-1 md:mt-2">
