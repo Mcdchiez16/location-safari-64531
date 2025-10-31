@@ -442,16 +442,6 @@ const Send = () => {
                         <span className="text-muted-foreground">Exchange rate</span>
                         <span className="font-medium text-foreground">1 USD = {exchangeRate} ZMW</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Transfer fee ({transferFeePercentage}%)</span>
-                        <span className="font-semibold text-foreground">${calculateFee(parseFloat(amount)).toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Total to pay</span>
-                        <span className="font-semibold text-foreground">
-                          ${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}
-                        </span>
-                      </div>
                       <div className="border-t border-primary/20 pt-3 mt-3">
                         <div className="flex justify-between items-center">
                           <span className="text-foreground font-medium">Recipient gets</span>

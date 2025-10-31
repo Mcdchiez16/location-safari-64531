@@ -31,6 +31,7 @@ interface Transaction {
   status: string;
   created_at: string;
   tid?: string;
+  rejection_reason?: string;
   profiles?: { full_name: string; phone_number: string };
   sender_profile?: { full_name: string; phone_number: string };
 }
@@ -95,12 +96,15 @@ const Dashboard = () => {
     const currency = profileData?.country === 'Zambia' ? 'ZMW' : 'USD';
     setUserCurrency(currency);
 
-    // Load pending and rejected transactions (both sent and received)
+    // Load pending and rejected transactions from last 24 hours (both sent and received)
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    
     const { data: received, error: receivedError } = await supabase
       .from("transactions")
       .select("*")
       .eq("receiver_phone", profileData?.phone_number || '')
       .in("status", ["pending", "rejected"])
+      .gte("created_at", twentyFourHoursAgo)
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -109,6 +113,7 @@ const Dashboard = () => {
       .select("*")
       .eq("sender_id", userId)
       .in("status", ["pending", "rejected"])
+      .gte("created_at", twentyFourHoursAgo)
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -365,6 +370,12 @@ const Dashboard = () => {
                           </p>
                         )}
                       </div>
+                      {transaction.rejection_reason && (
+                        <div className="mt-2 p-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg">
+                          <p className="text-xs font-semibold text-red-800 dark:text-red-400 mb-1">Rejection Reason:</p>
+                          <p className="text-xs text-red-700 dark:text-red-300">{transaction.rejection_reason}</p>
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground mt-1">
                         {new Date(transaction.created_at).toLocaleDateString()}
                       </p>

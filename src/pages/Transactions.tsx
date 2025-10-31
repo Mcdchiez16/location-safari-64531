@@ -60,26 +60,28 @@ const Transactions = () => {
       .eq("id", userId)
       .maybeSingle();
 
-    // Load only completed transactions (both sent and received)
+    // Load all transactions (both sent and received)
     const { data: sent, error: sentError } = await supabase
       .from("transactions")
       .select("*, profiles(full_name, phone_number)")
       .eq("sender_id", userId)
-      .in("status", ["paid", "deposited", "completed"])
       .order("created_at", { ascending: false });
 
     const { data: received, error: receivedError } = await supabase
       .from("transactions")
       .select("*, profiles(full_name, phone_number)")
       .eq("receiver_phone", profileData?.phone_number || '')
-      .in("status", ["paid", "deposited", "completed"])
       .order("created_at", { ascending: false });
 
     if (sentError) console.error("Error loading sent:", sentError);
     if (receivedError) console.error("Error loading received:", receivedError);
 
-    // Combine and sort by date, showing only completed
-    const allTransactions = [...(sent || []), ...(received || [])]
+    // Combine, deduplicate, and sort by date
+    const combinedTransactions = [...(sent || []), ...(received || [])];
+    const uniqueTransactions = Array.from(
+      new Map(combinedTransactions.map(tx => [tx.id, tx])).values()
+    );
+    const allTransactions = uniqueTransactions
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     setTransactions(allTransactions);
@@ -202,8 +204,8 @@ const Transactions = () => {
           <CardHeader className="bg-gray-50 border-b border-gray-200 p-4 md:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex-1">
-                <CardTitle className="text-lg md:text-2xl font-bold text-gray-900">Completed Transactions</CardTitle>
-                <p className="text-xs md:text-sm text-gray-600 mt-1">View all your completed transactions</p>
+                <CardTitle className="text-lg md:text-2xl font-bold text-gray-900">Payment History</CardTitle>
+                <p className="text-xs md:text-sm text-gray-600 mt-1">View all your transactions</p>
               </div>
               <Button
                 onClick={handleDownloadStatement}
@@ -218,8 +220,8 @@ const Transactions = () => {
           <CardContent className="p-3 md:p-6">
             {transactions.length === 0 ? (
               <div className="text-center py-8 md:py-12">
-                <p className="text-gray-600 text-base md:text-lg">No completed transactions</p>
-                <p className="text-gray-500 text-xs md:text-sm mt-2">Completed transactions will appear here</p>
+                <p className="text-gray-600 text-base md:text-lg">No transactions</p>
+                <p className="text-gray-500 text-xs md:text-sm mt-2">Your transactions will appear here</p>
               </div>
             ) : (
               <div className="space-y-2 md:space-y-3">
