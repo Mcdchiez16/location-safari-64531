@@ -163,18 +163,12 @@ const Dashboard = () => {
             {profile?.country === 'Zambia' ? 'ZMW' : 'USD'} {Number(profile?.balance || 0).toFixed(2)}
           </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 gap-3 md:gap-4">
             <Button 
               onClick={() => navigate("/send")} 
               className="h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg rounded-2xl shadow-xl bg-gradient-to-r from-primary to-accent hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-bold"
             >
               Send Money
-            </Button>
-            <Button 
-              onClick={() => navigate("/payment-link")} 
-              className="h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg rounded-2xl shadow-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-bold"
-            >
-              Receive Money
             </Button>
           </div>
         </div>

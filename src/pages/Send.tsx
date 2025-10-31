@@ -31,6 +31,7 @@ const Send = () => {
   const [senderName, setSenderName] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
   const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
+  const [paymentRecipientName, setPaymentRecipientName] = useState("TuraPay");
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
   const [senderNumber, setSenderNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
@@ -51,8 +52,9 @@ const Send = () => {
       handleLookup(linkId);
     }
 
-    // Fetch payment number and transfer fee from settings
+    // Fetch payment number, recipient name, and transfer fee from settings
     fetchPaymentNumber();
+    fetchPaymentRecipientName();
     fetchTransferFee();
 
     // Fetch exchange rate
@@ -74,6 +76,22 @@ const Send = () => {
       }
     } catch (error) {
       console.error('Error fetching payment number:', error);
+    }
+  };
+
+  const fetchPaymentRecipientName = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "payment_recipient_name")
+        .maybeSingle();
+      
+      if (!error && data) {
+        setPaymentRecipientName(data.value);
+      }
+    } catch (error) {
+      console.error('Error fetching payment recipient name:', error);
     }
   };
 
@@ -317,13 +335,13 @@ const Send = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="lookup" className="text-sm font-medium text-foreground">
-                  Phone Number or Payment Link
+                  Phone Number
                 </Label>
                 <div className="flex gap-3 mt-2">
                   <Input
                     id="lookup"
                     type="text"
-                    placeholder="+260... or payment link ID"
+                    placeholder="+260..."
                     value={lookupValue}
                     onChange={(e) => setLookupValue(e.target.value)}
                     className="h-12"
@@ -463,6 +481,7 @@ const Send = () => {
                     <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
                       <p className="text-xl sm:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
+                      <p className="text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
                     </div>
                   </div>

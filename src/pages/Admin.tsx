@@ -83,6 +83,7 @@ const Admin = () => {
   const [paymentProofUrl, setPaymentProofUrl] = useState("");
   const [manualTid, setManualTid] = useState("");
   const [senderName, setSenderName] = useState("");
+  const [paymentRecipientName, setPaymentRecipientName] = useState("");
 
   useEffect(() => {
     checkAdminAndLoadData();
@@ -183,6 +184,12 @@ const Admin = () => {
       const paymentNumberSetting = settingsData?.find(s => s.key === "payment_number");
       if (paymentNumberSetting) {
         setPaymentNumber(paymentNumberSetting.value);
+      }
+
+      // Get payment recipient name
+      const paymentRecipientNameSetting = settingsData?.find(s => s.key === "payment_recipient_name");
+      if (paymentRecipientNameSetting) {
+        setPaymentRecipientName(paymentRecipientNameSetting.value);
       }
 
     } catch (error) {
@@ -309,6 +316,28 @@ const Admin = () => {
     } catch (error) {
       console.error("Error updating payment number:", error);
       toast.error("Failed to update payment number");
+    }
+  };
+
+  const updatePaymentRecipientName = async () => {
+    if (!paymentRecipientName.trim()) {
+      toast.error("Please enter a valid recipient name");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .update({ value: paymentRecipientName })
+        .eq("key", "payment_recipient_name");
+
+      if (error) throw error;
+
+      toast.success("Payment recipient name updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating payment recipient name:", error);
+      toast.error("Failed to update payment recipient name");
     }
   };
 
@@ -817,6 +846,25 @@ const Admin = () => {
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
                     This number will be shown to senders for payment
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="payment_recipient_name">Payment Recipient Name</Label>
+                  <div className="flex gap-3 mt-2">
+                    <Input
+                      id="payment_recipient_name"
+                      type="text"
+                      value={paymentRecipientName}
+                      onChange={(e) => setPaymentRecipientName(e.target.value)}
+                      placeholder="e.g., John Doe"
+                    />
+                    <Button onClick={updatePaymentRecipientName} className="min-w-[100px]">
+                      Update
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This name will be displayed to senders as the payment recipient
                   </p>
                 </div>
               </CardContent>
