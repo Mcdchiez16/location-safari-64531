@@ -74,17 +74,17 @@ const Index = () => {
       </div>
 
       {/* Header */}
-      <header className="relative bg-card/98 backdrop-blur-xl border-b border-border sticky top-0 z-50 shadow-lg">
+      <header className="relative bg-card backdrop-blur-xl border-b border-border sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">TuraPay</span>
+              <span className="text-2xl md:text-3xl font-bold text-foreground">TuraPay</span>
             </div>
             <div className="flex items-center gap-3 md:gap-4">
               {exchangeRate && (
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 md:py-2 bg-primary/10 rounded-full border border-primary/20">
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                  <span className="text-xs md:text-sm font-semibold text-primary">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
+                <div className="hidden sm:flex items-center gap-2 px-3 md:px-4 py-2 bg-primary rounded-full shadow-md">
+                  <TrendingUp className="h-4 w-4 text-white" />
+                  <span className="text-xs md:text-sm font-bold text-white">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
                 </div>
               )}
               <Button 
