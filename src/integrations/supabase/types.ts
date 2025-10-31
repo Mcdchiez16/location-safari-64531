@@ -157,13 +157,16 @@ export type Database = {
       transactions: {
         Row: {
           admin_notes: string | null
+          admin_payment_proof_url: string | null
           amount: number
           created_at: string | null
           currency: string
           exchange_rate: number | null
           fee: number | null
           id: string
+          payment_date: string | null
           payment_proof_url: string | null
+          payment_reference: string | null
           payout_method: string | null
           receiver_country: string
           receiver_name: string
@@ -175,13 +178,16 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          admin_payment_proof_url?: string | null
           amount: number
           created_at?: string | null
           currency: string
           exchange_rate?: number | null
           fee?: number | null
           id?: string
+          payment_date?: string | null
           payment_proof_url?: string | null
+          payment_reference?: string | null
           payout_method?: string | null
           receiver_country: string
           receiver_name: string
@@ -193,13 +199,16 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          admin_payment_proof_url?: string | null
           amount?: number
           created_at?: string | null
           currency?: string
           exchange_rate?: number | null
           fee?: number | null
           id?: string
+          payment_date?: string | null
           payment_proof_url?: string | null
+          payment_reference?: string | null
           payout_method?: string | null
           receiver_country?: string
           receiver_name?: string
@@ -249,6 +258,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      normalize_phone_number: { Args: { phone: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user"
