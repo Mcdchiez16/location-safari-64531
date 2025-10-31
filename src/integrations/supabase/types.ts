@@ -14,16 +14,244 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      exchange_rates: {
+        Row: {
+          from_currency: string
+          id: string
+          rate: number
+          to_currency: string
+          updated_at: string | null
+        }
+        Insert: {
+          from_currency: string
+          id?: string
+          rate: number
+          to_currency: string
+          updated_at?: string | null
+        }
+        Update: {
+          from_currency?: string
+          id?: string
+          rate?: number
+          to_currency?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          account_type: string | null
+          balance: number
+          country: string
+          created_at: string | null
+          full_name: string
+          id: string
+          id_document_url: string | null
+          id_number: string | null
+          id_type: string | null
+          payment_link_id: string | null
+          phone_number: string
+          selfie_url: string | null
+          updated_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          account_type?: string | null
+          balance?: number
+          country: string
+          created_at?: string | null
+          full_name: string
+          id: string
+          id_document_url?: string | null
+          id_number?: string | null
+          id_type?: string | null
+          payment_link_id?: string | null
+          phone_number: string
+          selfie_url?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          account_type?: string | null
+          balance?: number
+          country?: string
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          id_document_url?: string | null
+          id_number?: string | null
+          id_type?: string | null
+          payment_link_id?: string | null
+          phone_number?: string
+          selfie_url?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      recipients: {
+        Row: {
+          account_number: string | null
+          bank_name: string | null
+          country: string
+          created_at: string | null
+          id: string
+          name: string
+          phone_number: string
+          user_id: string
+        }
+        Insert: {
+          account_number?: string | null
+          bank_name?: string | null
+          country: string
+          created_at?: string | null
+          id?: string
+          name: string
+          phone_number: string
+          user_id: string
+        }
+        Update: {
+          account_number?: string | null
+          bank_name?: string | null
+          country?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          phone_number?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipients_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string | null
+          currency: string
+          exchange_rate: number | null
+          fee: number | null
+          id: string
+          payment_proof_url: string | null
+          payout_method: string | null
+          receiver_country: string
+          receiver_name: string
+          receiver_phone: string
+          sender_id: string
+          status: string | null
+          total_amount: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string | null
+          currency: string
+          exchange_rate?: number | null
+          fee?: number | null
+          id?: string
+          payment_proof_url?: string | null
+          payout_method?: string | null
+          receiver_country: string
+          receiver_name: string
+          receiver_phone: string
+          sender_id: string
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string | null
+          currency?: string
+          exchange_rate?: number | null
+          fee?: number | null
+          id?: string
+          payment_proof_url?: string | null
+          payout_method?: string | null
+          receiver_country?: string
+          receiver_name?: string
+          receiver_phone?: string
+          sender_id?: string
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +378,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
