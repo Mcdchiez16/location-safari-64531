@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -15,6 +15,7 @@ interface ReceiverProfile {
   full_name: string;
   phone_number: string;
   payment_link_id: string;
+  verified: boolean;
 }
 
 const Send = () => {
@@ -150,7 +151,7 @@ const Send = () => {
       if (!/\d{3,}/.test(searchValue)) {
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, full_name, phone_number, payment_link_id")
+          .select("id, full_name, phone_number, payment_link_id, verified")
           .eq("payment_link_id", searchValue.trim())
           .maybeSingle();
 
@@ -181,7 +182,7 @@ const Send = () => {
       // Search by normalized phone
       let { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, phone_number, payment_link_id")
+        .select("id, full_name, phone_number, payment_link_id, verified")
         .eq("phone_number", normalizedPhone)
         .maybeSingle();
 
@@ -189,7 +190,7 @@ const Send = () => {
       if (!data && normalizedPhone !== searchValue) {
         const fallback = await supabase
           .from("profiles")
-          .select("id, full_name, phone_number, payment_link_id")
+          .select("id, full_name, phone_number, payment_link_id, verified")
           .eq("phone_number", searchValue.trim())
           .maybeSingle();
         
@@ -374,6 +375,12 @@ const Send = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-lg font-bold text-foreground">{receiverProfile.full_name}</h3>
                         <CheckCircle2 className="h-5 w-5 text-primary" />
+                        {receiverProfile.verified && (
+                          <div className="flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full">
+                            <Shield className="h-4 w-4" />
+                            <span className="text-xs font-medium">Verified</span>
+                          </div>
+                        )}
                       </div>
                       <p className="text-muted-foreground">{receiverProfile.phone_number}</p>
                     </div>
