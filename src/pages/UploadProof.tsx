@@ -85,7 +85,7 @@ const UploadProof = () => {
 
     const { error } = await supabase
       .from("transactions")
-      .update({ proof_of_payment_url: uploadedUrl } as any)
+      .update({ payment_proof_url: uploadedUrl })
       .eq("id", transactionId);
 
     if (error) {

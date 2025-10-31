@@ -19,6 +19,7 @@ interface Profile {
 
 interface Transaction {
   id: string;
+  sender_id: string;
   receiver_name: string;
   receiver_phone: string;
   amount: number;
@@ -74,10 +75,18 @@ const Dashboard = () => {
   };
 
   const loadTransactions = async (userId: string) => {
+    // Get current user's phone
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("phone_number")
+      .eq("id", userId)
+      .single();
+
+    // Load transactions where user is sender OR receiver
     const { data, error } = await supabase
       .from("transactions")
       .select("*")
-      .eq("sender_id", userId)
+      .or(`sender_id.eq.${userId},receiver_phone.eq.${profileData?.phone_number || ''}`)
       .order("created_at", { ascending: false })
       .limit(5);
 
@@ -194,34 +203,37 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {transactions.map((transaction) => (
-                <div 
-                  key={transaction.id} 
-                  className="flex items-center justify-between p-4 md:p-5 border border-border rounded-2xl hover:bg-muted/30 transition-colors"
-                >
-                  <div>
-                    <p className="font-medium text-sm md:text-base text-foreground">
-                      {transaction.receiver_name}
-                    </p>
-                    <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
-                      {getStatusLabel(transaction.status)}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      ID: {transaction.id.substring(0, 8)}...
-                    </p>
+              {transactions.map((transaction) => {
+                const isSender = transaction.sender_id === session?.user.id;
+                return (
+                  <div 
+                    key={transaction.id} 
+                    className="flex items-center justify-between p-4 md:p-5 border border-border rounded-2xl hover:bg-muted/30 transition-colors"
+                  >
+                    <div>
+                      <p className="font-medium text-sm md:text-base text-foreground">
+                        {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.receiver_name}`}
+                      </p>
+                      <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
+                        {getStatusLabel(transaction.status)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        ID: {transaction.id.substring(0, 8)}...
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-sm md:text-base text-foreground">
+                        {isSender ? '-' : '+'} {transaction.currency === 'USD' 
+                          ? `ZMW ${(transaction.amount * 15.5).toFixed(2)}` 
+                          : `${transaction.currency} ${transaction.amount.toFixed(2)}`}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(transaction.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-sm md:text-base text-foreground">
-                      {transaction.currency === 'USD' 
-                        ? `ZMW ${(transaction.amount * 15.5).toFixed(2)}` 
-                        : `${transaction.currency} ${transaction.amount.toFixed(2)}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(transaction.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

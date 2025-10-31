@@ -70,6 +70,7 @@ const Admin = () => {
   const [settings, setSettings] = useState<Setting[]>([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, revenue: 0, totalUsers: 0, pendingKyc: 0 });
   const [newTransferFee, setNewTransferFee] = useState("");
+  const [paymentNumber, setPaymentNumber] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -173,6 +174,12 @@ const Admin = () => {
         setNewTransferFee(transferFeeSetting.value);
       }
 
+      // Get payment number
+      const paymentNumberSetting = settingsData?.find(s => s.key === "payment_number");
+      if (paymentNumberSetting) {
+        setPaymentNumber(paymentNumberSetting.value);
+      }
+
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load admin data");
@@ -259,6 +266,28 @@ const Admin = () => {
     } catch (error) {
       console.error("Error updating transfer fee:", error);
       toast.error("Failed to update transfer fee");
+    }
+  };
+
+  const updatePaymentNumber = async () => {
+    if (!paymentNumber.trim()) {
+      toast.error("Please enter a valid payment number");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .update({ value: paymentNumber })
+        .eq("key", "payment_number");
+
+      if (error) throw error;
+
+      toast.success("Payment number updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating payment number:", error);
+      toast.error("Failed to update payment number");
     }
   };
 
@@ -704,6 +733,25 @@ const Admin = () => {
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
                     Current fee: {newTransferFee}%
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="payment_number">Payment Number (For receiving funds)</Label>
+                  <div className="flex gap-3 mt-2">
+                    <Input
+                      id="payment_number"
+                      type="text"
+                      value={paymentNumber}
+                      onChange={(e) => setPaymentNumber(e.target.value)}
+                      placeholder="e.g., +263 77 123 4567"
+                    />
+                    <Button onClick={updatePaymentNumber} className="min-w-[100px]">
+                      Update
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This number will be shown to senders for payment
                   </p>
                 </div>
               </CardContent>

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Send as SendIcon, QrCode, Search, User, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ReceiverProfile {
   id: string;
@@ -29,8 +30,9 @@ const Send = () => {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false);
   const [senderName, setSenderName] = useState("");
+  const [payoutMethod, setPayoutMethod] = useState("");
+  const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
   const transferFee = 2.99;
-  const paymentNumber = "+263 77 123 4567"; // Admin payment number
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -48,11 +50,30 @@ const Send = () => {
       handleLookup(linkId);
     }
 
+    // Fetch payment number from settings
+    fetchPaymentNumber();
+
     // Fetch exchange rate
     fetchExchangeRate();
     const interval = setInterval(fetchExchangeRate, 300000); // Update every 5 minutes
     return () => clearInterval(interval);
   }, [navigate, searchParams]);
+
+  const fetchPaymentNumber = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "payment_number")
+        .maybeSingle();
+      
+      if (!error && data) {
+        setPaymentNumber(data.value);
+      }
+    } catch (error) {
+      console.error('Error fetching payment number:', error);
+    }
+  };
 
   const fetchExchangeRate = async () => {
     try {
@@ -172,6 +193,11 @@ const Send = () => {
       return;
     }
 
+    if (!payoutMethod) {
+      toast.error("Please select a payout method");
+      return;
+    }
+
     setShowPaymentInstructions(true);
   };
 
@@ -197,6 +223,7 @@ const Send = () => {
       currency: "USD",
       fee: transferFee,
       exchange_rate: exchangeRate,
+      payout_method: payoutMethod,
       status: "pending",
     });
 
@@ -365,6 +392,21 @@ const Send = () => {
                   </div>
                 </div>
 
+                <div className="mb-6">
+                  <Label htmlFor="payoutMethod" className="text-sm font-medium text-foreground block mb-2">
+                    Recipient will receive via
+                  </Label>
+                  <Select value={payoutMethod} onValueChange={setPayoutMethod} required>
+                    <SelectTrigger className="h-12 text-base">
+                      <SelectValue placeholder="Select payout method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MTN Money">MTN Money</SelectItem>
+                      <SelectItem value="Airtel Money">Airtel Money</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {amount && parseFloat(amount) > 0 && (
                   <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
                     <div className="space-y-3">
@@ -395,7 +437,7 @@ const Send = () => {
                 <Button 
                   type="submit" 
                   className="w-full mt-8 h-14 text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg" 
-                  disabled={loading || !amount || parseFloat(amount) <= 0}
+                  disabled={loading || !amount || parseFloat(amount) <= 0 || !payoutMethod}
                 >
                   Continue to Payment
                 </Button>
@@ -426,7 +468,7 @@ const Send = () => {
                     <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
                       <p className="text-xl sm:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash / Airtel Money / OneMoney</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
                     </div>
                   </div>
                 </div>
