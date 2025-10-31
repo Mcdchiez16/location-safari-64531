@@ -74,22 +74,25 @@ const Index = () => {
       </div>
 
       {/* Header */}
-      <header className="relative bg-card backdrop-blur-xl border-b border-border sticky top-0 z-50 shadow-lg">
-        <div className="container mx-auto px-4 py-3 md:py-4">
+      <header className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
+        <div className="container mx-auto px-4 py-4 md:py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl md:text-3xl font-bold text-foreground">TuraPay</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                <span className="text-2xl md:text-3xl font-bold text-white">T</span>
+              </div>
+              <span className="text-2xl md:text-3xl font-bold text-white">TuraPay</span>
             </div>
             <div className="flex items-center gap-3 md:gap-4">
               {exchangeRate && (
-                <div className="hidden sm:flex items-center gap-2 px-3 md:px-4 py-2 bg-primary rounded-full shadow-md">
+                <div className="hidden sm:flex items-center gap-2 px-4 md:px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
                   <TrendingUp className="h-4 w-4 text-white" />
                   <span className="text-xs md:text-sm font-bold text-white">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
                 </div>
               )}
               <Button 
                 onClick={() => navigate("/auth")}
-                className="text-sm md:text-base px-4 md:px-6 h-9 md:h-10 font-semibold bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 transition-all shadow-lg"
+                className="text-sm md:text-base px-5 md:px-7 h-10 md:h-11 font-bold bg-white text-blue-700 hover:bg-white/90 transition-all shadow-lg"
               >
                 Get Started
               </Button>
