@@ -37,7 +37,7 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [mode, setMode] = useState<'received' | 'sent'>('received');
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
@@ -82,20 +82,35 @@ const Dashboard = () => {
       .from("profiles")
       .select("phone_number")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
-    // Load only received transactions (where user is the receiver)
-    const { data, error } = await supabase
+    // Try to load received transactions first (where user is the receiver)
+    const { data: received, error: receivedError } = await supabase
       .from("transactions")
       .select("*, profiles(full_name, phone_number)")
       .eq("receiver_phone", profileData?.phone_number || '')
       .order("created_at", { ascending: false })
       .limit(10);
 
-    if (error) {
-      console.error("Error loading transactions:", error);
+    if (!receivedError && received && received.length > 0) {
+      setTransactions(received);
+      setMode('received');
+      return;
+    }
+
+    // Fallback: load sent transactions (where user is the sender)
+    const { data: sent, error: sentError } = await supabase
+      .from("transactions")
+      .select("*, profiles(full_name, phone_number)")
+      .eq("sender_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (sentError) {
+      console.error("Error loading transactions:", sentError);
     } else {
-      setTransactions(data || []);
+      setTransactions(sent || []);
+      setMode('sent');
     }
   };
 
@@ -129,6 +144,39 @@ const Dashboard = () => {
   };
 
   const isReceiver = profile?.account_type === 'receiver';
+
+  const handleDownloadStatement = () => {
+    const headers = ['Date','Type','Name','Phone','Amount','Currency','Status','TID','Transaction ID'];
+    const rows = transactions.map((tx) => {
+      const isSender = tx.sender_id === session?.user.id;
+      const type = isSender ? 'Sent' : 'Received';
+      const name = isSender ? tx.receiver_name : (tx.profiles?.full_name || tx.receiver_name);
+      const phone = isSender ? tx.receiver_phone : (tx.profiles?.phone_number || tx.receiver_phone);
+      return [
+        new Date(tx.created_at).toISOString(),
+        type,
+        name,
+        phone,
+        tx.amount,
+        tx.currency,
+        getStatusLabel(tx.status),
+        tx.tid || '',
+        tx.id
+      ].map((val) => `"${String(val ?? '').replace(/"/g, '""')}"`).join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const today = new Date().toISOString().slice(0,10);
+    link.setAttribute('download', `statement-${mode}-${today}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Statement download started');
+  };
 
   if (loading) {
     return (
@@ -188,9 +236,17 @@ const Dashboard = () => {
 
         {/* Transactions Card */}
         <div id="transactions-section" className="bg-primary-foreground rounded-3xl p-6 md:p-8 shadow-xl">
-          <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground">
-            Received Transactions
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">
+              {mode === 'received' ? 'Received Transactions' : 'Sent Transactions'}
+            </h2>
+            <Button
+              onClick={handleDownloadStatement}
+              className="h-10 md:h-11 rounded-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-semibold"
+            >
+              Download Statement
+            </Button>
+          </div>
           
           {transactions.length === 0 ? (
             <div className="text-center py-12">
