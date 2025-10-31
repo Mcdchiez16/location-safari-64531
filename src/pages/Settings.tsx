@@ -16,6 +16,7 @@ interface Profile {
   verified: boolean;
   payment_link_id: string;
   account_type: string;
+  email: string;
 }
 
 interface SupportSettings {
@@ -53,7 +54,7 @@ const Settings = () => {
       toast.error("Error loading profile");
       console.error(error);
     } else {
-      setProfile(data);
+      setProfile({ ...data, email: session.user.email || '' });
     }
     setLoading(false);
   };
@@ -180,6 +181,11 @@ const Settings = () => {
                     <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
                       <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Full Name</p>
                       <p className="text-sm md:text-base font-semibold text-gray-900">{profile?.full_name}</p>
+                    </div>
+                    
+                    <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</p>
+                      <p className="text-sm md:text-base font-semibold text-gray-900">{profile?.email}</p>
                     </div>
                     
                     <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">

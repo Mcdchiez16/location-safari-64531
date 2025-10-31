@@ -95,12 +95,12 @@ const Dashboard = () => {
     const currency = profileData?.country === 'Zambia' ? 'ZMW' : 'USD';
     setUserCurrency(currency);
 
-    // Load only pending transactions (both sent and received)
+    // Load pending and rejected transactions (both sent and received)
     const { data: received, error: receivedError } = await supabase
       .from("transactions")
       .select("*")
       .eq("receiver_phone", profileData?.phone_number || '')
-      .eq("status", "pending")
+      .in("status", ["pending", "rejected"])
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -108,7 +108,7 @@ const Dashboard = () => {
       .from("transactions")
       .select("*")
       .eq("sender_id", userId)
-      .eq("status", "pending")
+      .in("status", ["pending", "rejected"])
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -155,6 +155,7 @@ const Dashboard = () => {
         return "text-green-500";
       case "pending":
         return "text-yellow-500";
+      case "rejected":
       case "failed":
         return "text-red-500";
       default:
@@ -170,6 +171,8 @@ const Dashboard = () => {
         return "Deposited";
       case "pending":
         return "Pending";
+      case "rejected":
+        return "Rejected";
       case "failed":
         return "Failed";
       default:
@@ -309,10 +312,10 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
             <div>
               <h2 className="text-lg md:text-2xl font-bold text-foreground">
-                Pending Transactions
+                Recent Transactions
               </h2>
               <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                View all completed transactions on the Transactions page
+                Pending and rejected transactions
               </p>
             </div>
             <Button
@@ -333,10 +336,10 @@ const Dashboard = () => {
                 </div>
               </div>
               <p className="text-muted-foreground mb-1 text-sm md:text-lg font-medium">
-                No pending transactions
+                No recent transactions
               </p>
               <p className="text-muted-foreground mb-4 text-xs md:text-base">
-                All transactions are completed
+                Your pending and rejected transactions will appear here
               </p>
             </div>
           ) : (
@@ -368,9 +371,7 @@ const Dashboard = () => {
                     </div>
                     <div className="text-left sm:text-right">
                       <p className="font-bold text-sm md:text-base text-foreground">
-                        {isSender ? '-' : '+'} {transaction.currency === 'USD' 
-                          ? `ZMW ${(transaction.amount * 15.5).toFixed(2)}` 
-                          : `${transaction.currency} ${transaction.amount.toFixed(2)}`}
+                        {isSender ? '-' : '+'} {transaction.currency} {transaction.amount.toFixed(2)}
                       </p>
                     </div>
                   </div>
