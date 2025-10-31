@@ -74,14 +74,14 @@ const Index = () => {
       </div>
 
       {/* Header */}
-      <header className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
+      <header className="relative bg-gradient-to-r from-primary via-primary to-primary/90 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto px-4 py-4 md:py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white/10 flex items-center justify-center backdrop-blur-sm">
-                <span className="text-2xl md:text-3xl font-bold text-white">T</span>
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/20 flex items-center justify-center backdrop-blur-sm">
+                <span className="text-2xl md:text-3xl font-bold text-primary-foreground">T</span>
               </div>
-              <span className="text-2xl md:text-3xl font-bold text-white">TuraPay</span>
+              <span className="text-2xl md:text-3xl font-bold text-primary-foreground">TuraPay</span>
             </div>
             <div className="flex items-center gap-3 md:gap-4">
               {exchangeRate && (
@@ -92,7 +92,7 @@ const Index = () => {
               )}
               <Button 
                 onClick={() => navigate("/auth")}
-                className="text-sm md:text-base px-5 md:px-7 h-10 md:h-11 font-bold bg-white text-blue-700 hover:bg-white/90 transition-all shadow-lg"
+                className="text-sm md:text-base px-5 md:px-7 h-10 md:h-11 font-bold bg-white text-primary hover:bg-white/90 transition-all shadow-lg"
               >
                 Get Started
               </Button>
