@@ -62,51 +62,34 @@ const Index = () => {
           }}
         />
         
-        {/* Dark Gradient Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-accent/90" />
+        {/* Lighter Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 via-primary/50 to-accent/60" />
         
-        {/* Additional Gradient for Depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-background/30" />
+        {/* Additional Subtle Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
         
         {/* Animated Gradient Orbs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        
-        {/* Floating Particles */}
-        <div className="absolute inset-0">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white/20 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animation: `float ${10 + Math.random() * 10}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 5}s`,
-              }}
-            />
-          ))}
-        </div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
       {/* Header */}
-      <header className="relative bg-background/95 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-lg">
+      <header className="relative bg-card/98 backdrop-blur-xl border-b border-border sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">TuraPay</span>
+              <span className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">TuraPay</span>
             </div>
             <div className="flex items-center gap-3 md:gap-4">
               {exchangeRate && (
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 md:py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                  <TrendingUp className="h-4 w-4 text-white" />
-                  <span className="text-xs md:text-sm font-semibold text-white">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 md:py-2 bg-primary/10 rounded-full border border-primary/20">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="text-xs md:text-sm font-semibold text-primary">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
                 </div>
               )}
               <Button 
                 onClick={() => navigate("/auth")}
-                className="text-sm md:text-base px-4 md:px-6 h-9 md:h-10 font-semibold hover:bg-white/90 transition-all bg-white text-primary shadow-lg"
+                className="text-sm md:text-base px-4 md:px-6 h-9 md:h-10 font-semibold bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 transition-all shadow-lg"
               >
                 Get Started
               </Button>
@@ -158,69 +141,68 @@ const Index = () => {
 
             {/* Right - Calculator Card */}
             <div className="relative animate-scale-in" style={{ animationDelay: '0.2s' }}>
-              <Card className="relative bg-white shadow-2xl overflow-hidden rounded-2xl">
+              <Card className="relative bg-card/98 backdrop-blur-xl shadow-2xl overflow-hidden rounded-2xl border-2 border-white/20">
                 <div className="relative p-6 md:p-8 space-y-6">
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-600">You pay</label>
+                    <label className="text-sm font-medium text-muted-foreground">You pay</label>
                     <div className="relative">
                       <Input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value) || 0)}
-                        className="pr-24 h-14 text-xl font-bold border-2"
+                        className="pr-24 h-14 text-xl font-bold border-2 bg-background"
                         min="1"
                         placeholder="Enter amount"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700 font-bold text-sm">USD</span>
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground font-bold text-sm">USD</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFE5E0' }}>
-                      <ArrowRight className="h-5 w-5 rotate-90" style={{ color: '#FF5722' }} />
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10">
+                      <ArrowRight className="h-5 w-5 rotate-90 text-primary" />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-600">They receive</label>
+                    <label className="text-sm font-medium text-muted-foreground">They receive</label>
                     <div className="relative">
                       <Input
                         type="text"
                         value={recipientGets}
                         readOnly
-                        className="pr-24 h-14 text-xl font-bold border-2 bg-gray-50"
+                        className="pr-24 h-14 text-xl font-bold border-2 bg-muted"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700 font-bold text-sm">ZMW</span>
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground font-bold text-sm">ZMW</span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-600">Receive method</label>
+                    <label className="text-sm font-medium text-muted-foreground">Receive method</label>
                     <div className="relative">
                       <Input
                         type="text"
                         value="Mobile Money (MTN/Airtel)"
                         readOnly
-                        className="h-12 text-sm border-2 bg-gray-50"
+                        className="h-12 text-sm border-2 bg-muted"
                       />
                     </div>
                   </div>
 
-                  <div className="rounded-xl p-4 space-y-2" style={{ backgroundColor: '#FFE5E0' }}>
-                    <p className="text-sm font-bold text-center" style={{ color: '#FF5722' }}>
+                  <div className="rounded-xl p-4 space-y-2 bg-primary/10">
+                    <p className="text-sm font-bold text-center text-primary">
                       Competitive rates • Instant delivery • Secure transfers
                     </p>
-                    <p className="text-xs text-center text-gray-600">
+                    <p className="text-xs text-center text-muted-foreground">
                       Prices may vary slightly at time of order
                     </p>
                   </div>
 
                   <Button 
                     onClick={() => navigate("/auth")}
-                    className="w-full h-14 text-lg font-bold hover:opacity-90 transition-all"
-                    style={{ backgroundColor: '#FF5722', color: 'white' }}
+                    className="w-full h-14 text-lg font-bold bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 transition-all shadow-lg"
                   >
-                    CALCULATE
+                    Get Started
                   </Button>
                 </div>
               </Card>
@@ -230,20 +212,20 @@ const Index = () => {
       </section>
 
       {/* About TuraPay Section */}
-      <section className="relative py-16 md:py-20 bg-gray-50">
+      <section className="relative py-16 md:py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FF5722' }}>About TuraPay</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">About TuraPay</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               TuraPay is your trusted partner for fast and affordable money transfers from Zimbabwe to Zambia. 
               We combine advanced technology with accessible cash collection points to ensure your family gets 
               the money they need, when they need it.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-10 mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-center" style={{ color: '#FF5722' }}>Our Mission</h3>
-            <p className="text-gray-700 text-lg leading-relaxed text-center">
+          <div className="max-w-4xl mx-auto bg-card rounded-2xl shadow-lg p-6 md:p-10 mb-12 border">
+            <h3 className="text-2xl font-bold mb-6 text-center text-primary">Our Mission</h3>
+            <p className="text-foreground text-lg leading-relaxed text-center">
               Making cross-border payments easy, secure, and convenient. TuraPay enables instant payments 
               across Africa by providing reliable money transfer services that connect families and businesses. 
               We understand the importance of financial connectivity and strive to make every transaction seamless.
@@ -253,52 +235,52 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="relative py-16 md:py-20 bg-white">
+      <section className="relative py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FF5722' }}>Why Choose TuraPay?</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">Why Choose TuraPay?</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Experience the future of cross-border payments with our secure and reliable platform
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group hover:border-primary/50">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform bg-gradient-to-br from-primary to-accent">
                 <Zap className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Lightning Fast</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-bold mb-2 text-primary">Lightning Fast</h3>
+              <p className="text-sm text-muted-foreground">
                 Transfers complete in minutes, not days. Real-time processing ensures your recipient gets funds instantly to their mobile money wallet.
               </p>
             </Card>
 
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group hover:border-primary/50">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform bg-gradient-to-br from-secondary to-primary">
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Bank-Level Security</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-bold mb-2 text-primary">Bank-Level Security</h3>
+              <p className="text-sm text-muted-foreground">
                 Your money and personal data are protected with enterprise-grade encryption and security protocols at every step.
               </p>
             </Card>
 
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group hover:border-primary/50">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform bg-gradient-to-br from-accent to-secondary">
                 <Globe2 className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Competitive Rates</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-bold mb-2 text-primary">Competitive Rates</h3>
+              <p className="text-sm text-muted-foreground">
                 No hidden fees. Transparent pricing with competitive exchange rates so you know exactly what you're paying.
               </p>
             </Card>
 
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group hover:border-primary/50">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform bg-gradient-to-br from-primary to-secondary">
                 <Smartphone className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Mobile Money Direct</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-bold mb-2 text-primary">Mobile Money Direct</h3>
+              <p className="text-sm text-muted-foreground">
                 Direct delivery to Airtel Money and MTN Money wallets. Recipients get instant access to funds on their phones.
               </p>
             </Card>
@@ -307,11 +289,11 @@ const Index = () => {
       </section>
 
       {/* How It Works */}
-      <section className="relative py-16 md:py-20 bg-gray-50">
+      <section className="relative py-16 md:py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FF5722' }}>How It Works</h2>
-            <p className="text-lg text-gray-600">Send money in 3 simple steps</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">How It Works</h2>
+            <p className="text-lg text-muted-foreground">Send money in 3 simple steps</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -337,17 +319,17 @@ const Index = () => {
             ].map((item, index) => (
               <div key={index} className="relative">
                 <div className="text-center">
-                  <div className="inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-4 shadow-lg" style={{ backgroundColor: '#FF5722' }}>
+                  <div className="inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-4 shadow-lg bg-gradient-to-br from-primary to-accent">
                     <span className="text-3xl">{item.icon}</span>
                   </div>
-                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center -z-10" style={{ backgroundColor: '#FFE5E0' }}>
-                    <span className="text-xl font-bold" style={{ color: '#FF5722' }}>{item.step}</span>
+                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center -z-10 bg-primary/10">
+                    <span className="text-xl font-bold text-primary">{item.step}</span>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 mt-6" style={{ color: '#FF5722' }}>{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                  <h3 className="text-xl font-bold mb-3 mt-6 text-primary">{item.title}</h3>
+                  <p className="text-muted-foreground">{item.description}</p>
                 </div>
                 {index < 2 && (
-                  <div className="hidden md:block absolute top-8 left-full w-full h-0.5 -translate-x-8" style={{ background: 'linear-gradient(to right, #FF5722, transparent)' }} />
+                  <div className="hidden md:block absolute top-8 left-full w-full h-0.5 -translate-x-8 bg-gradient-to-r from-primary/50 to-transparent" />
                 )}
               </div>
             ))}
@@ -356,7 +338,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-16 md:py-20 overflow-hidden" style={{ backgroundColor: '#FF5722' }}>
+      <section className="relative py-16 md:py-20 overflow-hidden bg-gradient-to-br from-primary via-accent to-secondary">
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
@@ -373,8 +355,7 @@ const Index = () => {
           <Button 
             size="lg"
             onClick={() => navigate("/auth")}
-            className="h-14 md:h-16 px-8 md:px-12 text-base md:text-lg bg-white hover:bg-gray-100 hover:shadow-2xl transition-all font-bold"
-            style={{ color: '#FF5722' }}
+            className="h-14 md:h-16 px-8 md:px-12 text-base md:text-lg bg-white text-primary hover:bg-white/90 hover:shadow-2xl transition-all font-bold"
           >
             Create Free Account
           </Button>
@@ -382,38 +363,38 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-gray-900 border-t border-gray-800 py-12">
+      <footer className="relative bg-card border-t border-border py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-bold mb-4" style={{ color: '#FF5722' }}>TuraPay</div>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <div className="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">TuraPay</div>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Your trusted partner for fast and affordable cross-border money transfers between Zimbabwe and Zambia.
               </p>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Services</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>Send Money</li>
-                <li>Receive Money</li>
-                <li>Mobile Money Transfers</li>
-                <li>Currency Exchange</li>
+              <h4 className="text-foreground font-bold mb-4">Services</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="hover:text-primary cursor-pointer transition-colors">Send Money</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Receive Money</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Mobile Money Transfers</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Currency Exchange</li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>Help Center</li>
-                <li>Track Transfer</li>
-                <li>Contact Us</li>
-                <li>FAQs</li>
+              <h4 className="text-foreground font-bold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="hover:text-primary cursor-pointer transition-colors">Help Center</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Track Transfer</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Contact Us</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">FAQs</li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8">
+          <div className="border-t border-border pt-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-gray-400">© 2024 TuraPay. All rights reserved.</p>
-              <p className="text-sm text-gray-400">Zimbabwe ↔️ Zambia Money Transfers</p>
+              <p className="text-sm text-muted-foreground">© 2024 TuraPay. All rights reserved.</p>
+              <p className="text-sm text-muted-foreground">Zimbabwe ↔️ Zambia Money Transfers</p>
             </div>
           </div>
         </div>
