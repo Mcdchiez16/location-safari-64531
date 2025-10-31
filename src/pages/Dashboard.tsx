@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, History } from "lucide-react";
+import { ArrowUpRight, History, Download } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Profile {
   id: string;
@@ -85,34 +87,33 @@ const Dashboard = () => {
       .eq("id", userId)
       .maybeSingle();
 
-    // Try to load received transactions first (where user is the receiver)
+    // Load only pending transactions (both sent and received)
     const { data: received, error: receivedError } = await supabase
       .from("transactions")
       .select("*, profiles(full_name, phone_number)")
       .eq("receiver_phone", profileData?.phone_number || '')
+      .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(10);
 
-    if (!receivedError && received && received.length > 0) {
-      setTransactions(received);
-      setMode('received');
-      return;
-    }
-
-    // Fallback: load sent transactions (where user is the sender)
     const { data: sent, error: sentError } = await supabase
       .from("transactions")
       .select("*, profiles(full_name, phone_number)")
       .eq("sender_id", userId)
+      .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(10);
 
-    if (sentError) {
-      console.error("Error loading transactions:", sentError);
-    } else {
-      setTransactions(sent || []);
-      setMode('sent');
-    }
+    if (sentError) console.error("Error loading sent:", sentError);
+    if (receivedError) console.error("Error loading received:", receivedError);
+
+    // Combine and sort by date, showing only pending
+    const allPending = [...(sent || []), ...(received || [])]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 10);
+
+    setTransactions(allPending);
+    setMode(allPending.length > 0 && allPending[0].sender_id === userId ? 'sent' : 'received');
 
     // Calculate total sent amount
     const { data: allSent } = await supabase
@@ -157,36 +158,48 @@ const Dashboard = () => {
   const isReceiver = profile?.account_type === 'receiver';
 
   const handleDownloadStatement = () => {
-    const headers = ['Date','Type','Name','Phone','Amount','Currency','Status','TID','Transaction ID'];
-    const rows = transactions.map((tx) => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(18);
+    doc.text('TuraPay Transaction Statement', 14, 22);
+    
+    // Add date
+    doc.setFontSize(11);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 32);
+    doc.text(`Account: ${profile?.full_name || 'User'}`, 14, 38);
+    
+    // Prepare table data
+    const tableData = transactions.map((tx) => {
       const isSender = tx.sender_id === session?.user.id;
       const type = isSender ? 'Sent' : 'Received';
-      const name = isSender ? tx.receiver_name : (tx.profiles?.full_name || tx.receiver_name);
-      const phone = isSender ? tx.receiver_phone : (tx.profiles?.phone_number || tx.receiver_phone);
+      const name = isSender ? tx.receiver_name : (tx.profiles?.full_name || 'Unknown');
+      const phone = isSender ? tx.receiver_phone : (tx.profiles?.phone_number || '');
+      
       return [
-        new Date(tx.created_at).toISOString(),
+        new Date(tx.created_at).toLocaleDateString(),
         type,
         name,
         phone,
-        tx.amount,
-        tx.currency,
-        getStatusLabel(tx.status),
-        tx.tid || '',
-        tx.id
-      ].map((val) => `"${String(val ?? '').replace(/"/g, '""')}"`).join(',');
+        `${tx.currency} ${tx.amount.toFixed(2)}`,
+        getStatusLabel(tx.status)
+      ];
     });
-    const csv = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    const today = new Date().toISOString().slice(0,10);
-    link.setAttribute('download', `statement-${mode}-${today}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    toast.success('Statement download started');
+    
+    // Add table
+    autoTable(doc, {
+      startY: 45,
+      head: [['Date', 'Type', 'Name', 'Phone', 'Amount', 'Status']],
+      body: tableData,
+      theme: 'striped',
+      headStyles: { fillColor: [59, 130, 246] },
+      styles: { fontSize: 9 }
+    });
+    
+    // Save PDF
+    const today = new Date().toISOString().slice(0, 10);
+    doc.save(`turapay-statement-${today}.pdf`);
+    toast.success('Statement downloaded successfully');
   };
 
   if (loading) {
@@ -242,66 +255,72 @@ const Dashboard = () => {
         </div>
 
         {/* Transactions Card */}
-        <div id="transactions-section" className="bg-primary-foreground rounded-3xl p-6 md:p-8 shadow-xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">
-              {mode === 'received' ? 'Received Transactions' : 'Sent Transactions'}
-            </h2>
+        <div id="transactions-section" className="bg-primary-foreground rounded-3xl p-4 md:p-8 shadow-xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+            <div>
+              <h2 className="text-lg md:text-2xl font-bold text-foreground">
+                Pending Transactions
+              </h2>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1">
+                View all completed transactions on the Transactions page
+              </p>
+            </div>
             <Button
               onClick={handleDownloadStatement}
-              className="h-10 md:h-11 rounded-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-semibold"
+              className="h-9 md:h-11 text-sm md:text-base rounded-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-semibold gap-2 w-full sm:w-auto"
             >
-              Download Statement
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Download PDF</span>
+              <span className="sm:hidden">PDF</span>
             </Button>
           </div>
           
           {transactions.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8 md:py-12">
               <div className="mb-4 flex justify-center">
-                <div className="h-24 w-24 rounded-full bg-muted/30 flex items-center justify-center">
-                  <History className="h-12 w-12 text-muted-foreground" />
+                <div className="h-16 w-16 md:h-24 md:w-24 rounded-full bg-muted/30 flex items-center justify-center">
+                  <History className="h-8 w-8 md:h-12 md:w-12 text-muted-foreground" />
                 </div>
               </div>
-              <p className="text-muted-foreground mb-1 text-base md:text-lg font-medium">
-                No received transactions yet
+              <p className="text-muted-foreground mb-1 text-sm md:text-lg font-medium">
+                No pending transactions
               </p>
-              <p className="text-muted-foreground mb-6 text-sm md:text-base">
-                Share your payment link to receive money from senders
+              <p className="text-muted-foreground mb-4 text-xs md:text-base">
+                All transactions are completed
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               {transactions.map((transaction) => {
                 const isSender = transaction.sender_id === session?.user.id;
                 return (
                   <div 
                     key={transaction.id} 
-                    className="flex items-center justify-between p-4 md:p-5 border border-border rounded-2xl hover:bg-muted/30 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-5 border border-border rounded-xl md:rounded-2xl hover:bg-muted/30 transition-colors gap-2 sm:gap-0"
                   >
-                    <div>
-                      <p className="font-medium text-sm md:text-base text-foreground">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-xs md:text-base text-foreground truncate">
                         {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.profiles?.full_name || 'Unknown'}`}
                       </p>
-                      <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
-                        {getStatusLabel(transaction.status)}
-                      </p>
-                      {transaction.tid && (
-                        <p className="text-xs font-semibold text-primary mt-1">
-                          TID: {transaction.tid}
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
+                          {getStatusLabel(transaction.status)}
                         </p>
-                      )}
+                        {transaction.tid && (
+                          <p className="text-xs font-semibold text-primary">
+                            • TID: {transaction.tid}
+                          </p>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        ID: {transaction.id.substring(0, 8)}...
+                        {new Date(transaction.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <p className="font-bold text-sm md:text-base text-foreground">
                         {isSender ? '-' : '+'} {transaction.currency === 'USD' 
                           ? `ZMW ${(transaction.amount * 15.5).toFixed(2)}` 
                           : `${transaction.currency} ${transaction.amount.toFixed(2)}`}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(transaction.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
