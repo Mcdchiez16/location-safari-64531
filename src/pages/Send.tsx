@@ -32,7 +32,9 @@ const Send = () => {
   const [senderName, setSenderName] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
   const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
-  const transferFee = 2.99;
+  const [transferFeePercentage, setTransferFeePercentage] = useState(2);
+  const [senderNumber, setSenderNumber] = useState("");
+  const [transactionId, setTransactionId] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -50,8 +52,9 @@ const Send = () => {
       handleLookup(linkId);
     }
 
-    // Fetch payment number from settings
+    // Fetch payment number and transfer fee from settings
     fetchPaymentNumber();
+    fetchTransferFee();
 
     // Fetch exchange rate
     fetchExchangeRate();
@@ -72,6 +75,22 @@ const Send = () => {
       }
     } catch (error) {
       console.error('Error fetching payment number:', error);
+    }
+  };
+
+  const fetchTransferFee = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "transfer_fee_percentage")
+        .maybeSingle();
+      
+      if (!error && data) {
+        setTransferFeePercentage(parseFloat(data.value));
+      }
+    } catch (error) {
+      console.error('Error fetching transfer fee:', error);
     }
   };
 
@@ -181,7 +200,7 @@ const Send = () => {
   };
 
   const calculateFee = (amount: number) => {
-    return transferFee;
+    return (amount * transferFeePercentage) / 100;
   };
 
   const handleProceedToPayment = (e: React.FormEvent) => {
@@ -202,8 +221,13 @@ const Send = () => {
   };
 
   const handleConfirmPayment = async () => {
-    if (!senderName.trim()) {
-      toast.error("Please enter the name on your transaction");
+    if (!senderNumber.trim()) {
+      toast.error("Please enter your sender number");
+      return;
+    }
+
+    if (!transactionId.trim()) {
+      toast.error("Please enter the transaction ID");
       return;
     }
 
@@ -214,7 +238,9 @@ const Send = () => {
 
     setLoading(true);
 
-    const { error } = await supabase.from("transactions").insert({
+    const transferFee = calculateFee(parseFloat(amount));
+
+    const { error, data } = await supabase.from("transactions").insert({
       sender_id: userId,
       receiver_name: receiverProfile.full_name,
       receiver_phone: receiverProfile.phone_number,
@@ -225,14 +251,16 @@ const Send = () => {
       exchange_rate: exchangeRate,
       payout_method: payoutMethod,
       status: "pending",
-    });
+      sender_number: senderNumber,
+      transaction_id: transactionId,
+    }).select();
 
     if (error) {
       toast.error("Failed to create transaction");
       console.error(error);
     } else {
-      toast.success("Transaction recorded! Please upload proof of payment.");
-      navigate("/upload-proof");
+      toast.success("Transaction submitted successfully! Awaiting admin approval.");
+      navigate("/dashboard");
     }
 
     setLoading(false);
@@ -415,13 +443,13 @@ const Send = () => {
                         <span className="font-medium text-foreground">1 USD = {exchangeRate} ZMW</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Transfer fee</span>
-                        <span className="font-semibold text-foreground">${transferFee.toFixed(2)}</span>
+                        <span className="text-muted-foreground">Transfer fee ({transferFeePercentage}%)</span>
+                        <span className="font-semibold text-foreground">${calculateFee(parseFloat(amount)).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Total to pay</span>
                         <span className="font-semibold text-foreground">
-                          ${(parseFloat(amount) + transferFee).toFixed(2)}
+                          ${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}
                         </span>
                       </div>
                       <div className="border-t border-primary/20 pt-3 mt-3">
@@ -464,7 +492,7 @@ const Send = () => {
                   </div>
                   <div className="ml-11 bg-secondary/10 rounded-xl p-4 sm:p-6 border-2 border-secondary/30">
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Send this amount:</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + transferFee).toFixed(2)}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}</p>
                     <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
                       <p className="text-xl sm:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>

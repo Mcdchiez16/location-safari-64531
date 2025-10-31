@@ -36,6 +36,9 @@ interface Transaction {
   payment_date?: string;
   admin_payment_proof_url?: string;
   created_at: string;
+  sender_number?: string;
+  transaction_id?: string;
+  tid?: string;
   profiles?: { full_name: string; phone_number: string };
 }
 
@@ -196,12 +199,16 @@ const Admin = () => {
     proofUrl?: string
   ) => {
     try {
+      // Generate TID when marking as paid or deposited
+      const { data: tidData } = await supabase.rpc('generate_tid');
+      
       const updateData: any = { status };
       if (notes) updateData.admin_notes = notes;
       if (reference) updateData.payment_reference = reference;
       if (proofUrl) updateData.admin_payment_proof_url = proofUrl;
       if (status === "paid" || status === "deposited") {
         updateData.payment_date = new Date().toISOString();
+        updateData.tid = tidData;
       }
 
       const { error } = await supabase
@@ -211,7 +218,7 @@ const Admin = () => {
 
       if (error) throw error;
 
-      toast.success(`Transaction marked as ${status}`);
+      toast.success(`Transaction marked as ${status}. TID: ${tidData}`);
       setPaymentReference("");
       setPaymentProofUrl("");
       setSelectedTransaction(null);
@@ -483,6 +490,21 @@ const Admin = () => {
                             <p className="text-sm text-muted-foreground">
                               Amount: ${transaction.amount.toFixed(2)} | Fee: ${transaction.fee.toFixed(2)}
                             </p>
+                            {transaction.sender_number && (
+                              <p className="text-sm text-muted-foreground">
+                                <strong>Sender #:</strong> {transaction.sender_number}
+                              </p>
+                            )}
+                            {transaction.transaction_id && (
+                              <p className="text-sm text-muted-foreground">
+                                <strong>Transaction ID:</strong> {transaction.transaction_id}
+                              </p>
+                            )}
+                            {transaction.tid && (
+                              <p className="text-sm font-semibold text-primary">
+                                <strong>TID:</strong> {transaction.tid}
+                              </p>
+                            )}
                             <p className="text-xs text-muted-foreground">
                               {new Date(transaction.created_at).toLocaleString()}
                             </p>

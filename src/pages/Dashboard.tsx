@@ -27,6 +27,8 @@ interface Transaction {
   fee: number;
   status: string;
   created_at: string;
+  tid?: string;
+  profiles?: { full_name: string; phone_number: string };
 }
 
 const Dashboard = () => {
@@ -217,6 +219,11 @@ const Dashboard = () => {
                       <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
                         {getStatusLabel(transaction.status)}
                       </p>
+                      {transaction.tid && (
+                        <p className="text-xs font-semibold text-primary mt-1">
+                          TID: {transaction.tid}
+                        </p>
+                      )}
                       <p className="text-xs text-muted-foreground mt-1">
                         ID: {transaction.id.substring(0, 8)}...
                       </p>
