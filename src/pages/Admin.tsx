@@ -69,7 +69,7 @@ const Admin = () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        navigate("/auth");
+        navigate("/admin/login");
         return;
       }
 
@@ -83,7 +83,7 @@ const Admin = () => {
 
       if (roleError || !roleData) {
         toast.error("Access denied. Admin privileges required.");
-        navigate("/dashboard");
+        navigate("/admin/login");
         return;
       }
 
@@ -91,7 +91,7 @@ const Admin = () => {
       await loadData();
     } catch (error) {
       console.error("Error checking admin status:", error);
-      navigate("/auth");
+      navigate("/admin/login");
     }
   };
 

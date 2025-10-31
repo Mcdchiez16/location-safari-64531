@@ -14,6 +14,7 @@ import Deposit from "./pages/Deposit";
 import NotFound from "./pages/NotFound";
 import Recipients from "./pages/Recipients";
 import Admin from "./pages/Admin";
+import AdminAuth from "./pages/AdminAuth";
 import UploadProof from "./pages/UploadProof";
 const queryClient = new QueryClient();
 const App = () => <QueryClientProvider client={queryClient}>
@@ -31,6 +32,7 @@ const App = () => <QueryClientProvider client={queryClient}>
           <Route path="/verification" element={<Verification />} />
           <Route path="/payment-link" element={<PaymentLink />} />
           <Route path="/recipients" element={<Recipients />} />
+          <Route path="/admin/login" element={<AdminAuth />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/upload-proof" element={<UploadProof />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
