@@ -220,11 +220,20 @@ const Dashboard = () => {
             </Button>
             <Button 
               onClick={() => {
+                if (session?.user?.id) {
+                  // Refresh transactions right before showing the section
+                  loadTransactions(session.user.id);
+                }
                 const element = document.getElementById('transactions-section');
                 if (element) {
+                  // Update URL hash for better accessibility/back navigation
+                  history.replaceState(null, '', '#transactions-section');
                   const yOffset = -20;
                   const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                   window.scrollTo({ top: y, behavior: 'smooth' });
+                  // Brief highlight to signal movement
+                  element.classList.add('ring-2','ring-primary','rounded-2xl');
+                  setTimeout(() => element.classList.remove('ring-2','ring-primary'), 1200);
                 }
               }} 
               className="h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg rounded-2xl shadow-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-bold"
