@@ -174,7 +174,9 @@ const Dashboard = () => {
               onClick={() => {
                 const element = document.getElementById('transactions-section');
                 if (element) {
-                  element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  const yOffset = -20;
+                  const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
                 }
               }} 
               className="h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg rounded-2xl shadow-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-bold"
