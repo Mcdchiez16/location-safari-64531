@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { SendIcon, Download, Shield, Zap, Globe2, CheckCircle2, TrendingUp, ArrowRight, Smartphone, Clock, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import heroImage from "@/assets/hero-image.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -50,20 +51,34 @@ const Index = () => {
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5 relative overflow-hidden">
-      {/* Animated Video-like Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Gradient Orbs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Image with Overlays */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        {/* Hero Image Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${heroImage})`,
+          }}
+        />
+        
+        {/* Dark Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-accent/90" />
+        
+        {/* Additional Gradient for Depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-background/30" />
+        
+        {/* Animated Gradient Orbs */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
         
         {/* Floating Particles */}
         <div className="absolute inset-0">
           {[...Array(15)].map((_, i) => (
             <div
               key={i}
-              className="absolute w-2 h-2 bg-primary/20 rounded-full"
+              className="absolute w-2 h-2 bg-white/20 rounded-full"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -73,39 +88,25 @@ const Index = () => {
             />
           ))}
         </div>
-        
-        {/* Animated Grid Pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `
-              linear-gradient(hsl(var(--primary)) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-            animation: 'grid-flow 20s linear infinite',
-          }}
-        />
       </div>
 
       {/* Header */}
-      <header className="relative bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-3">
+      <header className="relative bg-background/95 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-lg">
+        <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl md:text-3xl font-bold" style={{ color: '#FF5722' }}>TuraPay</span>
+              <span className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">TuraPay</span>
             </div>
             <div className="flex items-center gap-3 md:gap-4">
               {exchangeRate && (
-                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: '#FFE5E0' }}>
-                  <TrendingUp className="h-4 w-4" style={{ color: '#FF5722' }} />
-                  <span className="text-sm font-semibold" style={{ color: '#FF5722' }}>1 USD = {exchangeRate.toFixed(2)} ZMW</span>
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 md:py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                  <TrendingUp className="h-4 w-4 text-white" />
+                  <span className="text-xs md:text-sm font-semibold text-white">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
                 </div>
               )}
               <Button 
                 onClick={() => navigate("/auth")}
-                className="text-sm md:text-base px-4 md:px-6 h-9 md:h-10 font-semibold hover:opacity-90 transition-all"
-                style={{ backgroundColor: '#FF5722', color: 'white' }}
+                className="text-sm md:text-base px-4 md:px-6 h-9 md:h-10 font-semibold hover:bg-white/90 transition-all bg-white text-primary shadow-lg"
               >
                 Get Started
               </Button>
@@ -114,31 +115,33 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section - Inspired by Mukuru */}
-      <section className="relative overflow-hidden" style={{ backgroundColor: '#FF5722' }}>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Left Content */}
-            <div className="space-y-6 md:space-y-8 animate-fade-in text-white">
-              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+            <div className="space-y-6 md:space-y-8 animate-fade-in text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20">
                 <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                <span className="text-sm font-semibold">Zimbabwe to Zambia Money Transfer</span>
+                <span className="text-xs md:text-sm font-semibold text-white">Zimbabwe to Zambia Money Transfer</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                Check Our Rate
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-white">
+                Send Money to
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-secondary mt-2">
+                  Zambia Instantly
+                </span>
               </h1>
 
-              <p className="text-lg sm:text-xl leading-relaxed text-white/90">
+              <p className="text-base md:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl mx-auto lg:mx-0">
                 We help you send more money home with our competitive rates. Fast, secure, and reliable cross-border money transfers. Your recipient gets funds instantly to their mobile money wallet.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
                 <Button 
                   size="lg"
                   onClick={() => navigate("/auth")}
-                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-white hover:bg-gray-100 transition-all font-bold"
-                  style={{ color: '#FF5722' }}
+                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-white hover:bg-white/90 text-primary transition-all font-bold shadow-xl hover:shadow-2xl"
                 >
                   Start Sending Money
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -146,9 +149,9 @@ const Index = () => {
                 <Button 
                   size="lg"
                   onClick={() => navigate("/auth")}
-                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-transparent border-2 border-white text-white hover:bg-white/10 transition-all font-bold"
+                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white/20 transition-all font-bold"
                 >
-                  Receive Money
+                  Learn More
                 </Button>
               </div>
             </div>
