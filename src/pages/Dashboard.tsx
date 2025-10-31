@@ -84,13 +84,13 @@ const Dashboard = () => {
       .eq("id", userId)
       .single();
 
-    // Load transactions where user is sender OR receiver
+    // Load only received transactions (where user is the receiver)
     const { data, error } = await supabase
       .from("transactions")
-      .select("*")
-      .or(`sender_id.eq.${userId},receiver_phone.eq.${profileData?.phone_number || ''}`)
+      .select("*, profiles(full_name, phone_number)")
+      .eq("receiver_phone", profileData?.phone_number || '')
       .order("created_at", { ascending: false })
-      .limit(5);
+      .limit(10);
 
     if (error) {
       console.error("Error loading transactions:", error);
@@ -148,13 +148,9 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-6 md:py-8 max-w-4xl pb-24">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-primary-foreground flex items-center justify-center text-primary font-bold text-lg md:text-xl shadow-lg">
-              {profile?.full_name?.charAt(0) || 'U'}
-            </div>
-            <h1 className="text-xl md:text-2xl font-bold text-primary-foreground">
-              Hi, {profile?.full_name?.split(' ')[0]}
-            </h1>
+          <div>
+            <h1 className="text-2xl font-bold text-primary-foreground">Received Money</h1>
+            <p className="text-primary-foreground/80 text-sm">View money received from senders</p>
           </div>
         </div>
 
@@ -186,7 +182,7 @@ const Dashboard = () => {
         {/* Transactions Card */}
         <div className="bg-primary-foreground rounded-3xl p-6 md:p-8 shadow-xl">
           <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground">
-            {isReceiver ? 'Transaction History' : 'Recent Transactions'}
+            Received Transactions
           </h2>
           
           {transactions.length === 0 ? (
@@ -197,10 +193,10 @@ const Dashboard = () => {
                 </div>
               </div>
               <p className="text-muted-foreground mb-1 text-base md:text-lg font-medium">
-                {isReceiver ? 'When you start using TuraPay,' : 'No transactions yet'}
+                No received transactions yet
               </p>
               <p className="text-muted-foreground mb-6 text-sm md:text-base">
-                {isReceiver ? 'transactions will show here' : 'Transactions will appear here'}
+                Share your payment link to receive money from senders
               </p>
             </div>
           ) : (

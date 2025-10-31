@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, Send as SendIcon, QrCode, Search, User, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ReceiverProfile {
@@ -311,83 +310,51 @@ const Send = () => {
               <Search className="h-6 w-6" />
               Find Receiver
             </h2>
-            <p className="text-primary-foreground/90 mt-1">Enter phone number, scan QR code, or use payment link</p>
+            <p className="text-primary-foreground/90 mt-1">Enter phone number or payment link to find receiver</p>
           </div>
 
           <div className="p-8">
-            <Tabs defaultValue="phone" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-xl p-1 mb-6">
-                <TabsTrigger 
-                  value="phone" 
-                  className="flex gap-2 items-center data-[state=active]:bg-white rounded-lg py-3 font-medium"
-                >
-                  <Search className="h-4 w-4" /> Phone / Link
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="qr" 
-                  className="flex gap-2 items-center data-[state=active]:bg-white rounded-lg py-3 font-medium"
-                >
-                  <QrCode className="h-4 w-4" /> Scan QR Code
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="phone">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="lookup" className="text-sm font-medium text-foreground">
-                      Phone Number or Payment Link
-                    </Label>
-                    <div className="flex gap-3 mt-2">
-                      <Input
-                        id="lookup"
-                        type="text"
-                        placeholder="+260... or payment link ID"
-                        value={lookupValue}
-                        onChange={(e) => setLookupValue(e.target.value)}
-                        className="h-12"
-                      />
-                      <Button 
-                        onClick={() => handleLookup()}
-                        disabled={loading}
-                        className="bg-gradient-to-r from-primary to-accent px-8"
-                      >
-                        {loading ? "Searching..." : "Search"}
-                      </Button>
-                    </div>
-                  </div>
-
-                  {receiverProfile && (
-                    <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mt-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-2xl">
-                          {receiverProfile.full_name.charAt(0)}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-lg font-bold text-foreground">{receiverProfile.full_name}</h3>
-                            <CheckCircle2 className="h-5 w-5 text-primary" />
-                          </div>
-                          <p className="text-muted-foreground">{receiverProfile.phone_number}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="qr">
-                <div className="text-center py-12 bg-muted rounded-xl border-2 border-dashed border-border">
-                  <QrCode className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-foreground mb-2 font-medium">QR Code Scanner</p>
-                  <p className="text-sm text-muted-foreground">
-                    Scan the receiver's QR code to automatically fill their details
-                  </p>
-                  <Button className="mt-6 bg-gradient-to-r from-primary to-accent">
-                    Open Camera
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="lookup" className="text-sm font-medium text-foreground">
+                  Phone Number or Payment Link
+                </Label>
+                <div className="flex gap-3 mt-2">
+                  <Input
+                    id="lookup"
+                    type="text"
+                    placeholder="+260... or payment link ID"
+                    value={lookupValue}
+                    onChange={(e) => setLookupValue(e.target.value)}
+                    className="h-12"
+                  />
+                  <Button 
+                    onClick={() => handleLookup()}
+                    disabled={loading}
+                    className="bg-gradient-to-r from-primary to-accent px-8"
+                  >
+                    {loading ? "Searching..." : "Search"}
                   </Button>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+
+              {receiverProfile && (
+                <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mt-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-2xl">
+                      {receiverProfile.full_name.charAt(0)}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-lg font-bold text-foreground">{receiverProfile.full_name}</h3>
+                        <CheckCircle2 className="h-5 w-5 text-primary" />
+                      </div>
+                      <p className="text-muted-foreground">{receiverProfile.phone_number}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

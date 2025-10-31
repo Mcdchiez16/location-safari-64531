@@ -81,6 +81,8 @@ const Admin = () => {
   const [kycDialogOpen, setKycDialogOpen] = useState(false);
   const [paymentReference, setPaymentReference] = useState("");
   const [paymentProofUrl, setPaymentProofUrl] = useState("");
+  const [manualTid, setManualTid] = useState("");
+  const [senderName, setSenderName] = useState("");
 
   useEffect(() => {
     checkAdminAndLoadData();
@@ -192,15 +194,24 @@ const Admin = () => {
   };
 
   const updateTransactionStatus = async (
-    transactionId: string, 
-    status: string, 
+    transactionId: string,
+    status: string,
     notes?: string,
     reference?: string,
-    proofUrl?: string
+    proofUrl?: string,
+    tid?: string,
+    sender?: string
   ) => {
     try {
-      // Generate TID when marking as paid or deposited
-      const { data: tidData } = await supabase.rpc('generate_tid');
+      if (!tid || !tid.trim()) {
+        toast.error("Please enter a TID number");
+        return;
+      }
+      
+      if (!sender || !sender.trim()) {
+        toast.error("Please enter the sender name");
+        return;
+      }
       
       const updateData: any = { status };
       if (notes) updateData.admin_notes = notes;
@@ -208,7 +219,8 @@ const Admin = () => {
       if (proofUrl) updateData.admin_payment_proof_url = proofUrl;
       if (status === "paid" || status === "deposited") {
         updateData.payment_date = new Date().toISOString();
-        updateData.tid = tidData;
+        updateData.tid = tid;
+        updateData.admin_notes = sender ? `Sender: ${sender}${notes ? ` | ${notes}` : ''}` : notes;
       }
 
       const { error } = await supabase
@@ -218,9 +230,11 @@ const Admin = () => {
 
       if (error) throw error;
 
-      toast.success(`Transaction marked as ${status}. TID: ${tidData}`);
+      toast.success(`Transaction marked as ${status}. TID: ${tid}`);
       setPaymentReference("");
       setPaymentProofUrl("");
+      setManualTid("");
+      setSenderName("");
       setSelectedTransaction(null);
       loadData();
     } catch (error) {
@@ -429,20 +443,119 @@ const Admin = () => {
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="transactions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto">
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
+        <Tabs defaultValue="pending" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+            <TabsTrigger value="pending" className="gap-2">
+              <Badge className="bg-yellow-500">{stats.pending}</Badge>
+              Pending
+            </TabsTrigger>
+            <TabsTrigger value="all">All Transactions</TabsTrigger>
             <TabsTrigger value="kyc">KYC Verification</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
-          {/* Transactions Tab */}
-          <TabsContent value="transactions" className="space-y-6">
+          {/* Pending Transactions Tab */}
+          <TabsContent value="pending" className="space-y-6">
+            <Card className="border-yellow-500/50 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950 dark:to-orange-950">
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-yellow-600" />
+                  Pending Transactions
+                </CardTitle>
+                <CardDescription>Transactions awaiting approval and payment</CardDescription>
+                
+                {/* Search */}
+                <div className="mt-4">
+                  <Input
+                    placeholder="Search by name or phone..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {transactions.filter(t => t.status === "pending").filter(transaction => {
+                    const matchesSearch = 
+                      transaction.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      transaction.receiver_phone.includes(searchQuery) ||
+                      (transaction.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase());
+                    return matchesSearch;
+                  }).length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No pending transactions</p>
+                  ) : (
+                    transactions.filter(t => t.status === "pending").filter(transaction => {
+                      const matchesSearch = 
+                        transaction.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        transaction.receiver_phone.includes(searchQuery) ||
+                        (transaction.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase());
+                      return matchesSearch;
+                    }).map((transaction) => (
+                      <Card key={transaction.id} className="p-6 border-l-4 border-l-yellow-500 bg-gradient-to-r from-card to-yellow-50/30 dark:to-yellow-950/10">
+                        <div className="flex flex-col sm:flex-row justify-between gap-4">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-lg text-foreground">
+                                {transaction.profiles?.full_name || "Unknown Sender"}
+                              </h4>
+                              {getStatusBadge(transaction.status)}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                              <p className="text-muted-foreground">
+                                <strong>To:</strong> {transaction.receiver_name}
+                              </p>
+                              <p className="text-muted-foreground">
+                                <strong>Phone:</strong> {transaction.receiver_phone}
+                              </p>
+                              <p className="text-muted-foreground">
+                                <strong>Amount:</strong> ${transaction.amount.toFixed(2)}
+                              </p>
+                              <p className="text-muted-foreground">
+                                <strong>Fee:</strong> ${transaction.fee.toFixed(2)}
+                              </p>
+                              {transaction.sender_number && (
+                                <p className="text-muted-foreground">
+                                  <strong>Sender #:</strong> {transaction.sender_number}
+                                </p>
+                              )}
+                              {transaction.transaction_id && (
+                                <p className="text-muted-foreground">
+                                  <strong>Transaction ID:</strong> {transaction.transaction_id}
+                                </p>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(transaction.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                          
+                          <div className="flex flex-col gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => setSelectedTransaction(transaction)}
+                              className="bg-green-500 hover:bg-green-600 gap-2"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                              Process Payment
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* All Transactions Tab */}
+          <TabsContent value="all" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Transaction Management</CardTitle>
-                <CardDescription>Review and manage all transactions</CardDescription>
+                <CardTitle>All Transactions</CardTitle>
+                <CardDescription>Complete transaction history</CardDescription>
                 
                 {/* Search and Filter */}
                 <div className="flex flex-col sm:flex-row gap-4 mt-4">
@@ -549,81 +662,11 @@ const Admin = () => {
                           </div>
                         </div>
                       </Card>
-                    ))
-                  )}
+                     ))
+                   )}
                 </div>
               </CardContent>
             </Card>
-
-            {/* Payment Confirmation Modal */}
-            {selectedTransaction && (
-              <Card className="mt-6 border-2 border-primary">
-                <CardHeader>
-                  <CardTitle>Confirm Payment Completion</CardTitle>
-                  <CardDescription>
-                    Transaction to {selectedTransaction.receiver_name}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="payment_reference">Payment Reference</Label>
-                    <Input
-                      id="payment_reference"
-                      placeholder="Enter payment reference number"
-                      value={paymentReference}
-                      onChange={(e) => setPaymentReference(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="payment_proof">Payment Proof URL (Optional)</Label>
-                    <Input
-                      id="payment_proof"
-                      placeholder="URL to payment proof"
-                      value={paymentProofUrl}
-                      onChange={(e) => setPaymentProofUrl(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={() => updateTransactionStatus(
-                        selectedTransaction.id,
-                        "paid",
-                        undefined,
-                        paymentReference,
-                        paymentProofUrl
-                      )}
-                      className="flex-1 bg-green-500 hover:bg-green-600"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Mark as Paid
-                    </Button>
-                    <Button
-                      onClick={() => updateTransactionStatus(
-                        selectedTransaction.id,
-                        "deposited",
-                        undefined,
-                        paymentReference,
-                        paymentProofUrl
-                      )}
-                      className="flex-1 bg-emerald-500 hover:bg-emerald-600"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Mark as Deposited
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedTransaction(null);
-                        setPaymentReference("");
-                        setPaymentProofUrl("");
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
 
           {/* KYC Verification Tab */}
@@ -780,6 +823,135 @@ const Admin = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Payment Confirmation Modal - Separate from tabs */}
+        {selectedTransaction && (
+          <Card className="mt-6 border-2 border-green-500 shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+                Confirm Payment Completion
+              </CardTitle>
+              <CardDescription className="text-base">
+                Transaction to <strong>{selectedTransaction.receiver_name}</strong>
+              </CardDescription>
+              <div className="mt-4 p-4 bg-white dark:bg-gray-900 rounded-lg border">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Amount</p>
+                    <p className="font-semibold">${selectedTransaction.amount.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Fee</p>
+                    <p className="font-semibold">${selectedTransaction.fee.toFixed(2)}</p>
+                  </div>
+                  {selectedTransaction.sender_number && (
+                    <div className="col-span-2">
+                      <p className="text-muted-foreground">Sender Number</p>
+                      <p className="font-semibold">{selectedTransaction.sender_number}</p>
+                    </div>
+                  )}
+                  {selectedTransaction.transaction_id && (
+                    <div className="col-span-2">
+                      <p className="text-muted-foreground">Transaction ID</p>
+                      <p className="font-semibold">{selectedTransaction.transaction_id}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+              <div>
+                <Label htmlFor="sender_name" className="text-base font-semibold">Sender Name *</Label>
+                <Input
+                  id="sender_name"
+                  placeholder="Enter the name of who made the payment"
+                  value={senderName}
+                  onChange={(e) => setSenderName(e.target.value)}
+                  className="mt-2 h-12"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="manual_tid" className="text-base font-semibold">TID Number *</Label>
+                <Input
+                  id="manual_tid"
+                  placeholder="Enter TID manually (e.g., TIDXXX123)"
+                  value={manualTid}
+                  onChange={(e) => setManualTid(e.target.value)}
+                  className="mt-2 h-12"
+                  required
+                />
+                <p className="text-xs text-muted-foreground mt-1">This TID will be sent to the sender and receiver</p>
+              </div>
+              <div>
+                <Label htmlFor="payment_reference">Payment Reference</Label>
+                <Input
+                  id="payment_reference"
+                  placeholder="Enter payment reference number (optional)"
+                  value={paymentReference}
+                  onChange={(e) => setPaymentReference(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="payment_proof">Payment Proof URL (Optional)</Label>
+                <Input
+                  id="payment_proof"
+                  placeholder="URL to payment proof"
+                  value={paymentProofUrl}
+                  onChange={(e) => setPaymentProofUrl(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={() => updateTransactionStatus(
+                    selectedTransaction.id,
+                    "paid",
+                    undefined,
+                    paymentReference,
+                    paymentProofUrl,
+                    manualTid,
+                    senderName
+                  )}
+                  className="flex-1 bg-green-500 hover:bg-green-600 h-12 text-base"
+                >
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Mark as Paid
+                </Button>
+                <Button
+                  onClick={() => updateTransactionStatus(
+                    selectedTransaction.id,
+                    "deposited",
+                    undefined,
+                    paymentReference,
+                    paymentProofUrl,
+                    manualTid,
+                    senderName
+                  )}
+                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 h-12 text-base"
+                >
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Mark as Deposited
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedTransaction(null);
+                    setPaymentReference("");
+                    setPaymentProofUrl("");
+                    setManualTid("");
+                    setSenderName("");
+                  }}
+                  className="h-12"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* KYC Details Dialog */}
         <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
