@@ -9,40 +9,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, UserCircle, AlertCircle, Search, Download, Filter, Shield, Clock, Eye } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, Search, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/Navbar";
 
 interface Transaction {
   id: string;
   sender_id: string;
   receiver_name: string;
   receiver_phone: string;
+  receiver_country: string;
   amount: number;
   fee: number;
   status: string;
+  exchange_rate?: number;
+  total_amount?: number;
   payout_method?: string;
-  proof_of_payment_url?: string;
+  payment_proof_url?: string;
   admin_notes?: string;
   created_at: string;
-  kyc_verified?: boolean;
-  kyc_document_url?: string;
-  profiles?: { full_name: string; phone_number: string; email?: string };
-}
-
-interface ExchangeRate {
-  id: string;
-  from_currency: string;
-  to_currency: string;
-  rate: number;
-  is_active: boolean;
-  created_at: string;
+  profiles?: { full_name: string; phone_number: string };
 }
 
 interface User {
   id: string;
   full_name: string;
-  email: string;
   phone_number: string;
   country: string;
   balance: number;
@@ -65,297 +55,177 @@ const Admin = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [settings, setSettings] = useState<Setting[]>([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, revenue: 0, totalUsers: 0 });
-  const [newRate, setNewRate] = useState("");
-  const [currentRate, setCurrentRate] = useState<ExchangeRate | null>(null);
+  const [newTransferFee, setNewTransferFee] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    loadMockData();
+    checkAdminAndLoadData();
   }, []);
 
-  const loadMockData = () => {
-    // Mock Transactions Data
-    const mockTransactions: Transaction[] = [
-      {
-        id: "1",
-        sender_id: "user1",
-        receiver_name: "John Kabwe",
-        receiver_phone: "+260977123456",
-        amount: 500,
-        fee: 5,
-        status: "pending",
-        payout_method: "Mobile Money",
-        proof_of_payment_url: "https://example.com/proof1.pdf",
-        kyc_verified: false,
-        kyc_document_url: "https://example.com/kyc1.pdf",
-        created_at: new Date(Date.now() - 3600000).toISOString(),
-        profiles: { full_name: "Alice Mwansa", phone_number: "+260966789012", email: "alice.mwansa@example.com" }
-      },
-      {
-        id: "2",
-        sender_id: "user2",
-        receiver_name: "Mary Phiri",
-        receiver_phone: "+260955987654",
-        amount: 250,
-        fee: 2.5,
-        status: "completed",
-        payout_method: "Bank Transfer",
-        admin_notes: "Verified and processed successfully",
-        kyc_verified: true,
-        created_at: new Date(Date.now() - 86400000).toISOString(),
-        profiles: { full_name: "David Banda", phone_number: "+260977456789", email: "david.banda@example.com" }
-      },
-      {
-        id: "3",
-        sender_id: "user3",
-        receiver_name: "Joseph Tembo",
-        receiver_phone: "+260965432109",
-        amount: 1000,
-        fee: 10,
-        status: "pending",
-        payout_method: "Cash Pickup",
-        proof_of_payment_url: "https://example.com/proof3.pdf",
-        kyc_verified: false,
-        kyc_document_url: "https://example.com/kyc3.pdf",
-        created_at: new Date(Date.now() - 7200000).toISOString(),
-        profiles: { full_name: "Grace Lungu", phone_number: "+260966111222", email: "grace.lungu@example.com" }
-      },
-      {
-        id: "4",
-        sender_id: "user4",
-        receiver_name: "Ruth Chanda",
-        receiver_phone: "+260977888999",
-        amount: 750,
-        fee: 7.5,
-        status: "completed",
-        payout_method: "Mobile Money",
-        admin_notes: "Processed on time",
-        kyc_verified: true,
-        created_at: new Date(Date.now() - 172800000).toISOString(),
-        profiles: { full_name: "Peter Zulu", phone_number: "+260955333444", email: "peter.zulu@example.com" }
-      }
-    ];
-
-    // Mock Users Data
-    const mockUsers: User[] = [
-      {
-        id: "user1",
-        full_name: "Alice Mwansa",
-        email: "alice.mwansa@example.com",
-        phone_number: "+260966789012",
-        country: "Zambia",
-        balance: 1500,
-        verified: true,
-        created_at: new Date(Date.now() - 2592000000).toISOString()
-      },
-      {
-        id: "user2",
-        full_name: "David Banda",
-        email: "david.banda@example.com",
-        phone_number: "+260977456789",
-        country: "Zambia",
-        balance: 500,
-        verified: true,
-        created_at: new Date(Date.now() - 5184000000).toISOString()
-      },
-      {
-        id: "user3",
-        full_name: "Grace Lungu",
-        email: "grace.lungu@example.com",
-        phone_number: "+260966111222",
-        country: "Zambia",
-        balance: 2000,
-        verified: false,
-        created_at: new Date(Date.now() - 1296000000).toISOString()
-      },
-      {
-        id: "user4",
-        full_name: "Peter Zulu",
-        email: "peter.zulu@example.com",
-        phone_number: "+260955333444",
-        country: "Zambia",
-        balance: 800,
-        verified: true,
-        created_at: new Date(Date.now() - 7776000000).toISOString()
-      }
-    ];
-
-    // Mock Settings Data
-    const mockSettings: Setting[] = [
-      {
-        id: "1",
-        key: "min_transfer_amount",
-        value: "10",
-        description: "Minimum transfer amount in USD"
-      },
-      {
-        id: "2",
-        key: "max_transfer_amount",
-        value: "5000",
-        description: "Maximum transfer amount in USD"
-      },
-      {
-        id: "3",
-        key: "transaction_fee_percentage",
-        value: "1",
-        description: "Transaction fee as percentage"
-      },
-      {
-        id: "4",
-        key: "support_email",
-        value: "support@turapay.com",
-        description: "Customer support email address"
-      }
-    ];
-
-    // Mock Exchange Rate
-    const mockRate: ExchangeRate = {
-      id: "rate1",
-      from_currency: "USD",
-      to_currency: "ZMW",
-      rate: 26.5,
-      is_active: true,
-      created_at: new Date().toISOString()
-    };
-
-    setTransactions(mockTransactions);
-    setUsers(mockUsers);
-    setSettings(mockSettings);
-    setCurrentRate(mockRate);
-
-    // Calculate stats
-    const total = mockTransactions.length;
-    const pending = mockTransactions.filter(t => t.status === "pending").length;
-    const completed = mockTransactions.filter(t => t.status === "completed").length;
-    const revenue = mockTransactions.reduce((sum, t) => sum + t.fee, 0);
-    
-    setStats({
-      total,
-      pending,
-      completed,
-      revenue,
-      totalUsers: mockUsers.length
-    });
-
-    setIsAdmin(true);
-    setLoading(false);
-  };
-
-  const updateTransactionStatus = (
-    transactionId: string,
-    status: string,
-    notes?: string
-  ) => {
-    // Find the transaction to notify users
-    const transaction = transactions.find(tx => tx.id === transactionId);
-    
-    // Update transaction status in mock data
-    setTransactions(prev => 
-      prev.map(tx => 
-        tx.id === transactionId 
-          ? { ...tx, status, admin_notes: notes }
-          : tx
-      )
-    );
-
-    // Recalculate stats
-    setTimeout(() => {
-      const pending = transactions.filter(t => t.status === "pending").length;
-      const completed = transactions.filter(t => t.status === "completed").length;
-      setStats(prev => ({ ...prev, pending, completed }));
-    }, 100);
-
-    // Send notifications to both sender and receiver when payment is completed
-    if (status === "completed" && transaction) {
-      // Notify sender
-      toast.success(`Payment completed! ${transaction.profiles?.full_name} (sender) has been notified.`);
+  const checkAdminAndLoadData = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Notify receiver
-      toast.success(`${transaction.receiver_name} (receiver) has been notified of the payment.`);
-      
-      // In a real app, this would trigger email/SMS notifications
-      console.log(`Notification sent to sender: ${transaction.profiles?.email}`);
-      console.log(`Notification sent to receiver: ${transaction.receiver_phone}`);
-    } else {
-      toast.success(`Transaction marked as ${status}`);
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+
+      // Check if user is admin
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (roleError || !roleData) {
+        toast.error("Access denied. Admin privileges required.");
+        navigate("/dashboard");
+        return;
+      }
+
+      setIsAdmin(true);
+      await loadData();
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      navigate("/auth");
     }
   };
 
-  const updateKYCStatus = (transactionId: string, verified: boolean) => {
-    setTransactions(prev => 
-      prev.map(tx => 
-        tx.id === transactionId 
-          ? { ...tx, kyc_verified: verified }
-          : tx
-      )
-    );
-    toast.success(`KYC ${verified ? "verified" : "rejected"} successfully`);
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      // Load transactions with sender profiles
+      const { data: transData, error: transError } = await supabase
+        .from("transactions")
+        .select(`
+          *,
+          profiles:sender_id (full_name, phone_number)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (transError) throw transError;
+      setTransactions(transData || []);
+
+      // Load users
+      const { data: usersData, error: usersError } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (usersError) throw usersError;
+      setUsers(usersData || []);
+
+      // Load settings
+      const { data: settingsData, error: settingsError } = await supabase
+        .from("settings")
+        .select("*");
+
+      if (settingsError) throw settingsError;
+      setSettings(settingsData || []);
+
+      // Calculate stats
+      const totalTrans = transData?.length || 0;
+      const pendingTrans = transData?.filter(t => t.status === "pending").length || 0;
+      const completedTrans = transData?.filter(t => t.status === "completed").length || 0;
+      const revenue = transData?.reduce((sum, t) => sum + (t.fee || 0), 0) || 0;
+
+      setStats({
+        total: totalTrans,
+        pending: pendingTrans,
+        completed: completedTrans,
+        revenue: revenue,
+        totalUsers: usersData?.length || 0
+      });
+
+      // Get current transfer fee
+      const transferFeeSetting = settingsData?.find(s => s.key === "transfer_fee_percentage");
+      if (transferFeeSetting) {
+        setNewTransferFee(transferFeeSetting.value);
+      }
+
+    } catch (error) {
+      console.error("Error loading data:", error);
+      toast.error("Failed to load admin data");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const exportTransactions = () => {
-    const csvContent = [
-      ["ID", "Sender", "Receiver", "Amount (USD)", "Amount (ZMW)", "Fee", "Status", "KYC Status", "Date"],
-      ...filteredTransactions.map(tx => [
-        tx.id,
-        tx.profiles?.full_name || "Unknown",
-        tx.receiver_name,
-        tx.amount,
-        (tx.amount * (currentRate?.rate || 26.5)).toFixed(2),
-        tx.fee,
-        tx.status,
-        tx.kyc_verified ? "Verified" : "Pending",
-        new Date(tx.created_at).toLocaleString()
-      ])
-    ].map(row => row.join(",")).join("\n");
+  const updateTransactionStatus = async (transactionId: string, status: string, notes?: string) => {
+    try {
+      const updateData: any = { status };
+      if (notes) updateData.admin_notes = notes;
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `transactions-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    toast.success("Transactions exported successfully");
+      const { error } = await supabase
+        .from("transactions")
+        .update(updateData)
+        .eq("id", transactionId);
+
+      if (error) throw error;
+
+      toast.success(`Transaction ${status}`);
+      loadData();
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+      toast.error("Failed to update transaction");
+    }
   };
 
-  const filteredTransactions = transactions.filter(tx => {
-    const matchesSearch = 
-      tx.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.receiver_phone.includes(searchQuery);
-    const matchesFilter = filterStatus === "all" || tx.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
-
-  const updateExchangeRate = () => {
-    const rate = parseFloat(newRate);
-    if (isNaN(rate) || rate <= 0) {
-      toast.error("Please enter a valid rate");
+  const updateTransferFee = async () => {
+    const feeValue = parseFloat(newTransferFee);
+    if (isNaN(feeValue) || feeValue < 0 || feeValue > 100) {
+      toast.error("Please enter a valid percentage between 0 and 100");
       return;
     }
 
-    // Update mock exchange rate
-    const newMockRate: ExchangeRate = {
-      id: `rate${Date.now()}`,
-      from_currency: "USD",
-      to_currency: "ZMW",
-      rate,
-      is_active: true,
-      created_at: new Date().toISOString()
-    };
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .update({ value: newTransferFee })
+        .eq("key", "transfer_fee_percentage");
 
-    setCurrentRate(newMockRate);
-    setNewRate("");
-    toast.success("Exchange rate updated");
+      if (error) throw error;
+
+      toast.success("Transfer fee updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating transfer fee:", error);
+      toast.error("Failed to update transfer fee");
+    }
+  };
+
+  const filteredTransactions = transactions.filter(transaction => {
+    const matchesSearch = 
+      transaction.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.receiver_phone.includes(searchQuery) ||
+      (transaction.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus = filterStatus === "all" || transaction.status === filterStatus;
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <Badge className="bg-green-500">Completed</Badge>;
+      case "pending":
+        return <Badge className="bg-yellow-500">Pending</Badge>;
+      case "failed":
+        return <Badge className="bg-red-500">Failed</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
-        <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <p className="text-center">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading admin panel...</p>
       </div>
     );
   }
@@ -365,139 +235,113 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
-      <Navbar />
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/dashboard")}
-              className="mb-2 gap-2"
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-card border-b border-border sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold">T</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">TuraPay Admin</h1>
+                <p className="text-sm text-muted-foreground">Dashboard & Management</p>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/dashboard')} 
+              className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
             </Button>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Admin Control Center
-            </h1>
-            <p className="text-muted-foreground mt-1">Manage your TuraPay platform</p>
           </div>
         </div>
+      </header>
 
-        {/* Enhanced Stats Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Total Transactions</p>
-                  <p className="text-3xl font-bold mt-1">{stats.total}</p>
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-primary" />
-                </div>
-              </div>
+      <div className="container mx-auto px-4 py-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
           
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Pending</p>
-                  <p className="text-3xl font-bold mt-1 text-warning">{stats.pending}</p>
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-warning/10 flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-warning" />
-                </div>
-              </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <DollarSign className="h-4 w-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-500">{stats.pending}</div>
             </CardContent>
           </Card>
           
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Completed</p>
-                  <p className="text-3xl font-bold mt-1 text-success">{stats.completed}</p>
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-success/10 flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6 text-success" />
-                </div>
-              </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Completed</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-500">{stats.completed}</div>
             </CardContent>
           </Card>
-          
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Total Users</p>
-                  <p className="text-3xl font-bold mt-1">{stats.totalUsers}</p>
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-accent" />
-                </div>
-              </div>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalUsers}</div>
             </CardContent>
           </Card>
-          
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Revenue</p>
-                  <p className="text-3xl font-bold mt-1">${stats.revenue.toFixed(2)}</p>
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-emerald-600" />
-                </div>
-              </div>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Revenue (Fees)</CardTitle>
+              <DollarSign className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">${stats.revenue.toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
 
+        {/* Main Tabs */}
         <Tabs defaultValue="transactions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto">
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="kyc">KYC Verification</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="exchange">Exchange Rates</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="transactions" className="space-y-4">
-            <Card className="shadow-xl">
+          {/* Transactions Tab */}
+          <TabsContent value="transactions" className="space-y-6">
+            <Card>
               <CardHeader>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <CardTitle className="text-2xl">Transaction Management</CardTitle>
-                    <CardDescription>Review and manage all platform transactions</CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={exportTransactions} className="gap-2">
-                      <Download className="h-4 w-4" />
-                      Export CSV
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-col md:flex-row gap-3">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <CardTitle>Transaction Management</CardTitle>
+                <CardDescription>Review and manage all transactions</CardDescription>
+                
+                {/* Search and Filter */}
+                <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                  <div className="flex-1">
                     <Input
-                      placeholder="Search by sender, receiver, or phone..."
+                      placeholder="Search by name or phone..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="w-full"
                     />
                   </div>
                   <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-full md:w-[180px]">
-                      <Filter className="h-4 w-4 mr-2" />
+                    <SelectTrigger className="w-full sm:w-48">
                       <SelectValue placeholder="Filter by status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -508,425 +352,174 @@ const Admin = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </CardContent>
-            </Card>
-            {filteredTransactions.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <p className="text-muted-foreground">No transactions yet</p>
-                </CardContent>
-              </Card>
-            ) : (
-              filteredTransactions.map((tx) => (
-                <Card key={tx.id} className="hover:shadow-lg transition-all border-l-4 border-l-primary/20 hover:border-l-primary">
-                  <CardHeader>
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <CardTitle className="text-lg">
-                              {tx.profiles?.full_name} → {tx.receiver_name}
-                            </CardTitle>
-                            <Badge
-                              variant={tx.status === "completed" ? "default" : tx.status === "pending" ? "secondary" : "destructive"}
-                              className="uppercase"
-                            >
-                              {tx.status}
-                            </Badge>
-                            {tx.kyc_verified ? (
-                              <Badge variant="default" className="gap-1 bg-success/10 text-success hover:bg-success/20">
-                                <Shield className="h-3 w-3" />
-                                KYC Verified
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary" className="gap-1 bg-warning/10 text-warning hover:bg-warning/20">
-                                <Clock className="h-3 w-3" />
-                                KYC Pending
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground">{tx.profiles?.email}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid md:grid-cols-3 gap-4">
-                        <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (USD)</p>
-                          <p className="text-2xl font-bold text-primary">${tx.amount.toFixed(2)}</p>
-                        </div>
-                        <div className="p-4 bg-gradient-to-br from-accent/5 to-accent/10 rounded-lg border border-accent/20">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (ZMW)</p>
-                          <p className="text-2xl font-bold text-accent">
-                            K {(tx.amount * (currentRate?.rate || 26.5)).toFixed(2)}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">Rate: {currentRate?.rate || 26.5}</p>
-                        </div>
-                        <div className="p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-lg border border-secondary/20">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Transaction Fee</p>
-                          <p className="text-2xl font-bold">${tx.fee.toFixed(2)}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid md:grid-cols-2 gap-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-muted-foreground">Receiver Phone:</span>
-                          <span className="font-mono">{tx.receiver_phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-muted-foreground">Payout Method:</span>
-                          <Badge variant="outline">{tx.payout_method || "Not specified"}</Badge>
-                        </div>
-                        <div className="flex items-center gap-2 md:col-span-2">
-                          <span className="font-medium text-muted-foreground">Transaction Date:</span>
-                          <span>{new Date(tx.created_at).toLocaleString()}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2">
-                        {tx.proof_of_payment_url && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => window.open(tx.proof_of_payment_url, "_blank")}
-                          >
-                            <Eye className="h-4 w-4" />
-                            View Payment Proof
-                          </Button>
-                        )}
-                        {tx.kyc_document_url && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => window.open(tx.kyc_document_url, "_blank")}
-                          >
-                            <Eye className="h-4 w-4" />
-                            View KYC Document
-                          </Button>
-                        )}
-                      </div>
-
-                      {tx.admin_notes && (
-                        <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Admin Notes</p>
-                          <p className="text-sm italic">{tx.admin_notes}</p>
-                        </div>
-                      )}
-
-                      {tx.status === "pending" && (
-                        <div className="flex flex-col gap-3 pt-3 border-t border-border">
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              className="gap-2 flex-1"
-                              onClick={() => updateTransactionStatus(tx.id, "completed", "Transaction approved and completed")}
-                            >
-                              <CheckCircle className="h-4 w-4" />
-                              Approve Transaction
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              className="gap-2 flex-1"
-                              onClick={() => {
-                                const notes = prompt("Enter rejection reason:");
-                                if (notes) updateTransactionStatus(tx.id, "failed", notes);
-                              }}
-                            >
-                              <XCircle className="h-4 w-4" />
-                              Reject Transaction
-                            </Button>
-                          </div>
-                          {!tx.kyc_verified && (
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-2 flex-1"
-                                onClick={() => updateKYCStatus(tx.id, true)}
-                              >
-                                <Shield className="h-4 w-4" />
-                                Verify KYC
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-2 flex-1 text-destructive hover:text-destructive"
-                                onClick={() => updateKYCStatus(tx.id, false)}
-                              >
-                                <XCircle className="h-4 w-4" />
-                                Reject KYC
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))
-            )}
-          </TabsContent>
-
-          <TabsContent value="kyc" className="space-y-4">
-            <Card className="shadow-xl">
-              <CardHeader>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <CardTitle className="text-2xl flex items-center gap-3">
-                      <Shield className="h-6 w-6 text-primary" />
-                      KYC Verification
-                    </CardTitle>
-                    <CardDescription>Review and verify user identity documents</CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <Badge variant="secondary" className="text-lg px-4 py-2">
-                      {transactions.filter(tx => !tx.kyc_verified).length} Pending
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
-
-            {transactions.filter(tx => !tx.kyc_verified).length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <p className="text-muted-foreground text-lg">All KYC verifications completed</p>
-                  <p className="text-sm text-muted-foreground mt-2">Great job! There are no pending verifications.</p>
-                </CardContent>
-              </Card>
-            ) : (
-              transactions.filter(tx => !tx.kyc_verified).map((tx) => (
-                <Card key={tx.id} className="hover:shadow-lg transition-all border-l-4 border-l-warning">
-                  <CardHeader>
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <CardTitle className="text-lg">
-                              {tx.profiles?.full_name} → {tx.receiver_name}
-                            </CardTitle>
-                            <Badge variant="secondary" className="gap-1 bg-warning/10 text-warning hover:bg-warning/20">
-                              <Clock className="h-3 w-3" />
-                              KYC Pending
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{tx.profiles?.email}</p>
-                          <p className="text-sm text-muted-foreground">Phone: {tx.profiles?.phone_number}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid md:grid-cols-3 gap-4">
-                        <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (USD)</p>
-                          <p className="text-2xl font-bold text-primary">${tx.amount.toFixed(2)}</p>
-                        </div>
-                        <div className="p-4 bg-gradient-to-br from-accent/5 to-accent/10 rounded-lg border border-accent/20">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Amount (ZMW)</p>
-                          <p className="text-2xl font-bold text-accent">
-                            K {(tx.amount * (currentRate?.rate || 26.5)).toFixed(2)}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">Rate: {currentRate?.rate || 26.5}</p>
-                        </div>
-                        <div className="p-4 bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-lg border border-secondary/20">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Transaction Date</p>
-                          <p className="text-sm font-bold">{new Date(tx.created_at).toLocaleDateString()}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{new Date(tx.created_at).toLocaleTimeString()}</p>
-                        </div>
-                      </div>
-
-                      <div className="p-6 bg-gradient-to-br from-warning/5 to-warning/10 rounded-lg border-2 border-warning/30">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2 bg-warning/20 rounded-lg">
-                            <Shield className="h-5 w-5 text-warning" />
-                          </div>
-                          <div>
-                            <p className="font-bold text-lg">Identity Verification Required</p>
-                            <p className="text-sm text-muted-foreground">Review the submitted KYC documents carefully</p>
-                          </div>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-3 text-sm mb-4">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-muted-foreground">Sender:</span>
-                            <span className="font-semibold">{tx.profiles?.full_name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-muted-foreground">Receiver:</span>
-                            <span className="font-semibold">{tx.receiver_name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-muted-foreground">Receiver Phone:</span>
-                            <span className="font-mono">{tx.receiver_phone}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-muted-foreground">Payout Method:</span>
-                            <Badge variant="outline">{tx.payout_method || "Not specified"}</Badge>
-                          </div>
-                        </div>
-
-                        {tx.kyc_document_url && (
-                          <Button
-                            variant="outline"
-                            className="w-full gap-2 mb-4"
-                            onClick={() => window.open(tx.kyc_document_url, "_blank")}
-                          >
-                            <Eye className="h-4 w-4" />
-                            View KYC Document
-                          </Button>
-                        )}
-
-                        <div className="flex gap-3 pt-4 border-t border-warning/20">
-                          <Button
-                            size="lg"
-                            className="gap-2 flex-1 bg-success hover:bg-success/90"
-                            onClick={() => {
-                              updateKYCStatus(tx.id, true);
-                              toast.success(`KYC verified for ${tx.profiles?.full_name}`);
-                            }}
-                          >
-                            <CheckCircle className="h-5 w-5" />
-                            Verify KYC
-                          </Button>
-                          <Button
-                            size="lg"
-                            variant="destructive"
-                            className="gap-2 flex-1"
-                            onClick={() => {
-                              const reason = prompt("Enter rejection reason:");
-                              if (reason) {
-                                updateKYCStatus(tx.id, false);
-                                toast.error(`KYC rejected: ${reason}`);
-                              }
-                            }}
-                          >
-                            <XCircle className="h-5 w-5" />
-                            Reject KYC
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))
-            )}
-          </TabsContent>
-
-          <TabsContent value="users" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>View and manage platform users</CardDescription>
-              </CardHeader>
-            </Card>
-            <div className="grid gap-4">
-              {users.map((user) => (
-                <Card key={user.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex gap-4">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <UserCircle className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="space-y-2">
-                          <div>
-                            <p className="font-bold text-lg">{user.full_name}</p>
-                            <p className="text-sm text-muted-foreground">{user.email}</p>
-                          </div>
-                          <div className="grid md:grid-cols-2 gap-x-6 gap-y-1 text-sm">
-                            <p><span className="font-medium">Phone:</span> {user.phone_number}</p>
-                            <p><span className="font-medium">Country:</span> {user.country}</p>
-                            <p><span className="font-medium">Balance:</span> ${user.balance?.toFixed(2) || "0.00"}</p>
-                            <p><span className="font-medium">Joined:</span> {new Date(user.created_at).toLocaleDateString()}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2 items-end">
-                        {user.verified ? (
-                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-success/10 text-success">
-                            VERIFIED
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-warning/10 text-warning">
-                            UNVERIFIED
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="exchange">
-            <Card>
-              <CardHeader>
-                <CardTitle>Exchange Rate Management</CardTitle>
-                <CardDescription>Update currency exchange rates for the platform</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {currentRate && (
-                  <div className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border-2 border-primary/20">
-                    <p className="text-sm text-muted-foreground mb-2 font-medium">Current Active Rate</p>
-                    <p className="text-4xl font-bold mb-1">
-                      1 USD = {currentRate.rate} ZMW
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Last updated: {new Date(currentRate.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                )}
-                <div className="space-y-3">
-                  <Label className="text-base font-semibold">Set New Exchange Rate (USD to ZMW)</Label>
-                  <div className="flex gap-3">
-                    <Input
-                      type="number"
-                      step="0.0001"
-                      placeholder="27.5000"
-                      value={newRate}
-                      onChange={(e) => setNewRate(e.target.value)}
-                      className="text-lg h-12"
-                    />
-                    <Button onClick={updateExchangeRate} className="h-12 px-8">
-                      Update Rate
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    This will deactivate the current rate and set a new active rate for all transactions
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>Platform Settings</CardTitle>
-                <CardDescription>Configure global platform parameters</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {settings.map((setting) => (
-                    <div key={setting.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <p className="font-semibold text-sm uppercase tracking-wide text-primary mb-1">
-                            {setting.key.replace(/_/g, " ")}
-                          </p>
-                          <p className="text-xs text-muted-foreground mb-2">{setting.description}</p>
-                          <p className="text-2xl font-bold">{setting.value}</p>
+                  {filteredTransactions.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No transactions found</p>
+                  ) : (
+                    filteredTransactions.map((transaction) => (
+                      <Card key={transaction.id} className="p-4">
+                        <div className="flex flex-col sm:flex-row justify-between gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-foreground">
+                                {transaction.profiles?.full_name || "Unknown Sender"}
+                              </h4>
+                              {getStatusBadge(transaction.status)}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              To: {transaction.receiver_name} ({transaction.receiver_phone})
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Amount: ${transaction.amount.toFixed(2)} | Fee: ${transaction.fee.toFixed(2)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(transaction.created_at).toLocaleString()}
+                            </p>
+                            {transaction.admin_notes && (
+                              <p className="text-sm text-muted-foreground italic">
+                                Notes: {transaction.admin_notes}
+                              </p>
+                            )}
+                          </div>
+                          
+                          <div className="flex flex-col gap-2">
+                            {transaction.status === "pending" && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  onClick={() => updateTransactionStatus(transaction.id, "completed")}
+                                  className="bg-green-500 hover:bg-green-600"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => updateTransactionStatus(transaction.id, "failed", "Rejected by admin")}
+                                >
+                                  <XCircle className="h-4 w-4 mr-2" />
+                                  Reject
+                                </Button>
+                              </>
+                            )}
+                            {transaction.payment_proof_url && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => window.open(transaction.payment_proof_url, "_blank")}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Proof
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <SettingsIcon className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    </div>
-                  ))}
-                  {settings.length === 0 && (
-                    <p className="text-center py-8 text-muted-foreground">No settings configured</p>
+                      </Card>
+                    ))
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>View and manage registered users</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {users.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No users found</p>
+                  ) : (
+                    users.map((user) => (
+                      <Card key={user.id} className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-foreground">{user.full_name}</h4>
+                              {user.verified && (
+                                <Badge className="bg-green-500">Verified</Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{user.phone_number}</p>
+                            <p className="text-sm text-muted-foreground">Country: {user.country}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Balance: {user.country === "Zambia" ? "ZMW" : "USD"} {user.balance.toFixed(2)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Joined: {new Date(user.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Platform Settings</CardTitle>
+                <CardDescription>Manage platform configuration</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Transfer Fee Setting */}
+                <div className="space-y-4 p-4 border border-border rounded-lg">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">Transfer Fee Percentage</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Set the percentage fee charged on each transfer
+                    </p>
+                  </div>
+                  <div className="flex gap-4 items-end">
+                    <div className="flex-1">
+                      <Label htmlFor="transfer-fee">Fee Percentage (%)</Label>
+                      <Input
+                        id="transfer-fee"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        value={newTransferFee}
+                        onChange={(e) => setNewTransferFee(e.target.value)}
+                        placeholder="Enter percentage"
+                      />
+                    </div>
+                    <Button onClick={updateTransferFee}>
+                      Update Fee
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Current fee: {settings.find(s => s.key === "transfer_fee_percentage")?.value || "12"}%
+                  </p>
+                </div>
+
+                {/* Other Settings Display */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-foreground">Other Settings</h3>
+                  {settings.filter(s => s.key !== "transfer_fee_percentage").map((setting) => (
+                    <Card key={setting.id} className="p-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-semibold text-foreground capitalize">
+                            {setting.key.replace(/_/g, " ")}
+                          </h4>
+                          <Badge variant="outline">{setting.value}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{setting.description}</p>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>

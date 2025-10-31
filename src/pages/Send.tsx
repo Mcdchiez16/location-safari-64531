@@ -138,12 +138,13 @@ const Send = () => {
 
     const { error } = await supabase.from("transactions").insert({
       sender_id: userId,
-      receiver_id: receiverProfile.id,
       receiver_name: receiverProfile.full_name,
       receiver_phone: receiverProfile.phone_number,
+      receiver_country: "Zambia",
       amount: parseFloat(amount),
       currency: "USD",
       fee: transferFee,
+      exchange_rate: exchangeRate,
       status: "pending",
     });
 

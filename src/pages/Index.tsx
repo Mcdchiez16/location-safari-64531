@@ -4,16 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { SendIcon, Download, Shield, Zap, Globe2, CheckCircle2, TrendingUp, ArrowRight, Smartphone, Clock, DollarSign } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const navigate = useNavigate();
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [amount, setAmount] = useState(100);
-  const transferFee = 2.99;
+  const [transferFeePercentage, setTransferFeePercentage] = useState(12);
 
   useEffect(() => {
-    const fetchExchangeRate = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch exchange rate
         const response = await fetch('https://open.er-api.com/v6/latest/USD');
         const data = await response.json();
         
@@ -23,10 +25,25 @@ const Index = () => {
       } catch (error) {
         console.error('Error fetching exchange rate:', error);
       }
+
+      // Fetch transfer fee from database
+      try {
+        const { data, error } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'transfer_fee_percentage')
+          .single();
+        
+        if (!error && data) {
+          setTransferFeePercentage(parseFloat(data.value));
+        }
+      } catch (error) {
+        console.error('Error fetching transfer fee:', error);
+      }
     };
 
-    fetchExchangeRate();
-    const interval = setInterval(fetchExchangeRate, 300000);
+    fetchData();
+    const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
 
@@ -109,21 +126,6 @@ const Index = () => {
               </Button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-8">
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">2min</div>
-                <div className="text-sm text-muted-foreground">Average Transfer</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">$2.99</div>
-                <div className="text-sm text-muted-foreground">Transfer Fee</div>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1">24/7</div>
-                <div className="text-sm text-muted-foreground">Support</div>
-              </div>
-            </div>
           </div>
 
           {/* Right - Calculator Card */}
@@ -171,11 +173,11 @@ const Index = () => {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Transfer Fee</span>
-                      <span className="font-semibold text-foreground">${transferFee.toFixed(2)}</span>
+                      <span className="font-semibold text-foreground">{transferFeePercentage}%</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Total to Pay</span>
-                      <span className="font-semibold text-foreground">${(amount + transferFee).toFixed(2)}</span>
+                      <span className="font-semibold text-foreground">${(amount + (amount * transferFeePercentage / 100)).toFixed(2)}</span>
                     </div>
                     <div className="border-t border-primary/20 pt-3 mt-3">
                       <div className="flex items-center justify-between">

@@ -57,6 +57,7 @@ const Send = () => {
       sender_id: userId,
       receiver_name: receiverName,
       receiver_phone: receiverPhone,
+      receiver_country: "Zambia",
       amount: numAmount,
       currency: currency,
       fee: fee,
