@@ -154,6 +154,30 @@ export type Database = {
         }
         Relationships: []
       }
+      support_settings: {
+        Row: {
+          additional_info: string | null
+          email: string
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          additional_info?: string | null
+          email: string
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          additional_info?: string | null
+          email?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           admin_notes: string | null
@@ -171,6 +195,7 @@ export type Database = {
           receiver_country: string
           receiver_name: string
           receiver_phone: string
+          rejection_reason: string | null
           sender_id: string
           sender_number: string | null
           status: string | null
@@ -195,6 +220,7 @@ export type Database = {
           receiver_country: string
           receiver_name: string
           receiver_phone: string
+          rejection_reason?: string | null
           sender_id: string
           sender_number?: string | null
           status?: string | null
@@ -219,6 +245,7 @@ export type Database = {
           receiver_country?: string
           receiver_name?: string
           receiver_phone?: string
+          rejection_reason?: string | null
           sender_id?: string
           sender_number?: string | null
           status?: string | null

@@ -38,6 +38,7 @@ const Dashboard = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'received' | 'sent'>('received');
+  const [totalSent, setTotalSent] = useState(0);
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
@@ -112,6 +113,16 @@ const Dashboard = () => {
       setTransactions(sent || []);
       setMode('sent');
     }
+
+    // Calculate total sent amount
+    const { data: allSent } = await supabase
+      .from("transactions")
+      .select("amount, status")
+      .eq("sender_id", userId)
+      .in("status", ["paid", "deposited", "completed"]);
+
+    const total = allSent?.reduce((sum, tx) => sum + tx.amount, 0) || 0;
+    setTotalSent(total);
   };
 
   const getStatusColor = (status: string) => {
@@ -205,10 +216,13 @@ const Dashboard = () => {
         {/* Balance Card */}
         <div className="bg-primary-foreground rounded-3xl p-6 md:p-8 mb-6 shadow-xl">
           <p className="text-sm md:text-base text-muted-foreground mb-2">
-            {isReceiver ? 'Zambian Kwacha Balance' : 'Total'}
+            {isReceiver ? 'Zambian Kwacha Balance' : 'Total Amount Sent'}
           </p>
           <p className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
-            {profile?.country === 'Zambia' ? 'ZMW' : 'USD'} {Number(profile?.balance || 0).toFixed(2)}
+            {isReceiver 
+              ? `${profile?.country === 'Zambia' ? 'ZMW' : 'USD'} ${Number(profile?.balance || 0).toFixed(2)}`
+              : `USD ${totalSent.toFixed(2)}`
+            }
           </p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
@@ -219,26 +233,10 @@ const Dashboard = () => {
               Send Money
             </Button>
             <Button 
-              onClick={() => {
-                if (session?.user?.id) {
-                  // Refresh transactions right before showing the section
-                  loadTransactions(session.user.id);
-                }
-                const element = document.getElementById('transactions-section');
-                if (element) {
-                  // Update URL hash for better accessibility/back navigation
-                  history.replaceState(null, '', '#transactions-section');
-                  const yOffset = -20;
-                  const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                  window.scrollTo({ top: y, behavior: 'smooth' });
-                  // Brief highlight to signal movement
-                  element.classList.add('ring-2','ring-primary','rounded-2xl');
-                  setTimeout(() => element.classList.remove('ring-2','ring-primary'), 1200);
-                }
-              }} 
+              onClick={() => navigate("/transactions")} 
               className="h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg rounded-2xl shadow-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-bold"
             >
-              View Transactions
+              View All Transactions
             </Button>
           </div>
         </div>

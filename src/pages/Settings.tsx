@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, User, Shield, QrCode, LogOut, Mail, Settings as SettingsIcon, Lock, HelpCircle, CheckCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, User, Shield, QrCode, LogOut, Mail, Settings as SettingsIcon, Lock, HelpCircle, CheckCircle, AlertCircle, Phone, Info } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -18,13 +18,21 @@ interface Profile {
   account_type: string;
 }
 
+interface SupportSettings {
+  email: string;
+  phone: string;
+  additional_info: string;
+}
+
 const Settings = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [supportSettings, setSupportSettings] = useState<SupportSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadProfile();
+    loadSupportSettings();
   }, []);
 
   const loadProfile = async () => {
@@ -48,6 +56,20 @@ const Settings = () => {
       setProfile(data);
     }
     setLoading(false);
+  };
+
+  const loadSupportSettings = async () => {
+    const { data, error } = await supabase
+      .from("support_settings")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error loading support settings:", error);
+    } else if (data) {
+      setSupportSettings(data);
+    }
   };
 
   const handleLogout = async () => {
@@ -206,7 +228,7 @@ const Settings = () => {
                 </CardContent>
               </Card>
 
-              {isReceiver && (
+              {isReceiver && profile?.verified && (
                 <Card className="border border-gray-200 shadow-sm">
                   <CardHeader className="bg-gray-50 border-b border-gray-200">
                     <CardTitle className="text-xl font-semibold text-gray-900 flex items-center gap-2">
@@ -302,24 +324,36 @@ const Settings = () => {
                       <h3 className="font-semibold text-gray-900">Email Support</h3>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">Get help via email</p>
-                    <p className="font-semibold text-blue-600">support@turapay.com</p>
+                    <p className="font-semibold text-blue-600">{supportSettings?.email || 'support@turapay.com'}</p>
                   </div>
                   
                   <div className="p-5 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="p-2 bg-blue-100 rounded-lg">
-                        <HelpCircle className="h-5 w-5 text-blue-600" />
+                        <Phone className="h-5 w-5 text-blue-600" />
                       </div>
-                      <h3 className="font-semibold text-gray-900">Help Center</h3>
+                      <h3 className="font-semibold text-gray-900">Phone Support</h3>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">Browse our knowledge base</p>
-                    <p className="font-semibold text-gray-500">Coming Soon</p>
+                    <p className="text-sm text-gray-600 mb-2">Call us for assistance</p>
+                    <p className="font-semibold text-gray-900">{supportSettings?.phone || 'Contact via email'}</p>
                   </div>
                 </div>
                 
+                {supportSettings?.additional_info && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1">Support Hours</h4>
+                        <p className="text-sm text-gray-700">{supportSettings.additional_info}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="pt-4 border-t border-gray-200">
                   <Button 
-                    onClick={() => toast.info("Contact support at: support@turapay.com")}
+                    onClick={() => toast.info(`Contact support at: ${supportSettings?.email || 'support@turapay.com'}`)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium"
                   >
                     Contact Customer Support

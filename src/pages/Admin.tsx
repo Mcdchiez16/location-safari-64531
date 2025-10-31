@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, Search, Eye, User, FileText } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, Search, Eye, User, FileText, Menu } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { AdminSidebar } from "@/components/AdminSidebar";
 
 interface Transaction {
   id: string;
@@ -39,6 +40,7 @@ interface Transaction {
   sender_number?: string;
   transaction_id?: string;
   tid?: string;
+  rejection_reason?: string;
   profiles?: { full_name: string; phone_number: string };
 }
 
@@ -63,6 +65,13 @@ interface Setting {
   description: string;
 }
 
+interface SupportSettings {
+  id: string;
+  email: string;
+  phone: string;
+  additional_info: string;
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -71,6 +80,7 @@ const Admin = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [kycRequests, setKycRequests] = useState<UserProfile[]>([]);
   const [settings, setSettings] = useState<Setting[]>([]);
+  const [supportSettings, setSupportSettings] = useState<SupportSettings | null>(null);
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, revenue: 0, totalUsers: 0, pendingKyc: 0 });
   const [newTransferFee, setNewTransferFee] = useState("");
   const [paymentNumber, setPaymentNumber] = useState("");
@@ -82,6 +92,9 @@ const Admin = () => {
   const [manualTid, setManualTid] = useState("");
   const [senderName, setSenderName] = useState("");
   const [paymentRecipientName, setPaymentRecipientName] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [activeTab, setActiveTab] = useState("pending");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     checkAdminAndLoadData();
