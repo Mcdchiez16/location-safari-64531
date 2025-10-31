@@ -491,24 +491,44 @@ const Send = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
-                    <h3 className="font-semibold text-foreground text-base sm:text-lg">Note the Transaction Name</h3>
+                    <h3 className="font-semibold text-foreground text-base sm:text-lg">Enter Payment Details</h3>
                   </div>
-                  <div className="ml-11">
-                    <Label htmlFor="senderName" className="text-sm font-medium text-foreground mb-2 block">
-                      Name on Transaction
-                    </Label>
-                    <Input
-                      id="senderName"
-                      type="text"
-                      placeholder="e.g., John Doe"
-                      value={senderName}
-                      onChange={(e) => setSenderName(e.target.value)}
-                      className="h-12 text-base"
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Enter the name exactly as shown on your payment receipt
-                    </p>
+                  <div className="ml-11 space-y-4">
+                    <div>
+                      <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
+                        Your Phone Number *
+                      </Label>
+                      <Input
+                        id="senderNumber"
+                        type="text"
+                        placeholder="e.g., +263 77 123 4567"
+                        value={senderNumber}
+                        onChange={(e) => setSenderNumber(e.target.value)}
+                        className="h-12 text-base"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Enter the phone number you used to send the payment
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="transactionId" className="text-sm font-medium text-foreground mb-2 block">
+                        Transaction ID *
+                      </Label>
+                      <Input
+                        id="transactionId"
+                        type="text"
+                        placeholder="e.g., ABC123XYZ"
+                        value={transactionId}
+                        onChange={(e) => setTransactionId(e.target.value)}
+                        className="h-12 text-base"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Enter the transaction ID from your payment confirmation
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -516,13 +536,14 @@ const Send = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
-                    <h3 className="font-semibold text-foreground text-base sm:text-lg">Upload Proof</h3>
+                    <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm & Submit</h3>
                   </div>
-                  <div className="ml-11 bg-warning/10 border border-warning/30 rounded-xl p-3 sm:p-4">
-                    <p className="text-xs sm:text-sm font-medium text-foreground mb-2">📸 Remember to:</p>
+                  <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
+                    <p className="text-xs sm:text-sm font-medium text-foreground mb-2">✅ Ready to submit:</p>
                     <ul className="text-xs sm:text-sm text-muted-foreground space-y-1 ml-4 list-disc">
-                      <li>Take a clear screenshot of your payment confirmation</li>
-                      <li>Make sure the amount and transaction details are visible</li>
+                      <li>Your transaction will be reviewed by our admin team</li>
+                      <li>You'll be notified once the payment is confirmed</li>
+                      <li>The recipient will receive their funds shortly after</li>
                     </ul>
                   </div>
                 </div>
@@ -531,9 +552,9 @@ const Send = () => {
                   <Button 
                     onClick={handleConfirmPayment}
                     className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
-                    disabled={loading || !senderName.trim()}
+                    disabled={loading || !senderNumber.trim() || !transactionId.trim()}
                   >
-                    {loading ? "Processing..." : "Continue to Upload Proof"}
+                    {loading ? "Processing..." : "Submit Transaction"}
                   </Button>
 
                   <Button 
