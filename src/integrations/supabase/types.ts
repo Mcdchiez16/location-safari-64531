@@ -172,8 +172,11 @@ export type Database = {
           receiver_name: string
           receiver_phone: string
           sender_id: string
+          sender_number: string | null
           status: string | null
+          tid: string | null
           total_amount: number | null
+          transaction_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -193,8 +196,11 @@ export type Database = {
           receiver_name: string
           receiver_phone: string
           sender_id: string
+          sender_number?: string | null
           status?: string | null
+          tid?: string | null
           total_amount?: number | null
+          transaction_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -214,8 +220,11 @@ export type Database = {
           receiver_name?: string
           receiver_phone?: string
           sender_id?: string
+          sender_number?: string | null
           status?: string | null
+          tid?: string | null
           total_amount?: number | null
+          transaction_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -252,6 +261,7 @@ export type Database = {
     }
     Functions: {
       generate_payment_link_id: { Args: never; Returns: string }
+      generate_tid: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
