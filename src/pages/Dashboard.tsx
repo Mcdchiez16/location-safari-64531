@@ -282,7 +282,7 @@ const Dashboard = () => {
                   >
                     <div>
                       <p className="font-medium text-sm md:text-base text-foreground">
-                        {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.receiver_name}`}
+                        {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.profiles?.full_name || 'Unknown'}`}
                       </p>
                       <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
                         {getStatusLabel(transaction.status)}
