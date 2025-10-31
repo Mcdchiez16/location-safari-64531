@@ -89,50 +89,58 @@ const Send = () => {
     setLoading(true);
 
     try {
-      // First try exact match
-      let { data, error } = await supabase
+      // If it's a payment link ID (no digits or mostly letters), search directly
+      if (!/\d{3,}/.test(searchValue)) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, full_name, phone_number, payment_link_id")
+          .eq("payment_link_id", searchValue.trim())
+          .eq("account_type", "receiver")
+          .maybeSingle();
+
+        if (error && error.code !== "PGRST116") throw error;
+
+        if (data) {
+          setReceiverProfile(data);
+          toast.success(`Receiver found: ${data.full_name}`);
+        } else {
+          toast.error("Receiver not found. Please check the payment link.");
+          setReceiverProfile(null);
+        }
+        setLoading(false);
+        return;
+      }
+
+      // For phone numbers, use the database normalize function
+      const { data: normalizedData, error: normalizeError } = await supabase
+        .rpc('normalize_phone_number', { phone: searchValue });
+
+      if (normalizeError) {
+        console.error("Normalization error:", normalizeError);
+        toast.error("Error processing phone number");
+        setLoading(false);
+        return;
+      }
+
+      const normalizedPhone = normalizedData;
+
+      // Search by normalized phone
+      const { data, error } = await supabase
         .from("profiles")
         .select("id, full_name, phone_number, payment_link_id")
-        .or(`phone_number.eq.${searchValue},payment_link_id.eq.${searchValue}`)
+        .eq("phone_number", normalizedPhone)
         .eq("account_type", "receiver")
         .maybeSingle();
 
-      // If no exact match and looks like a phone number, try normalized search
-      if (!data && /^\+?\d+$/.test(searchValue.replace(/[\s\-()]/g, ''))) {
-        // Normalize the search value
-        let normalizedSearch = searchValue.replace(/[\s\-()]/g, '');
-        
-        // If starts with 0, try Zambian number (+260)
-        if (normalizedSearch.startsWith('0')) {
-          normalizedSearch = '+260' + normalizedSearch.substring(1);
-        } else if (!normalizedSearch.startsWith('+')) {
-          normalizedSearch = '+' + normalizedSearch;
-        }
+      if (error && error.code !== "PGRST116") throw error;
 
-        // Search with normalized number
-        const result = await supabase
-          .from("profiles")
-          .select("id, full_name, phone_number, payment_link_id")
-          .eq("account_type", "receiver");
-
-        if (result.data) {
-          // Filter manually to handle phone number variations
-          data = result.data.find(profile => {
-            const profilePhone = profile.phone_number.replace(/[\s\-()]/g, '');
-            const searchPhone = normalizedSearch.replace(/[\s\-()]/g, '');
-            return profilePhone === searchPhone || 
-                   profilePhone.endsWith(searchPhone.substring(searchPhone.length - 9)) ||
-                   searchPhone.endsWith(profilePhone.substring(profilePhone.length - 9));
-          }) || null;
-        }
-      }
-
-      if (!data) {
+      if (data) {
+        setReceiverProfile(data);
+        setLookupValue("");
+        toast.success(`Receiver found: ${data.full_name}`);
+      } else {
         toast.error("Receiver not found. Please check the phone number or payment link.");
         setReceiverProfile(null);
-      } else {
-        setReceiverProfile(data);
-        toast.success(`Receiver found: ${data.full_name}`);
       }
     } catch (error) {
       console.error("Lookup error:", error);

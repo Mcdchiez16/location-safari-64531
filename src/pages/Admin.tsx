@@ -9,8 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, Search, Eye } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, DollarSign, Users, TrendingUp, Settings as SettingsIcon, Search, Eye, User, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Transaction {
   id: string;
@@ -33,7 +39,7 @@ interface Transaction {
   profiles?: { full_name: string; phone_number: string };
 }
 
-interface User {
+interface UserProfile {
   id: string;
   full_name: string;
   phone_number: string;
@@ -41,6 +47,10 @@ interface User {
   balance: number;
   verified: boolean;
   created_at: string;
+  id_type?: string;
+  id_number?: string;
+  id_document_url?: string;
+  selfie_url?: string;
 }
 
 interface Setting {
@@ -55,13 +65,16 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [kycRequests, setKycRequests] = useState<UserProfile[]>([]);
   const [settings, setSettings] = useState<Setting[]>([]);
-  const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, revenue: 0, totalUsers: 0 });
+  const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, revenue: 0, totalUsers: 0, pendingKyc: 0 });
   const [newTransferFee, setNewTransferFee] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedKyc, setSelectedKyc] = useState<UserProfile | null>(null);
+  const [kycDialogOpen, setKycDialogOpen] = useState(false);
   const [paymentReference, setPaymentReference] = useState("");
   const [paymentProofUrl, setPaymentProofUrl] = useState("");
 
@@ -115,7 +128,7 @@ const Admin = () => {
       if (transError) throw transError;
       setTransactions(transData || []);
 
-      // Load users
+      // Load all users
       const { data: usersData, error: usersError } = await supabase
         .from("profiles")
         .select("*")
@@ -123,6 +136,12 @@ const Admin = () => {
 
       if (usersError) throw usersError;
       setUsers(usersData || []);
+
+      // Filter KYC requests (users who have uploaded documents or need verification)
+      const kycData = usersData?.filter(user => 
+        user.id_document_url || user.selfie_url || !user.verified
+      ) || [];
+      setKycRequests(kycData);
 
       // Load settings
       const { data: settingsData, error: settingsError } = await supabase
@@ -135,15 +154,17 @@ const Admin = () => {
       // Calculate stats
       const totalTrans = transData?.length || 0;
       const pendingTrans = transData?.filter(t => t.status === "pending").length || 0;
-      const completedTrans = transData?.filter(t => t.status === "completed").length || 0;
+      const completedTrans = transData?.filter(t => t.status === "completed" || t.status === "paid" || t.status === "deposited").length || 0;
       const revenue = transData?.reduce((sum, t) => sum + (t.fee || 0), 0) || 0;
+      const pendingKyc = kycData.filter(u => !u.verified && (u.id_document_url || u.selfie_url)).length;
 
       setStats({
         total: totalTrans,
         pending: pendingTrans,
         completed: completedTrans,
         revenue: revenue,
-        totalUsers: usersData?.length || 0
+        totalUsers: usersData?.length || 0,
+        pendingKyc: pendingKyc
       });
 
       // Get current transfer fee
@@ -194,21 +215,28 @@ const Admin = () => {
     }
   };
 
-  const verifyUser = async (userId: string, verified: boolean) => {
+  const handleKycAction = async (userId: string, action: "approve" | "decline") => {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ verified })
+        .update({ verified: action === "approve" })
         .eq("id", userId);
 
       if (error) throw error;
 
-      toast.success(`User ${verified ? "verified" : "unverified"} successfully`);
+      toast.success(`KYC ${action === "approve" ? "approved" : "declined"} successfully`);
+      setKycDialogOpen(false);
+      setSelectedKyc(null);
       loadData();
     } catch (error) {
-      console.error("Error updating user verification:", error);
-      toast.error("Failed to update user verification");
+      console.error("Error updating KYC:", error);
+      toast.error("Failed to update KYC status");
     }
+  };
+
+  const viewKycDetails = (kyc: UserProfile) => {
+    setSelectedKyc(kyc);
+    setKycDialogOpen(true);
   };
 
   const updateTransferFee = async () => {
@@ -248,7 +276,10 @@ const Admin = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-green-500">Completed</Badge>;
+      case "paid":
+        return <Badge className="bg-green-500">Paid</Badge>;
+      case "deposited":
+        return <Badge className="bg-emerald-500">Deposited</Badge>;
       case "pending":
         return <Badge className="bg-yellow-500">Pending</Badge>;
       case "failed":
@@ -299,7 +330,7 @@ const Admin = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
@@ -342,6 +373,16 @@ const Admin = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending KYC</CardTitle>
+              <FileText className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-500">{stats.pendingKyc}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Revenue (Fees)</CardTitle>
               <DollarSign className="h-4 w-4 text-green-500" />
             </CardHeader>
@@ -353,8 +394,9 @@ const Admin = () => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="transactions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto">
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            <TabsTrigger value="kyc">KYC Verification</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
@@ -383,6 +425,8 @@ const Admin = () => {
                     <SelectContent>
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
+                      <SelectItem value="deposited">Deposited</SelectItem>
                       <SelectItem value="completed">Completed</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                     </SelectContent>
@@ -464,43 +508,56 @@ const Admin = () => {
             {selectedTransaction && (
               <Card className="mt-6 border-2 border-primary">
                 <CardHeader>
-                  <CardTitle>Confirm Payment to Receiver</CardTitle>
+                  <CardTitle>Confirm Payment Completion</CardTitle>
                   <CardDescription>
-                    Transaction ID: {selectedTransaction.id.substring(0, 8)}...
+                    Transaction to {selectedTransaction.receiver_name}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="paymentRef">Payment Reference Number</Label>
+                    <Label htmlFor="payment_reference">Payment Reference</Label>
                     <Input
-                      id="paymentRef"
-                      placeholder="Enter payment reference (e.g., MTN12345)"
+                      id="payment_reference"
+                      placeholder="Enter payment reference number"
                       value={paymentReference}
                       onChange={(e) => setPaymentReference(e.target.value)}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="proofUrl">Payment Proof URL (Optional)</Label>
+                    <Label htmlFor="payment_proof">Payment Proof URL (Optional)</Label>
                     <Input
-                      id="proofUrl"
-                      placeholder="Enter screenshot URL or receipt link"
+                      id="payment_proof"
+                      placeholder="URL to payment proof"
                       value={paymentProofUrl}
                       onChange={(e) => setPaymentProofUrl(e.target.value)}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Button
                       onClick={() => updateTransactionStatus(
                         selectedTransaction.id,
                         "paid",
-                        `Payment sent to ${selectedTransaction.receiver_name}`,
+                        undefined,
                         paymentReference,
                         paymentProofUrl
                       )}
-                      disabled={!paymentReference}
-                      className="flex-1"
+                      className="flex-1 bg-green-500 hover:bg-green-600"
                     >
-                      Confirm Payment Sent
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Mark as Paid
+                    </Button>
+                    <Button
+                      onClick={() => updateTransactionStatus(
+                        selectedTransaction.id,
+                        "deposited",
+                        undefined,
+                        paymentReference,
+                        paymentProofUrl
+                      )}
+                      className="flex-1 bg-emerald-500 hover:bg-emerald-600"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Mark as Deposited
                     </Button>
                     <Button
                       variant="outline"
@@ -518,12 +575,71 @@ const Admin = () => {
             )}
           </TabsContent>
 
+          {/* KYC Verification Tab */}
+          <TabsContent value="kyc" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>KYC Verification Requests</CardTitle>
+                <CardDescription>Review and verify user identification documents</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {kycRequests.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No KYC requests</p>
+                  ) : (
+                    kycRequests.map((kyc) => (
+                      <Card key={kyc.id} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-6 w-6 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-semibold">{kyc.full_name}</p>
+                              <p className="text-sm text-muted-foreground">{kyc.phone_number}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {kyc.id_type && kyc.id_number ? `${kyc.id_type} - ${kyc.id_number}` : "No ID info"}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1">
+                                {kyc.verified ? (
+                                  <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-600 flex items-center gap-1">
+                                    <CheckCircle className="h-3 w-3" />
+                                    Verified
+                                  </span>
+                                ) : (
+                                  <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-600">
+                                    Pending Verification
+                                  </span>
+                                )
+                                }
+                                {(kyc.id_document_url || kyc.selfie_url) && (
+                                  <span className="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-600 flex items-center gap-1">
+                                    <FileText className="h-3 w-3" />
+                                    Documents Uploaded
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <Button onClick={() => viewKycDetails(kyc)} variant="outline" size="sm" className="gap-2">
+                            <Eye className="h-4 w-4" />
+                            Review KYC
+                          </Button>
+                        </div>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>User Management</CardTitle>
-                <CardDescription>View and manage registered users</CardDescription>
+                <CardDescription>View and manage all registered users</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -532,41 +648,24 @@ const Admin = () => {
                   ) : (
                     users.map((user) => (
                       <Card key={user.id} className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="space-y-1 flex-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-semibold text-foreground">{user.full_name}</h4>
-                              {user.verified && (
-                                <Badge className="bg-green-500">Verified</Badge>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground">{user.phone_number}</p>
-                            <p className="text-sm text-muted-foreground">Country: {user.country}</p>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h4 className="font-semibold text-foreground">{user.full_name}</h4>
                             <p className="text-sm text-muted-foreground">
-                              Balance: {user.country === "Zambia" ? "ZMW" : "USD"} {user.balance.toFixed(2)}
+                              {user.phone_number} | {user.country}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Balance: ${user.balance.toFixed(2)}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               Joined: {new Date(user.created_at).toLocaleDateString()}
                             </p>
                           </div>
-                          <div className="flex flex-col gap-2">
-                            {!user.verified ? (
-                              <Button
-                                size="sm"
-                                onClick={() => verifyUser(user.id, true)}
-                                className="bg-green-500 hover:bg-green-600"
-                              >
-                                <CheckCircle className="h-4 w-4 mr-2" />
-                                Verify KYC
-                              </Button>
+                          <div className="flex items-center gap-2">
+                            {user.verified ? (
+                              <Badge className="bg-green-500">Verified</Badge>
                             ) : (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => verifyUser(user.id, false)}
-                              >
-                                Unverify
-                              </Button>
+                              <Badge className="bg-yellow-500">Unverified</Badge>
                             )}
                           </div>
                         </div>
@@ -583,61 +682,130 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Platform Settings</CardTitle>
-                <CardDescription>Manage platform configuration</CardDescription>
+                <CardDescription>Configure platform parameters</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Transfer Fee Setting */}
-                <div className="space-y-4 p-4 border border-border rounded-lg">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">Transfer Fee Percentage</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Set the percentage fee charged on each transfer
-                    </p>
-                  </div>
-                  <div className="flex gap-4 items-end">
-                    <div className="flex-1">
-                      <Label htmlFor="transfer-fee">Fee Percentage (%)</Label>
-                      <Input
-                        id="transfer-fee"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.01"
-                        value={newTransferFee}
-                        onChange={(e) => setNewTransferFee(e.target.value)}
-                        placeholder="Enter percentage"
-                      />
-                    </div>
-                    <Button onClick={updateTransferFee}>
-                      Update Fee
+                <div>
+                  <Label htmlFor="transfer_fee">Transfer Fee Percentage</Label>
+                  <div className="flex gap-3 mt-2">
+                    <Input
+                      id="transfer_fee"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      value={newTransferFee}
+                      onChange={(e) => setNewTransferFee(e.target.value)}
+                      placeholder="e.g., 2.5"
+                    />
+                    <Button onClick={updateTransferFee} className="min-w-[100px]">
+                      Update
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Current fee: {settings.find(s => s.key === "transfer_fee_percentage")?.value || "12"}%
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Current fee: {newTransferFee}%
                   </p>
-                </div>
-
-                {/* Other Settings Display */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">Other Settings</h3>
-                  {settings.filter(s => s.key !== "transfer_fee_percentage").map((setting) => (
-                    <Card key={setting.id} className="p-4">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-semibold text-foreground capitalize">
-                            {setting.key.replace(/_/g, " ")}
-                          </h4>
-                          <Badge variant="outline">{setting.value}</Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{setting.description}</p>
-                      </div>
-                    </Card>
-                  ))}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* KYC Details Dialog */}
+        <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>KYC Verification Details</DialogTitle>
+            </DialogHeader>
+            {selectedKyc && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Full Name</p>
+                    <p className="font-semibold">{selectedKyc.full_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Phone Number</p>
+                    <p className="font-semibold">{selectedKyc.phone_number}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Country</p>
+                    <p className="font-semibold">{selectedKyc.country}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">ID Type</p>
+                    <p className="font-semibold">{selectedKyc.id_type || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">ID Number</p>
+                    <p className="font-semibold">{selectedKyc.id_number || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Status</p>
+                    <p className="font-semibold">
+                      {selectedKyc.verified ? (
+                        <span className="text-green-600 flex items-center gap-1">
+                          <CheckCircle className="h-4 w-4" />
+                          Verified
+                        </span>
+                      ) : (
+                        <span className="text-yellow-600">Pending</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">ID Document</p>
+                    {selectedKyc.id_document_url ? (
+                      <img 
+                        src={selectedKyc.id_document_url} 
+                        alt="ID Document" 
+                        className="w-full max-w-md rounded-lg border"
+                      />
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No document uploaded</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Selfie</p>
+                    {selectedKyc.selfie_url ? (
+                      <img 
+                        src={selectedKyc.selfie_url} 
+                        alt="Selfie" 
+                        className="w-full max-w-md rounded-lg border"
+                      />
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No selfie uploaded</p>
+                    )}
+                  </div>
+                </div>
+
+                {!selectedKyc.verified && (
+                  <div className="flex gap-3 pt-4">
+                    <Button 
+                      onClick={() => handleKycAction(selectedKyc.id, "approve")}
+                      className="flex-1 bg-green-600 hover:bg-green-700 gap-2"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      Approve KYC
+                    </Button>
+                    <Button 
+                      onClick={() => handleKycAction(selectedKyc.id, "decline")}
+                      variant="destructive"
+                      className="flex-1 gap-2"
+                    >
+                      <XCircle className="h-4 w-4" />
+                      Decline KYC
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
