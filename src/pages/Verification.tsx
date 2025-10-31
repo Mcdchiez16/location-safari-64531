@@ -60,24 +60,41 @@ const Verification = () => {
     if (!profile) return;
     
     setUploading(true);
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${profile.id}/${type}_${Date.now()}.${fileExt}`;
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${profile.id}/${type}_${Date.now()}.${fileExt}`;
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        [type === 'id_document' ? 'id_document_url' : 'selfie_url']: `placeholder_${fileName}`
-      })
-      .eq("id", profile.id);
+      // Upload to Supabase Storage kyc-docs bucket
+      const { error: uploadError, data } = await supabase.storage
+        .from("kyc-docs")
+        .upload(fileName, file);
 
-    if (error) {
-      toast.error(`Failed to upload ${type}`);
-      console.error(error);
-    } else {
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("kyc-docs")
+        .getPublicUrl(fileName);
+
+      // Update profile with the file URL
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          [type === 'id_document' ? 'id_document_url' : 'selfie_url']: urlData.publicUrl
+        })
+        .eq("id", profile.id);
+
+      if (updateError) throw updateError;
+
       toast.success(`${type === 'id_document' ? 'ID Document' : 'Selfie'} uploaded successfully`);
       loadProfile();
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(`Failed to upload ${type}: ${error.message}`);
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const updateKYCInfo = async () => {

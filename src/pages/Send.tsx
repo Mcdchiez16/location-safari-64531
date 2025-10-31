@@ -95,7 +95,6 @@ const Send = () => {
           .from("profiles")
           .select("id, full_name, phone_number, payment_link_id")
           .eq("payment_link_id", searchValue.trim())
-          .eq("account_type", "receiver")
           .maybeSingle();
 
         if (error && error.code !== "PGRST116") throw error;
@@ -111,26 +110,35 @@ const Send = () => {
         return;
       }
 
-      // For phone numbers, use the database normalize function
+      // For phone numbers, first try normalizing
       const { data: normalizedData, error: normalizeError } = await supabase
         .rpc('normalize_phone_number', { phone: searchValue });
 
       if (normalizeError) {
         console.error("Normalization error:", normalizeError);
-        toast.error("Error processing phone number");
-        setLoading(false);
-        return;
+        // Fallback to raw search if normalization fails
       }
 
-      const normalizedPhone = normalizedData;
+      const normalizedPhone = normalizedData || searchValue;
 
       // Search by normalized phone
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("profiles")
         .select("id, full_name, phone_number, payment_link_id")
         .eq("phone_number", normalizedPhone)
-        .eq("account_type", "receiver")
         .maybeSingle();
+
+      // If not found with normalized, try raw phone as fallback
+      if (!data && normalizedPhone !== searchValue) {
+        const fallback = await supabase
+          .from("profiles")
+          .select("id, full_name, phone_number, payment_link_id")
+          .eq("phone_number", searchValue.trim())
+          .maybeSingle();
+        
+        data = fallback.data;
+        error = fallback.error;
+      }
 
       if (error && error.code !== "PGRST116") throw error;
 

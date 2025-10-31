@@ -191,7 +191,7 @@ const PaymentLink = () => {
               </div>
               <div className="bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 rounded-2xl p-6 mb-3 border-2 border-primary/20">
                 <p className="font-mono text-xl md:text-2xl font-bold text-foreground break-all tracking-wide">
-                  {profile?.payment_link_id}
+                  {profile?.payment_link_id || 'Loading...'}
                 </p>
               </div>
               <p className="text-xs text-muted-foreground">
