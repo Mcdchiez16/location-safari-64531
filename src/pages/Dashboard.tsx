@@ -90,14 +90,30 @@ const Dashboard = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "success":
-        return "text-success";
+      case "paid":
+      case "deposited":
+        return "text-green-500";
       case "pending":
-        return "text-warning";
+        return "text-yellow-500";
       case "failed":
-        return "text-destructive";
+        return "text-red-500";
       default:
         return "text-muted-foreground";
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "Paid";
+      case "deposited":
+        return "Deposited";
+      case "pending":
+        return "Pending";
+      case "failed":
+        return "Failed";
+      default:
+        return status;
     }
   };
 
@@ -188,9 +204,10 @@ const Dashboard = () => {
                       {transaction.receiver_name}
                     </p>
                     <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
-                      {transaction.status === 'completed' ? 'Completed' : 
-                       transaction.status === 'pending' ? 'Pending' : 
-                       transaction.status}
+                      {getStatusLabel(transaction.status)}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      ID: {transaction.id.substring(0, 8)}...
                     </p>
                   </div>
                   <div className="text-right">

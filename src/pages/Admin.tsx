@@ -26,6 +26,9 @@ interface Transaction {
   payout_method?: string;
   payment_proof_url?: string;
   admin_notes?: string;
+  payment_reference?: string;
+  payment_date?: string;
+  admin_payment_proof_url?: string;
   created_at: string;
   profiles?: { full_name: string; phone_number: string };
 }
@@ -59,6 +62,8 @@ const Admin = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [paymentReference, setPaymentReference] = useState("");
+  const [paymentProofUrl, setPaymentProofUrl] = useState("");
 
   useEffect(() => {
     checkAdminAndLoadData();
@@ -155,10 +160,21 @@ const Admin = () => {
     }
   };
 
-  const updateTransactionStatus = async (transactionId: string, status: string, notes?: string) => {
+  const updateTransactionStatus = async (
+    transactionId: string, 
+    status: string, 
+    notes?: string,
+    reference?: string,
+    proofUrl?: string
+  ) => {
     try {
       const updateData: any = { status };
       if (notes) updateData.admin_notes = notes;
+      if (reference) updateData.payment_reference = reference;
+      if (proofUrl) updateData.admin_payment_proof_url = proofUrl;
+      if (status === "paid" || status === "deposited") {
+        updateData.payment_date = new Date().toISOString();
+      }
 
       const { error } = await supabase
         .from("transactions")
@@ -167,11 +183,31 @@ const Admin = () => {
 
       if (error) throw error;
 
-      toast.success(`Transaction ${status}`);
+      toast.success(`Transaction marked as ${status}`);
+      setPaymentReference("");
+      setPaymentProofUrl("");
+      setSelectedTransaction(null);
       loadData();
     } catch (error) {
       console.error("Error updating transaction:", error);
       toast.error("Failed to update transaction");
+    }
+  };
+
+  const verifyUser = async (userId: string, verified: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ verified })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      toast.success(`User ${verified ? "verified" : "unverified"} successfully`);
+      loadData();
+    } catch (error) {
+      console.error("Error updating user verification:", error);
+      toast.error("Failed to update user verification");
     }
   };
 
@@ -384,27 +420,7 @@ const Admin = () => {
                             )}
                           </div>
                           
-                          <div className="flex flex-col gap-2">
-                            {transaction.status === "pending" && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  onClick={() => updateTransactionStatus(transaction.id, "completed")}
-                                  className="bg-green-500 hover:bg-green-600"
-                                >
-                                  <CheckCircle className="h-4 w-4 mr-2" />
-                                  Approve
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => updateTransactionStatus(transaction.id, "failed", "Rejected by admin")}
-                                >
-                                  <XCircle className="h-4 w-4 mr-2" />
-                                  Reject
-                                </Button>
-                              </>
-                            )}
+                           <div className="flex flex-col gap-2">
                             {transaction.payment_proof_url && (
                               <Button
                                 size="sm"
@@ -412,7 +428,27 @@ const Admin = () => {
                                 onClick={() => window.open(transaction.payment_proof_url, "_blank")}
                               >
                                 <Eye className="h-4 w-4 mr-2" />
-                                View Proof
+                                View Sender Proof
+                              </Button>
+                            )}
+                            {transaction.status === "pending" && (
+                              <Button
+                                size="sm"
+                                onClick={() => setSelectedTransaction(transaction)}
+                                className="bg-green-500 hover:bg-green-600"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Mark as Paid
+                              </Button>
+                            )}
+                            {transaction.status !== "pending" && transaction.admin_payment_proof_url && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => window.open(transaction.admin_payment_proof_url, "_blank")}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Payment Proof
                               </Button>
                             )}
                           </div>
@@ -423,6 +459,63 @@ const Admin = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Payment Confirmation Modal */}
+            {selectedTransaction && (
+              <Card className="mt-6 border-2 border-primary">
+                <CardHeader>
+                  <CardTitle>Confirm Payment to Receiver</CardTitle>
+                  <CardDescription>
+                    Transaction ID: {selectedTransaction.id.substring(0, 8)}...
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="paymentRef">Payment Reference Number</Label>
+                    <Input
+                      id="paymentRef"
+                      placeholder="Enter payment reference (e.g., MTN12345)"
+                      value={paymentReference}
+                      onChange={(e) => setPaymentReference(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="proofUrl">Payment Proof URL (Optional)</Label>
+                    <Input
+                      id="proofUrl"
+                      placeholder="Enter screenshot URL or receipt link"
+                      value={paymentProofUrl}
+                      onChange={(e) => setPaymentProofUrl(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => updateTransactionStatus(
+                        selectedTransaction.id,
+                        "paid",
+                        `Payment sent to ${selectedTransaction.receiver_name}`,
+                        paymentReference,
+                        paymentProofUrl
+                      )}
+                      disabled={!paymentReference}
+                      className="flex-1"
+                    >
+                      Confirm Payment Sent
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedTransaction(null);
+                        setPaymentReference("");
+                        setPaymentProofUrl("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Users Tab */}
@@ -440,7 +533,7 @@ const Admin = () => {
                     users.map((user) => (
                       <Card key={user.id} className="p-4">
                         <div className="flex justify-between items-start">
-                          <div className="space-y-1">
+                          <div className="space-y-1 flex-1">
                             <div className="flex items-center gap-2">
                               <h4 className="font-semibold text-foreground">{user.full_name}</h4>
                               {user.verified && (
@@ -455,6 +548,26 @@ const Admin = () => {
                             <p className="text-xs text-muted-foreground">
                               Joined: {new Date(user.created_at).toLocaleDateString()}
                             </p>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {!user.verified ? (
+                              <Button
+                                size="sm"
+                                onClick={() => verifyUser(user.id, true)}
+                                className="bg-green-500 hover:bg-green-600"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Verify KYC
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => verifyUser(user.id, false)}
+                              >
+                                Unverify
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </Card>

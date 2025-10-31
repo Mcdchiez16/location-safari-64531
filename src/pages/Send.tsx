@@ -88,20 +88,56 @@ const Send = () => {
 
     setLoading(true);
 
-    // Search by phone number or payment link ID
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name, phone_number, payment_link_id")
-      .or(`phone_number.eq.${searchValue},payment_link_id.eq.${searchValue}`)
-      .eq("account_type", "receiver")
-      .single();
+    try {
+      // First try exact match
+      let { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, phone_number, payment_link_id")
+        .or(`phone_number.eq.${searchValue},payment_link_id.eq.${searchValue}`)
+        .eq("account_type", "receiver")
+        .maybeSingle();
 
-    if (error || !data) {
-      toast.error("Receiver not found. Please check the phone number or payment link.");
+      // If no exact match and looks like a phone number, try normalized search
+      if (!data && /^\+?\d+$/.test(searchValue.replace(/[\s\-()]/g, ''))) {
+        // Normalize the search value
+        let normalizedSearch = searchValue.replace(/[\s\-()]/g, '');
+        
+        // If starts with 0, try Zambian number (+260)
+        if (normalizedSearch.startsWith('0')) {
+          normalizedSearch = '+260' + normalizedSearch.substring(1);
+        } else if (!normalizedSearch.startsWith('+')) {
+          normalizedSearch = '+' + normalizedSearch;
+        }
+
+        // Search with normalized number
+        const result = await supabase
+          .from("profiles")
+          .select("id, full_name, phone_number, payment_link_id")
+          .eq("account_type", "receiver");
+
+        if (result.data) {
+          // Filter manually to handle phone number variations
+          data = result.data.find(profile => {
+            const profilePhone = profile.phone_number.replace(/[\s\-()]/g, '');
+            const searchPhone = normalizedSearch.replace(/[\s\-()]/g, '');
+            return profilePhone === searchPhone || 
+                   profilePhone.endsWith(searchPhone.substring(searchPhone.length - 9)) ||
+                   searchPhone.endsWith(profilePhone.substring(profilePhone.length - 9));
+          }) || null;
+        }
+      }
+
+      if (!data) {
+        toast.error("Receiver not found. Please check the phone number or payment link.");
+        setReceiverProfile(null);
+      } else {
+        setReceiverProfile(data);
+        toast.success(`Receiver found: ${data.full_name}`);
+      }
+    } catch (error) {
+      console.error("Lookup error:", error);
+      toast.error("Error searching for receiver");
       setReceiverProfile(null);
-    } else {
-      setReceiverProfile(data);
-      toast.success(`Receiver found: ${data.full_name}`);
     }
 
     setLoading(false);
