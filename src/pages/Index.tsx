@@ -89,25 +89,23 @@ const Index = () => {
       </div>
 
       {/* Header */}
-      <header className="relative bg-card/80 backdrop-blur-xl border-b border-border/50 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="relative bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">TuraPay</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl md:text-3xl font-bold" style={{ color: '#FF5722' }}>TuraPay</span>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
               {exchangeRate && (
-                <div className="hidden sm:flex items-center gap-2 bg-secondary/10 px-4 py-2 rounded-full">
-                  <TrendingUp className="h-4 w-4 text-secondary" />
-                  <span className="text-sm font-semibold text-secondary">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
+                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: '#FFE5E0' }}>
+                  <TrendingUp className="h-4 w-4" style={{ color: '#FF5722' }} />
+                  <span className="text-sm font-semibold" style={{ color: '#FF5722' }}>1 USD = {exchangeRate.toFixed(2)} ZMW</span>
                 </div>
               )}
               <Button 
                 onClick={() => navigate("/auth")}
-                className="bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all"
+                className="text-sm md:text-base px-4 md:px-6 h-9 md:h-10 font-semibold hover:opacity-90 transition-all"
+                style={{ backgroundColor: '#FF5722', color: 'white' }}
               >
                 Get Started
               </Button>
@@ -116,169 +114,189 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative container mx-auto px-4 py-12 md:py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-          <div className="space-y-8 animate-fade-in">
-            <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              <span className="text-sm font-semibold text-primary">Cross-Border Money Transfer</span>
+      {/* Hero Section - Inspired by Mukuru */}
+      <section className="relative overflow-hidden" style={{ backgroundColor: '#FF5722' }}>
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+            {/* Left Content */}
+            <div className="space-y-6 md:space-y-8 animate-fade-in text-white">
+              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                <span className="text-sm font-semibold">Zimbabwe to Zambia Money Transfer</span>
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                Check Our Rate
+              </h1>
+
+              <p className="text-lg sm:text-xl leading-relaxed text-white/90">
+                We help you send more money home with our competitive rates. Fast, secure, and reliable cross-border money transfers. Your recipient gets funds instantly to their mobile money wallet.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/auth")}
+                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-white hover:bg-gray-100 transition-all font-bold"
+                  style={{ color: '#FF5722' }}
+                >
+                  Start Sending Money
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/auth")}
+                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-transparent border-2 border-white text-white hover:bg-white/10 transition-all font-bold"
+                >
+                  Receive Money
+                </Button>
+              </div>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Send Money to
-              <span className="block bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-                Zambia in Seconds
-              </span>
-            </h1>
-
-            <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
-              Fast, secure, and reliable cross-border money transfers from Zimbabwe to Zambia. 
-              Your recipient gets funds instantly to their mobile money wallet.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg"
-                onClick={() => navigate("/auth")}
-                className="h-14 px-8 text-lg bg-gradient-to-r from-primary via-accent to-secondary hover:shadow-2xl transition-all group"
-              >
-                Start Sending Money
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                onClick={() => navigate("/auth")}
-                className="h-14 px-8 text-lg border-2 hover:bg-muted"
-              >
-                Receive Money
-              </Button>
-            </div>
-
-          </div>
-
-          {/* Right - Calculator Card */}
-          <div className="relative animate-scale-in" style={{ animationDelay: '0.2s' }}>
-            <Card className="relative bg-card/80 backdrop-blur-xl border-2 border-border/50 shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl -translate-y-32 translate-x-32" />
-              
-              <div className="relative p-6 sm:p-8 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-foreground">Send Money</h3>
-                  <div className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-semibold text-primary">Instant</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-2 block">You Send</label>
+            {/* Right - Calculator Card */}
+            <div className="relative animate-scale-in" style={{ animationDelay: '0.2s' }}>
+              <Card className="relative bg-white shadow-2xl overflow-hidden rounded-2xl">
+                <div className="relative p-6 md:p-8 space-y-6">
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">You pay</label>
                     <div className="relative">
-                      <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                       <Input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value) || 0)}
-                        className="pl-12 pr-20 h-16 text-2xl font-bold border-2 focus:border-primary"
+                        className="pr-24 h-14 text-xl font-bold border-2"
                         min="1"
+                        placeholder="Enter amount"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">USD</span>
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700 font-bold text-sm">USD</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <ArrowRight className="h-5 w-5 text-primary rotate-90" />
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFE5E0' }}>
+                      <ArrowRight className="h-5 w-5 rotate-90" style={{ color: '#FF5722' }} />
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 border border-primary/20 space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Exchange Rate</span>
-                      <span className="font-semibold text-foreground">
-                        1 USD = {exchangeRate ? exchangeRate.toFixed(2) : '--'} ZMW
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Transfer Fee</span>
-                      <span className="font-semibold text-foreground">{transferFeePercentage}%</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Total to Pay</span>
-                      <span className="font-semibold text-foreground">${(amount + (amount * transferFeePercentage / 100)).toFixed(2)}</span>
-                    </div>
-                    <div className="border-t border-primary/20 pt-3 mt-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground font-medium">Recipient Gets</span>
-                        <span className="text-2xl font-bold text-primary">{recipientGets} ZMW</span>
-                      </div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">They receive</label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        value={recipientGets}
+                        readOnly
+                        className="pr-24 h-14 text-xl font-bold border-2 bg-gray-50"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700 font-bold text-sm">ZMW</span>
                     </div>
                   </div>
+
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">Receive method</label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        value="Mobile Money (MTN/Airtel)"
+                        readOnly
+                        className="h-12 text-sm border-2 bg-gray-50"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl p-4 space-y-2" style={{ backgroundColor: '#FFE5E0' }}>
+                    <p className="text-sm font-bold text-center" style={{ color: '#FF5722' }}>
+                      Competitive rates • Instant delivery • Secure transfers
+                    </p>
+                    <p className="text-xs text-center text-gray-600">
+                      Prices may vary slightly at time of order
+                    </p>
+                  </div>
+
+                  <Button 
+                    onClick={() => navigate("/auth")}
+                    className="w-full h-14 text-lg font-bold hover:opacity-90 transition-all"
+                    style={{ backgroundColor: '#FF5722', color: 'white' }}
+                  >
+                    CALCULATE
+                  </Button>
                 </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
 
-                <Button 
-                  onClick={() => navigate("/auth")}
-                  className="w-full h-14 text-lg bg-gradient-to-r from-primary to-accent hover:shadow-xl transition-all"
-                >
-                  Continue
-                </Button>
-              </div>
-            </Card>
+      {/* About TuraPay Section */}
+      <section className="relative py-16 md:py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FF5722' }}>About TuraPay</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              TuraPay is your trusted partner for fast and affordable money transfers from Zimbabwe to Zambia. 
+              We combine advanced technology with accessible cash collection points to ensure your family gets 
+              the money they need, when they need it.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-10 mb-12">
+            <h3 className="text-2xl font-bold mb-6 text-center" style={{ color: '#FF5722' }}>Our Mission</h3>
+            <p className="text-gray-700 text-lg leading-relaxed text-center">
+              Making cross-border payments easy, secure, and convenient. TuraPay enables instant payments 
+              across Africa by providing reliable money transfer services that connect families and businesses. 
+              We understand the importance of financial connectivity and strive to make every transaction seamless.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="relative py-20 bg-card/30 backdrop-blur-sm">
+      <section className="relative py-16 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Why Choose TuraPay?</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FF5722' }}>Why Choose TuraPay?</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Experience the future of cross-border payments with our secure and reliable platform
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
                 <Zap className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">Lightning Fast</h3>
-              <p className="text-sm text-muted-foreground">
-                Transfers complete in minutes, not days. Real-time processing for instant delivery.
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Lightning Fast</h3>
+              <p className="text-sm text-gray-600">
+                Transfers complete in minutes, not days. Real-time processing ensures your recipient gets funds instantly to their mobile money wallet.
               </p>
             </Card>
 
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 hover:border-secondary/50 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-secondary to-secondary/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">Bank-Level Security</h3>
-              <p className="text-sm text-muted-foreground">
-                Your money and data are protected with enterprise-grade encryption.
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Bank-Level Security</h3>
+              <p className="text-sm text-gray-600">
+                Your money and personal data are protected with enterprise-grade encryption and security protocols at every step.
               </p>
             </Card>
 
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 hover:border-accent/50 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-accent to-accent/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
                 <Globe2 className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">Transparent Pricing</h3>
-              <p className="text-sm text-muted-foreground">
-                No hidden fees. See exactly what you pay with our competitive rates.
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Competitive Rates</h3>
+              <p className="text-sm text-gray-600">
+                No hidden fees. Transparent pricing with competitive exchange rates so you know exactly what you're paying.
               </p>
             </Card>
 
-            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50 group">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 group" style={{ borderColor: '#FFE5E0' }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#FF5722' }}>
                 <Smartphone className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">Mobile Money</h3>
-              <p className="text-sm text-muted-foreground">
-                Direct delivery to Airtel Money, MTN Money, and other mobile wallets.
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#FF5722' }}>Mobile Money Direct</h3>
+              <p className="text-sm text-gray-600">
+                Direct delivery to Airtel Money and MTN Money wallets. Recipients get instant access to funds on their phones.
               </p>
             </Card>
           </div>
@@ -286,11 +304,11 @@ const Index = () => {
       </section>
 
       {/* How It Works */}
-      <section className="relative py-20">
+      <section className="relative py-16 md:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">How It Works</h2>
-            <p className="text-lg text-muted-foreground">Send money in 3 simple steps</p>
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#FF5722' }}>How It Works</h2>
+            <p className="text-lg text-gray-600">Send money in 3 simple steps</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -298,35 +316,35 @@ const Index = () => {
               {
                 step: "1",
                 title: "Create Account",
-                description: "Sign up in seconds with your phone number and email. Quick verification process.",
+                description: "Sign up in seconds with your phone number and email. Quick verification process to get you started.",
                 icon: "👤"
               },
               {
                 step: "2",
-                title: "Choose Recipient",
-                description: "Search by phone number, scan QR code, or use their payment link ID.",
-                icon: "🔍"
+                title: "Enter Details",
+                description: "Choose your recipient by phone number or payment link, enter the amount, and see the exact rate.",
+                icon: "💰"
               },
               {
                 step: "3",
-                title: "Send & Track",
-                description: "Make payment, upload proof, and track your transfer in real-time.",
-                icon: "💸"
+                title: "Make Payment",
+                description: "Pay via EcoCash, provide payment confirmation, and your recipient gets funds instantly via mobile money.",
+                icon: "✅"
               }
             ].map((item, index) => (
               <div key={index} className="relative">
                 <div className="text-center">
-                  <div className="inline-flex w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl items-center justify-center mb-4 shadow-lg">
+                  <div className="inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-4 shadow-lg" style={{ backgroundColor: '#FF5722' }}>
                     <span className="text-3xl">{item.icon}</span>
                   </div>
-                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center -z-10">
-                    <span className="text-xl font-bold text-primary">{item.step}</span>
+                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center -z-10" style={{ backgroundColor: '#FFE5E0' }}>
+                    <span className="text-xl font-bold" style={{ color: '#FF5722' }}>{item.step}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3 mt-6">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
+                  <h3 className="text-xl font-bold mb-3 mt-6" style={{ color: '#FF5722' }}>{item.title}</h3>
+                  <p className="text-gray-600">{item.description}</p>
                 </div>
                 {index < 2 && (
-                  <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-primary/50 to-transparent -translate-x-8" />
+                  <div className="hidden md:block absolute top-8 left-full w-full h-0.5 -translate-x-8" style={{ background: 'linear-gradient(to right, #FF5722, transparent)' }} />
                 )}
               </div>
             ))}
@@ -335,24 +353,25 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-secondary opacity-90" />
+      <section className="relative py-16 md:py-20 overflow-hidden" style={{ backgroundColor: '#FF5722' }}>
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         </div>
         
         <div className="relative container mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
             Ready to Get Started?
           </h2>
-          <p className="text-lg sm:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-            Join thousands of users sending and receiving money across borders. Fast, secure, and reliable.
+          <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+            Join thousands of users sending and receiving money across borders with TuraPay. 
+            Fast, secure, and reliable transfers from Zimbabwe to Zambia with competitive rates.
           </p>
           <Button 
             size="lg"
             onClick={() => navigate("/auth")}
-            className="h-16 px-12 text-lg bg-white text-primary hover:bg-white/90 hover:shadow-2xl transition-all"
+            className="h-14 md:h-16 px-8 md:px-12 text-base md:text-lg bg-white hover:bg-gray-100 hover:shadow-2xl transition-all font-bold"
+            style={{ color: '#FF5722' }}
           >
             Create Free Account
           </Button>
@@ -360,21 +379,38 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-card border-t border-border py-12">
+      <footer className="relative bg-gray-900 border-t border-gray-800 py-12">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <div>
-                <div className="text-xl font-bold text-foreground">TuraPay</div>
-                <div className="text-sm text-muted-foreground">Secure cross-border transfers</div>
-              </div>
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <div className="text-2xl font-bold mb-4" style={{ color: '#FF5722' }}>TuraPay</div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Your trusted partner for fast and affordable cross-border money transfers between Zimbabwe and Zambia.
+              </p>
             </div>
-            <div className="text-center md:text-right">
-              <p className="text-sm text-muted-foreground">© 2024 TuraPay. All rights reserved.</p>
-              <p className="text-xs text-muted-foreground mt-1">Zimbabwe ↔️ Zambia</p>
+            <div>
+              <h4 className="text-white font-bold mb-4">Services</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>Send Money</li>
+                <li>Receive Money</li>
+                <li>Mobile Money Transfers</li>
+                <li>Currency Exchange</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>Help Center</li>
+                <li>Track Transfer</li>
+                <li>Contact Us</li>
+                <li>FAQs</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-gray-400">© 2024 TuraPay. All rights reserved.</p>
+              <p className="text-sm text-gray-400">Zimbabwe ↔️ Zambia Money Transfers</p>
             </div>
           </div>
         </div>
