@@ -5,20 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
 const Index = () => {
   const navigate = useNavigate();
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [amount, setAmount] = useState(100);
   const [transferFeePercentage, setTransferFeePercentage] = useState(12);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch exchange rate
         const response = await fetch('https://open.er-api.com/v6/latest/USD');
         const data = await response.json();
-        
         if (data.rates && data.rates.ZMW) {
           setExchangeRate(data.rates.ZMW);
         }
@@ -28,12 +25,10 @@ const Index = () => {
 
       // Fetch transfer fee from database
       try {
-        const { data, error } = await supabase
-          .from('settings')
-          .select('value')
-          .eq('key', 'transfer_fee_percentage')
-          .single();
-        
+        const {
+          data,
+          error
+        } = await supabase.from('settings').select('value').eq('key', 'transfer_fee_percentage').single();
         if (!error && data) {
           setTransferFeePercentage(parseFloat(data.value));
         }
@@ -41,37 +36,26 @@ const Index = () => {
         console.error('Error fetching transfer fee:', error);
       }
     };
-
     fetchData();
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
-
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-lg sm:text-xl font-bold text-primary-foreground">T</span>
-              </div>
-              <span className="text-xl sm:text-2xl font-bold text-primary">TuraPay</span>
+            <div className="flex items-center space-x-2 sm:space-x-3 rounded-md">
+              
+              <span className="text-xl sm:text-2xl text-primary font-bold">TuraPay</span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              {exchangeRate && (
-                <div className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary/10 rounded-full">
+              {exchangeRate && <div className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary/10 rounded-full">
                   <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                   <span className="text-xs sm:text-sm font-semibold text-primary">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
-                </div>
-              )}
-              <Button 
-                onClick={() => navigate("/auth")}
-                className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-10"
-              >
+                </div>}
+              <Button onClick={() => navigate("/auth")} className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-10">
                 Get Started
               </Button>
             </div>
@@ -102,11 +86,7 @@ const Index = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <Button 
-                  size="lg"
-                  onClick={() => navigate("/auth")}
-                  className="h-11 sm:h-12 md:h-14 px-6 sm:px-8 text-sm sm:text-base"
-                >
+                <Button size="lg" onClick={() => navigate("/auth")} className="h-11 sm:h-12 md:h-14 px-6 sm:px-8 text-sm sm:text-base">
                   Start Sending Money
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
@@ -120,13 +100,7 @@ const Index = () => {
                   <div className="space-y-2">
                     <label className="text-xs sm:text-sm font-medium text-muted-foreground">You pay</label>
                     <div className="relative">
-                      <Input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(Number(e.target.value) || 0)}
-                        className="pr-16 h-12 sm:h-14 text-lg sm:text-xl font-bold"
-                        min="1"
-                      />
+                      <Input type="number" value={amount} onChange={e => setAmount(Number(e.target.value) || 0)} className="pr-16 h-12 sm:h-14 text-lg sm:text-xl font-bold" min="1" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-sm">USD</span>
                     </div>
                   </div>
@@ -140,24 +114,14 @@ const Index = () => {
                   <div className="space-y-2">
                     <label className="text-xs sm:text-sm font-medium text-muted-foreground">They receive</label>
                     <div className="relative">
-                      <Input
-                        type="text"
-                        value={recipientGets}
-                        readOnly
-                        className="pr-16 h-12 sm:h-14 text-lg sm:text-xl font-bold bg-muted"
-                      />
+                      <Input type="text" value={recipientGets} readOnly className="pr-16 h-12 sm:h-14 text-lg sm:text-xl font-bold bg-muted" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-sm">ZMW</span>
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-xs sm:text-sm font-medium text-muted-foreground">Receive method</label>
-                    <Input
-                      type="text"
-                      value="Mobile Money (MTN/Airtel)"
-                      readOnly
-                      className="h-10 sm:h-12 text-xs sm:text-sm bg-muted"
-                    />
+                    <Input type="text" value="Mobile Money (MTN/Airtel)" readOnly className="h-10 sm:h-12 text-xs sm:text-sm bg-muted" />
                   </div>
 
                   <div className="rounded-xl p-3 sm:p-4 space-y-2 bg-primary/5">
@@ -166,10 +130,7 @@ const Index = () => {
                     </p>
                   </div>
 
-                  <Button 
-                    onClick={() => navigate("/auth")}
-                    className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold"
-                  >
+                  <Button onClick={() => navigate("/auth")} className="w-full h-12 sm:h-14 text-sm sm:text-base font-bold">
                     Get Started
                   </Button>
                 </div>
@@ -262,27 +223,22 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                step: "1",
-                title: "Create Account",
-                description: "Sign up in seconds with your phone and email",
-                icon: "👤"
-              },
-              {
-                step: "2",
-                title: "Enter Details",
-                description: "Choose recipient and enter amount to send",
-                icon: "💰"
-              },
-              {
-                step: "3",
-                title: "Make Payment",
-                description: "Pay via EcoCash and recipient gets funds instantly",
-                icon: "✅"
-              }
-            ].map((item, index) => (
-              <div key={index} className="relative">
+            {[{
+            step: "1",
+            title: "Create Account",
+            description: "Sign up in seconds with your phone and email",
+            icon: "👤"
+          }, {
+            step: "2",
+            title: "Enter Details",
+            description: "Choose recipient and enter amount to send",
+            icon: "💰"
+          }, {
+            step: "3",
+            title: "Make Payment",
+            description: "Pay via EcoCash and recipient gets funds instantly",
+            icon: "✅"
+          }].map((item, index) => <div key={index} className="relative">
                 <div className="text-center">
                   <div className="inline-flex w-14 h-14 sm:w-16 sm:h-16 rounded-2xl items-center justify-center mb-4 shadow-lg bg-gradient-to-br from-primary to-accent">
                     <span className="text-2xl sm:text-3xl">{item.icon}</span>
@@ -290,11 +246,8 @@ const Index = () => {
                   <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-primary">{item.title}</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground px-2">{item.description}</p>
                 </div>
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-8 left-full w-full h-0.5 -translate-x-8 bg-gradient-to-r from-primary/50 to-transparent" />
-                )}
-              </div>
-            ))}
+                {index < 2 && <div className="hidden md:block absolute top-8 left-full w-full h-0.5 -translate-x-8 bg-gradient-to-r from-primary/50 to-transparent" />}
+              </div>)}
           </div>
         </div>
       </section>
@@ -309,11 +262,7 @@ const Index = () => {
             Join thousands sending money across borders with TuraPay
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Button 
-              size="lg"
-              onClick={() => navigate("/auth")}
-              className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 md:px-10 text-sm sm:text-base md:text-lg bg-background text-primary hover:bg-background/90"
-            >
+            <Button size="lg" onClick={() => navigate("/auth")} className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 md:px-10 text-sm sm:text-base md:text-lg bg-background text-primary hover:bg-background/90">
               Create Free Account
               <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
@@ -372,8 +321,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
