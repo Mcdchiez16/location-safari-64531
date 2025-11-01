@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { SendIcon, Download, Shield, Zap, Globe2, CheckCircle2, TrendingUp, ArrowRight, Smartphone, Clock, DollarSign, Search } from "lucide-react";
+import { SendIcon, Download, Shield, Zap, Globe2, CheckCircle2, TrendingUp, ArrowRight, Smartphone, Clock, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-image.jpg";
 
@@ -51,59 +51,50 @@ const Index = () => {
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-white">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Image with Overlays */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        {/* Hero Image Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${heroImage})`,
+          }}
+        />
+        
+        {/* Lighter Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 via-primary/50 to-accent/60" />
+        
+        {/* Additional Subtle Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+        
+        {/* Animated Gradient Orbs */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
       {/* Header */}
-      <header className="relative bg-secondary sticky top-0 z-50 shadow-lg">
-        <div className="container mx-auto px-4 py-4">
+      <header className="relative bg-gradient-to-r from-primary via-primary to-primary/90 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
+        <div className="container mx-auto px-4 py-4 md:py-5">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">T</span>
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/20 flex items-center justify-center backdrop-blur-sm">
+                <span className="text-2xl md:text-3xl font-bold text-primary-foreground">T</span>
               </div>
-              <span className="text-xl font-bold text-white">TuraPay</span>
+              <span className="text-2xl md:text-3xl font-bold text-primary-foreground">TuraPay</span>
             </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
-              <Button variant="ghost" className="text-white hover:bg-white/10">
-                Personal
-              </Button>
-              <Button variant="ghost" className="text-primary hover:bg-white/10 hover:text-primary">
-                Send Money
-              </Button>
-              <Button variant="ghost" className="text-white hover:bg-white/10">
-                Services
-              </Button>
-              <Button variant="ghost" className="text-white hover:bg-white/10">
-                Help & Support
-              </Button>
-              <Button variant="ghost" className="text-white hover:bg-white/10">
-                About Us
-              </Button>
-            </nav>
-
-            {/* Right Section */}
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-white/10"
-              >
-                <Search className="h-5 w-5" />
-              </Button>
+            <div className="flex items-center gap-3 md:gap-4">
+              {exchangeRate && (
+                <div className="hidden sm:flex items-center gap-2 px-4 md:px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                  <TrendingUp className="h-4 w-4 text-white" />
+                  <span className="text-xs md:text-sm font-bold text-white">1 USD = {exchangeRate.toFixed(2)} ZMW</span>
+                </div>
+              )}
               <Button 
                 onClick={() => navigate("/auth")}
-                className="bg-primary hover:bg-primary/90 text-white font-bold px-6 h-10"
+                className="text-sm md:text-base px-5 md:px-7 h-10 md:h-11 font-bold bg-white text-primary hover:bg-white/90 transition-all shadow-lg"
               >
-                Sign up
-              </Button>
-              <Button 
-                onClick={() => navigate("/auth")}
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 font-bold px-6 h-10 hidden sm:inline-flex"
-              >
-                Login
+                Get Started
               </Button>
             </div>
           </div>
@@ -111,85 +102,110 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-primary">
-        {/* Geometric Background Pattern */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/10 rotate-45 transform -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white/10 rotate-45 transform translate-x-1/2 translate-y-1/2"></div>
-          <div className="absolute top-1/3 right-1/3 w-64 h-64 bg-white/10 rotate-12"></div>
-        </div>
-
-        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* Left Content */}
-            <div className="space-y-8">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                Check Our Rate
+            <div className="space-y-6 md:space-y-8 animate-fade-in text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                <span className="text-xs md:text-sm font-semibold text-white">Zimbabwe to Zambia Money Transfer</span>
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-white">
+                Send Money to
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-accent to-secondary mt-2">
+                  Zambia Instantly
+                </span>
               </h1>
-              <p className="text-lg md:text-xl text-white leading-relaxed max-w-md">
-                We help you send more money home with our competitive rates.
+
+              <p className="text-base md:text-lg lg:text-xl leading-relaxed text-white/90 max-w-2xl mx-auto lg:mx-0">
+                We help you send more money home with our competitive rates. Fast, secure, and reliable cross-border money transfers. Your recipient gets funds instantly to their mobile money wallet.
               </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/auth")}
+                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-white hover:bg-white/90 text-primary transition-all font-bold shadow-xl hover:shadow-2xl"
+                >
+                  Start Sending Money
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/auth")}
+                  className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white/20 transition-all font-bold"
+                >
+                  Learn More
+                </Button>
+              </div>
             </div>
 
             {/* Right - Calculator Card */}
-            <div className="relative">
-              <Card className="bg-white shadow-2xl rounded-2xl overflow-hidden">
-                <div className="p-6 md:p-8 space-y-5">
-                  <div className="space-y-2">
+            <div className="relative animate-scale-in" style={{ animationDelay: '0.2s' }}>
+              <Card className="relative bg-card/98 backdrop-blur-xl shadow-2xl overflow-hidden rounded-2xl border-2 border-white/20">
+                <div className="relative p-6 md:p-8 space-y-6">
+                  <div className="space-y-1">
                     <label className="text-sm font-medium text-muted-foreground">You pay</label>
                     <div className="relative">
                       <Input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value) || 0)}
-                        className="pr-20 h-12 text-lg font-semibold border-2"
+                        className="pr-24 h-14 text-xl font-bold border-2 bg-background"
                         min="1"
                         placeholder="Enter amount"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground font-bold text-sm">ZMW</span>
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground font-bold text-sm">USD</span>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10">
+                      <ArrowRight className="h-5 w-5 rotate-90 text-primary" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
                     <label className="text-sm font-medium text-muted-foreground">They receive</label>
                     <div className="relative">
                       <Input
                         type="text"
                         value={recipientGets}
                         readOnly
-                        className="pr-20 h-12 text-lg font-semibold border-2 bg-muted/30"
+                        className="pr-24 h-14 text-xl font-bold border-2 bg-muted"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground font-bold text-sm">USD</span>
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground font-bold text-sm">ZMW</span>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <label className="text-sm font-medium text-muted-foreground">Receive method</label>
                     <div className="relative">
                       <Input
                         type="text"
-                        value="Mukuru Wallet USD"
+                        value="Mobile Money (MTN/Airtel)"
                         readOnly
-                        className="h-12 text-sm border-2 bg-muted/30"
+                        className="h-12 text-sm border-2 bg-muted"
                       />
                     </div>
                   </div>
 
-                  <div className="rounded-xl p-4 space-y-2 bg-primary/10 border border-primary/20">
+                  <div className="rounded-xl p-4 space-y-2 bg-primary/10">
                     <p className="text-sm font-bold text-center text-primary">
-                      EXCITING NEWS! Get 20% OFF transfer fees when you use your Mukuru Wallet to send money directly to a Mukuru Wallet in Zimbabwe.
+                      Competitive rates • Instant delivery • Secure transfers
+                    </p>
+                    <p className="text-xs text-center text-muted-foreground">
+                      Prices may vary slightly at time of order
                     </p>
                   </div>
 
-                  <p className="text-xs text-center text-muted-foreground">
-                    Prices may vary slightly at time of order
-                  </p>
-
                   <Button 
                     onClick={() => navigate("/auth")}
-                    className="w-full h-12 text-base font-bold bg-primary hover:bg-primary/90 text-white transition-all"
+                    className="w-full h-14 text-lg font-bold bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 transition-all shadow-lg"
                   >
-                    CALCULATE
+                    Get Started
                   </Button>
                 </div>
               </Card>
@@ -199,13 +215,23 @@ const Index = () => {
       </section>
 
       {/* About TuraPay Section */}
-      <section className="relative py-16 md:py-20 bg-secondary">
+      <section className="relative py-16 md:py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-base md:text-lg text-white/90 leading-relaxed">
-              TuraPay's fast and affordable money transfers make sure your family gets the money they need, 
-              when they need it. Combining our advanced technology with accessible cash collection points 
-              across Africa, Europe and Asia. TuraPay is the easy, secure, and convenient way to make instant payments.
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">About TuraPay</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              TuraPay is your trusted partner for fast and affordable money transfers from Zimbabwe to Zambia. 
+              We combine advanced technology with accessible cash collection points to ensure your family gets 
+              the money they need, when they need it.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto bg-card rounded-2xl shadow-lg p-6 md:p-10 mb-12 border">
+            <h3 className="text-2xl font-bold mb-6 text-center text-primary">Our Mission</h3>
+            <p className="text-foreground text-lg leading-relaxed text-center">
+              Making cross-border payments easy, secure, and convenient. TuraPay enables instant payments 
+              across Africa by providing reliable money transfer services that connect families and businesses. 
+              We understand the importance of financial connectivity and strive to make every transaction seamless.
             </p>
           </div>
         </div>
@@ -340,43 +366,38 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-secondary py-12">
+      <footer className="relative bg-card border-t border-border py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-2xl font-bold text-white">T</span>
-                </div>
-                <span className="text-2xl font-bold text-white">TuraPay</span>
-              </div>
-              <p className="text-white/70 text-sm leading-relaxed">
+              <div className="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">TuraPay</div>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Your trusted partner for fast and affordable cross-border money transfers between Zimbabwe and Zambia.
               </p>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Services</h4>
-              <ul className="space-y-2 text-sm text-white/70">
-                <li className="hover:text-white cursor-pointer transition-colors">Send Money</li>
-                <li className="hover:text-white cursor-pointer transition-colors">Receive Money</li>
-                <li className="hover:text-white cursor-pointer transition-colors">Mobile Money Transfers</li>
-                <li className="hover:text-white cursor-pointer transition-colors">Currency Exchange</li>
+              <h4 className="text-foreground font-bold mb-4">Services</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="hover:text-primary cursor-pointer transition-colors">Send Money</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Receive Money</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Mobile Money Transfers</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Currency Exchange</li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-white/70">
-                <li className="hover:text-white cursor-pointer transition-colors">Help Center</li>
-                <li className="hover:text-white cursor-pointer transition-colors">Track Transfer</li>
-                <li className="hover:text-white cursor-pointer transition-colors">Contact Us</li>
-                <li className="hover:text-white cursor-pointer transition-colors">FAQs</li>
+              <h4 className="text-foreground font-bold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="hover:text-primary cursor-pointer transition-colors">Help Center</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Track Transfer</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">Contact Us</li>
+                <li className="hover:text-primary cursor-pointer transition-colors">FAQs</li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/10 pt-8">
+          <div className="border-t border-border pt-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-white/70">© 2024 TuraPay. All rights reserved.</p>
-              <p className="text-sm text-white/70">Zimbabwe ↔️ Zambia Money Transfers</p>
+              <p className="text-sm text-muted-foreground">© 2024 TuraPay. All rights reserved.</p>
+              <p className="text-sm text-muted-foreground">Zimbabwe ↔️ Zambia Money Transfers</p>
             </div>
           </div>
         </div>
