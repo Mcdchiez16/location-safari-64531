@@ -276,9 +276,7 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center space-x-2 mb-3 sm:mb-4">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-lg sm:text-xl font-bold text-primary-foreground">T</span>
-                </div>
+                
                 <span className="text-lg sm:text-xl font-bold text-primary">TuraPay</span>
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground">
