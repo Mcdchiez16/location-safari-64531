@@ -369,133 +369,140 @@ const Admin = () => {
   return <div className="min-h-screen bg-[hsl(220,15%,12%)]">
       {/* Header */}
       <header className="bg-[hsl(220,15%,14%)] border-b border-white/10 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              
-              <div>
-                <h1 className="text-2xl font-bold text-white">TuraPay Admin</h1>
-                <p className="text-sm text-white/60">Dashboard & Management</p>
+        <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-2xl font-bold text-white truncate">TuraPay Admin</h1>
+                <p className="text-xs md:text-sm text-white/60 hidden sm:block">Dashboard & Management</p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => navigate('/dashboard')} className="gap-2 border-white/20 hover:bg-white/10 text-slate-50">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+            <Button variant="outline" onClick={() => navigate('/dashboard')} className="gap-1 md:gap-2 border-white/20 hover:bg-white/10 text-slate-50 text-xs md:text-sm h-8 md:h-10 px-2 md:px-4 shrink-0">
+              <ArrowLeft className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
+              <span className="sm:hidden">Back</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-6 mb-4 md:mb-8">
           <Card className="bg-[hsl(220,15%,16%)] border-white/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/80">Total Transactions</CardTitle>
-              <TrendingUp className="h-4 w-4 text-blue-400" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
+              <CardTitle className="text-xs md:text-sm font-medium text-white/80">Total Transactions</CardTitle>
+              <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-blue-400" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.total}</div>
+            <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+              <div className="text-xl md:text-2xl font-bold text-white">{stats.total}</div>
             </CardContent>
           </Card>
           
           <Card className="bg-[hsl(220,15%,16%)] border-white/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/80">Pending</CardTitle>
-              <DollarSign className="h-4 w-4 text-yellow-400" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
+              <CardTitle className="text-xs md:text-sm font-medium text-white/80">Pending</CardTitle>
+              <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-yellow-400" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-400">{stats.pending}</div>
+            <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+              <div className="text-xl md:text-2xl font-bold text-yellow-400">{stats.pending}</div>
             </CardContent>
           </Card>
           
           <Card className="bg-[hsl(220,15%,16%)] border-white/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/80">Completed</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-400" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
+              <CardTitle className="text-xs md:text-sm font-medium text-white/80">Completed</CardTitle>
+              <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-green-400" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-400">{stats.completed}</div>
+            <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+              <div className="text-xl md:text-2xl font-bold text-green-400">{stats.completed}</div>
             </CardContent>
           </Card>
 
           <Card className="bg-[hsl(220,15%,16%)] border-white/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/80">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-indigo-400" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
+              <CardTitle className="text-xs md:text-sm font-medium text-white/80">Total Users</CardTitle>
+              <Users className="h-3 w-3 md:h-4 md:w-4 text-indigo-400" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.totalUsers}</div>
+            <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+              <div className="text-xl md:text-2xl font-bold text-white">{stats.totalUsers}</div>
             </CardContent>
           </Card>
 
           <Card className="bg-[hsl(220,15%,16%)] border-white/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/80">Pending KYC</CardTitle>
-              <FileText className="h-4 w-4 text-orange-400" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
+              <CardTitle className="text-xs md:text-sm font-medium text-white/80">Pending KYC</CardTitle>
+              <FileText className="h-3 w-3 md:h-4 md:w-4 text-orange-400" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-400">{stats.pendingKyc}</div>
+            <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+              <div className="text-xl md:text-2xl font-bold text-orange-400">{stats.pendingKyc}</div>
             </CardContent>
           </Card>
 
           <Card className="bg-[hsl(220,15%,16%)] border-white/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/80">Revenue (Fees)</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-400" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 md:p-6">
+              <CardTitle className="text-xs md:text-sm font-medium text-white/80">Revenue (Fees)</CardTitle>
+              <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-green-400" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">${stats.revenue.toFixed(2)}</div>
+            <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+              <div className="text-xl md:text-2xl font-bold text-white">${stats.revenue.toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="pending" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto bg-[hsl(220,15%,16%)] border border-white/10">
-            <TabsTrigger value="pending" className="gap-2 data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">
-              <Badge className="bg-yellow-500/20 text-yellow-400 border-0">{stats.pending}</Badge>
-              Pending
+        <Tabs defaultValue="pending" className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto bg-[hsl(220,15%,16%)] border border-white/10 h-auto">
+            <TabsTrigger value="pending" className="gap-1 text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">
+              <Badge className="bg-yellow-500/20 text-yellow-400 border-0 text-xs hidden sm:inline-flex">{stats.pending}</Badge>
+              <span className="hidden sm:inline">Pending</span>
+              <span className="sm:hidden">Pend</span>
             </TabsTrigger>
-            <TabsTrigger value="all" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">All Transactions</TabsTrigger>
-            <TabsTrigger value="kyc" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">KYC Verification</TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">Users</TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60">Settings</TabsTrigger>
+            <TabsTrigger value="all" className="text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">
+              <span className="hidden sm:inline">All Transactions</span>
+              <span className="sm:hidden">All</span>
+            </TabsTrigger>
+            <TabsTrigger value="kyc" className="text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">KYC</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">Users</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">
+              <span className="hidden sm:inline">Settings</span>
+              <span className="sm:hidden">Set</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Pending Transactions Tab */}
-          <TabsContent value="pending" className="space-y-6">
+          <TabsContent value="pending" className="space-y-4 md:space-y-6">
             <Card className="border-yellow-500/30 shadow-lg bg-[hsl(220,15%,16%)] border-white/10">
-              <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-white/10">
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <DollarSign className="h-5 w-5 text-yellow-400" />
+              <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-white/10 p-4 md:p-6">
+                <CardTitle className="flex items-center gap-2 text-white text-base md:text-lg">
+                  <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-yellow-400" />
                   Pending Transactions
                 </CardTitle>
-                <CardDescription className="text-white/60">Transactions awaiting approval and payment</CardDescription>
+                <CardDescription className="text-white/60 text-xs md:text-sm">Transactions awaiting approval and payment</CardDescription>
                 
                 {/* Search */}
-                <div className="mt-4">
-                  <Input placeholder="Search by name or phone..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full" />
+                <div className="mt-3 md:mt-4">
+                  <Input placeholder="Search by name or phone..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full text-sm" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="p-3 md:p-6">
+                <div className="space-y-3 md:space-y-4">
                   {transactions.filter(t => t.status === "pending").filter(transaction => {
                   const matchesSearch = transaction.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) || transaction.receiver_phone.includes(searchQuery) || (transaction.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase());
                   return matchesSearch;
-                }).length === 0 ? <p className="text-center text-muted-foreground py-8">No pending transactions</p> : transactions.filter(t => t.status === "pending").filter(transaction => {
+                }).length === 0 ? <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">No pending transactions</p> : transactions.filter(t => t.status === "pending").filter(transaction => {
                   const matchesSearch = transaction.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) || transaction.receiver_phone.includes(searchQuery) || (transaction.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase());
                   return matchesSearch;
-                }).map(transaction => <Card key={transaction.id} className="p-6 border-l-4 border-l-yellow-500 bg-gradient-to-r from-card to-yellow-50/30 dark:to-yellow-950/10">
-                        <div className="flex flex-col sm:flex-row justify-between gap-4">
+                }).map(transaction => <Card key={transaction.id} className="p-3 md:p-6 border-l-4 border-l-yellow-500 bg-gradient-to-r from-card to-yellow-50/30 dark:to-yellow-950/10">
+                        <div className="flex flex-col gap-3 md:gap-4">
                           <div className="space-y-2 flex-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-semibold text-lg text-foreground">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                              <h4 className="font-semibold text-sm md:text-lg text-foreground">
                                 {transaction.profiles?.full_name || "Unknown Sender"}
                               </h4>
                               {getStatusBadge(transaction.status)}
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 md:gap-2 text-xs md:text-sm">
                               <p className="text-muted-foreground">
                                 <strong>To:</strong> {transaction.receiver_name}
                               </p>
@@ -521,8 +528,8 @@ const Admin = () => {
                           </div>
                           
                           <div className="flex flex-col gap-2">
-                            <Button size="sm" onClick={() => setSelectedTransaction(transaction)} className="bg-green-500 hover:bg-green-600 gap-2">
-                              <CheckCircle className="h-4 w-4" />
+                            <Button size="sm" onClick={() => setSelectedTransaction(transaction)} className="bg-green-500 hover:bg-green-600 gap-2 text-xs md:text-sm h-8 md:h-9">
+                              <CheckCircle className="h-3 w-3 md:h-4 md:w-4" />
                               Process Payment
                             </Button>
                           </div>
@@ -534,19 +541,19 @@ const Admin = () => {
           </TabsContent>
 
           {/* All Transactions Tab */}
-          <TabsContent value="all" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>All Transactions</CardTitle>
-                <CardDescription>Complete transaction history</CardDescription>
+          <TabsContent value="all" className="space-y-4 md:space-y-6">
+            <Card className="bg-[hsl(220,15%,16%)] border-white/10">
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-base md:text-lg text-white">All Transactions</CardTitle>
+                <CardDescription className="text-white/60 text-xs md:text-sm">Complete transaction history</CardDescription>
                 
                 {/* Search and Filter */}
-                <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-3 md:mt-4">
                   <div className="flex-1">
-                    <Input placeholder="Search by name or phone..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full" />
+                    <Input placeholder="Search by name or phone..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full text-sm" />
                   </div>
                   <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-full sm:w-48">
+                    <SelectTrigger className="w-full sm:w-40 md:w-48 text-sm">
                       <SelectValue placeholder="Filter by status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -560,51 +567,51 @@ const Admin = () => {
                   </Select>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {filteredTransactions.length === 0 ? <p className="text-center text-muted-foreground py-8">No transactions found</p> : filteredTransactions.map(transaction => <Card key={transaction.id} className="p-4">
-                        <div className="flex flex-col sm:flex-row justify-between gap-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-semibold text-foreground">
+              <CardContent className="p-3 md:p-6">
+                <div className="space-y-3 md:space-y-4">
+                  {filteredTransactions.length === 0 ? <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">No transactions found</p> : filteredTransactions.map(transaction => <Card key={transaction.id} className="p-3 md:p-4 bg-card">
+                        <div className="flex flex-col gap-3 md:gap-4">
+                          <div className="space-y-1.5 md:space-y-2 flex-1">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                              <h4 className="font-semibold text-sm md:text-base text-foreground">
                                 {transaction.profiles?.full_name || "Unknown Sender"}
                               </h4>
                               {getStatusBadge(transaction.status)}
                             </div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs md:text-sm text-muted-foreground">
                               To: {transaction.receiver_name} ({transaction.receiver_phone})
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs md:text-sm text-muted-foreground">
                               Amount: ${transaction.amount.toFixed(2)} | Fee: ${transaction.fee.toFixed(2)}
                             </p>
-                            {transaction.sender_number && <p className="text-sm text-muted-foreground">
+                            {transaction.sender_number && <p className="text-xs md:text-sm text-muted-foreground">
                                 <strong>Sender #:</strong> {transaction.sender_number}
                               </p>}
-                            {transaction.transaction_id && <p className="text-sm text-muted-foreground">
+                            {transaction.transaction_id && <p className="text-xs md:text-sm text-muted-foreground">
                                 <strong>Transaction ID:</strong> {transaction.transaction_id}
                               </p>}
-                            {transaction.tid && <p className="text-sm font-semibold text-primary">
+                            {transaction.tid && <p className="text-xs md:text-sm font-semibold text-primary">
                                 <strong>TID:</strong> {transaction.tid}
                               </p>}
                             <p className="text-xs text-muted-foreground">
                               {new Date(transaction.created_at).toLocaleString()}
                             </p>
-                            {transaction.admin_notes && <p className="text-sm text-muted-foreground italic">
+                            {transaction.admin_notes && <p className="text-xs md:text-sm text-muted-foreground italic">
                                 Notes: {transaction.admin_notes}
                               </p>}
                           </div>
                           
                            <div className="flex flex-col gap-2">
-                            {transaction.payment_proof_url && <Button size="sm" variant="outline" onClick={() => window.open(transaction.payment_proof_url, "_blank")}>
-                                <Eye className="h-4 w-4 mr-2" />
+                            {transaction.payment_proof_url && <Button size="sm" variant="outline" onClick={() => window.open(transaction.payment_proof_url, "_blank")} className="text-xs md:text-sm h-8 md:h-9">
+                                <Eye className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                                 View Sender Proof
                               </Button>}
-                            {transaction.status === "pending" && <Button size="sm" onClick={() => setSelectedTransaction(transaction)} className="bg-green-500 hover:bg-green-600">
-                               <CheckCircle className="h-4 w-4 mr-2" />
+                            {transaction.status === "pending" && <Button size="sm" onClick={() => setSelectedTransaction(transaction)} className="bg-green-500 hover:bg-green-600 text-xs md:text-sm h-8 md:h-9">
+                               <CheckCircle className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                                 Mark as Deposited
                               </Button>}
-                            {transaction.status !== "pending" && transaction.admin_payment_proof_url && <Button size="sm" variant="outline" onClick={() => window.open(transaction.admin_payment_proof_url, "_blank")}>
-                                <Eye className="h-4 w-4 mr-2" />
+                            {transaction.status !== "pending" && transaction.admin_payment_proof_url && <Button size="sm" variant="outline" onClick={() => window.open(transaction.admin_payment_proof_url, "_blank")} className="text-xs md:text-sm h-8 md:h-9">
+                                <Eye className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                                 View Payment Proof
                               </Button>}
                           </div>
@@ -616,43 +623,44 @@ const Admin = () => {
           </TabsContent>
 
           {/* KYC Verification Tab */}
-          <TabsContent value="kyc" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>KYC Verification Requests</CardTitle>
-                <CardDescription>Review and verify user identification documents</CardDescription>
+          <TabsContent value="kyc" className="space-y-4 md:space-y-6">
+            <Card className="bg-[hsl(220,15%,16%)] border-white/10">
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-base md:text-lg text-white">KYC Verification Requests</CardTitle>
+                <CardDescription className="text-white/60 text-xs md:text-sm">Review and verify user identification documents</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {kycRequests.length === 0 ? <p className="text-center text-muted-foreground py-8">No KYC requests</p> : kycRequests.map(kyc => <Card key={kyc.id} className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                              <User className="h-6 w-6 text-primary" />
+              <CardContent className="p-3 md:p-6">
+                <div className="space-y-3 md:space-y-4">
+                  {kycRequests.length === 0 ? <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">No KYC requests</p> : kycRequests.map(kyc => <Card key={kyc.id} className="p-3 md:p-4 bg-card">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
+                          <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                              <User className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                             </div>
-                            <div>
-                              <p className="font-semibold">{kyc.full_name}</p>
-                              <p className="text-sm text-muted-foreground">{kyc.phone_number}</p>
-                              <p className="text-xs text-muted-foreground">
+                            <div className="min-w-0">
+                              <p className="font-semibold text-sm md:text-base text-foreground truncate">{kyc.full_name}</p>
+                              <p className="text-xs md:text-sm text-muted-foreground">{kyc.phone_number}</p>
+                              <p className="text-xs text-muted-foreground truncate">
                                 {kyc.id_type && kyc.id_number ? `${kyc.id_type} - ${kyc.id_number}` : "No ID info"}
                               </p>
                               <div className="flex items-center gap-2 mt-1">
-                                {kyc.verified ? <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-600 flex items-center gap-1">
+                                {kyc.verified ? <span className="text-xs px-2 py-0.5 md:py-1 rounded-full bg-green-500/10 text-green-600 flex items-center gap-1">
                                     <CheckCircle className="h-3 w-3" />
                                     Verified
-                                  </span> : <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-600">
-                                    Pending Verification
+                                  </span> : <span className="text-xs px-2 py-0.5 md:py-1 rounded-full bg-yellow-500/10 text-yellow-600">
+                                    Pending
                                   </span>}
-                                {(kyc.id_document_url || kyc.selfie_url) && <span className="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-600 flex items-center gap-1">
+                                {(kyc.id_document_url || kyc.selfie_url) && <span className="text-xs px-2 py-0.5 md:py-1 rounded-full bg-blue-500/10 text-blue-600 flex items-center gap-1">
                                     <FileText className="h-3 w-3" />
-                                    Documents Uploaded
+                                    <span className="hidden sm:inline">Documents</span>
                                   </span>}
                               </div>
                             </div>
                           </div>
-                          <Button onClick={() => viewKycDetails(kyc)} variant="outline" size="sm" className="gap-2">
-                            <Eye className="h-4 w-4" />
-                            Review KYC
+                          <Button onClick={() => viewKycDetails(kyc)} variant="outline" size="sm" className="gap-2 text-xs md:text-sm h-8 md:h-9 shrink-0">
+                            <Eye className="h-3 w-3 md:h-4 md:w-4" />
+                            <span className="hidden sm:inline">Review KYC</span>
+                            <span className="sm:hidden">Review</span>
                           </Button>
                         </div>
                       </Card>)}
@@ -662,22 +670,22 @@ const Admin = () => {
           </TabsContent>
 
           {/* Users Tab */}
-          <TabsContent value="users" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>View and manage all registered users</CardDescription>
+          <TabsContent value="users" className="space-y-4 md:space-y-6">
+            <Card className="bg-[hsl(220,15%,16%)] border-white/10">
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-base md:text-lg text-white">User Management</CardTitle>
+                <CardDescription className="text-white/60 text-xs md:text-sm">View and manage all registered users</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {users.length === 0 ? <p className="text-center text-muted-foreground py-8">No users found</p> : users.map(user => <Card key={user.id} className="p-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h4 className="font-semibold text-foreground">{user.full_name}</h4>
-                            <p className="text-sm text-muted-foreground">
+              <CardContent className="p-3 md:p-6">
+                <div className="space-y-3 md:space-y-4">
+                  {users.length === 0 ? <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">No users found</p> : users.map(user => <Card key={user.id} className="p-3 md:p-4 bg-card">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                          <div className="min-w-0">
+                            <h4 className="font-semibold text-sm md:text-base text-foreground truncate">{user.full_name}</h4>
+                            <p className="text-xs md:text-sm text-muted-foreground">
                               {user.phone_number} | {user.country}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs md:text-sm text-muted-foreground">
                               Balance: ${user.balance.toFixed(2)}
                             </p>
                             <p className="text-xs text-muted-foreground">
@@ -685,7 +693,7 @@ const Admin = () => {
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                            {user.verified ? <Badge className="bg-green-500">Verified</Badge> : <Badge className="bg-yellow-500">Unverified</Badge>}
+                            {user.verified ? <Badge className="bg-green-500 text-xs">Verified</Badge> : <Badge className="bg-yellow-500 text-xs">Unverified</Badge>}
                           </div>
                         </div>
                       </Card>)}
@@ -695,48 +703,48 @@ const Admin = () => {
           </TabsContent>
 
           {/* Settings Tab */}
-          <TabsContent value="settings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Platform Settings</CardTitle>
-                <CardDescription>Configure platform parameters</CardDescription>
+          <TabsContent value="settings" className="space-y-4 md:space-y-6">
+            <Card className="bg-[hsl(220,15%,16%)] border-white/10">
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-base md:text-lg text-white">Platform Settings</CardTitle>
+                <CardDescription className="text-white/60 text-xs md:text-sm">Configure platform parameters</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 md:space-y-6 p-3 md:p-6">
                 <div>
-                  <Label htmlFor="transfer_fee">Transfer Fee Percentage</Label>
-                  <div className="flex gap-3 mt-2">
-                    <Input id="transfer_fee" type="number" step="0.01" min="0" max="100" value={newTransferFee} onChange={e => setNewTransferFee(e.target.value)} placeholder="e.g., 2.5" />
-                    <Button onClick={updateTransferFee} className="min-w-[100px]">
+                  <Label htmlFor="transfer_fee" className="text-sm md:text-base text-white">Transfer Fee Percentage</Label>
+                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                    <Input id="transfer_fee" type="number" step="0.01" min="0" max="100" value={newTransferFee} onChange={e => setNewTransferFee(e.target.value)} placeholder="e.g., 2.5" className="text-sm" />
+                    <Button onClick={updateTransferFee} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
                       Update
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-white/60 mt-2">
                     Current fee: {newTransferFee}%
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="payment_number">Payment Number (For receiving funds)</Label>
-                  <div className="flex gap-3 mt-2">
-                    <Input id="payment_number" type="text" value={paymentNumber} onChange={e => setPaymentNumber(e.target.value)} placeholder="e.g., +263 77 123 4567" />
-                    <Button onClick={updatePaymentNumber} className="min-w-[100px]">
+                  <Label htmlFor="payment_number" className="text-sm md:text-base text-white">Payment Number (For receiving funds)</Label>
+                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                    <Input id="payment_number" type="text" value={paymentNumber} onChange={e => setPaymentNumber(e.target.value)} placeholder="e.g., +263 77 123 4567" className="text-sm" />
+                    <Button onClick={updatePaymentNumber} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
                       Update
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-white/60 mt-2">
                     This number will be shown to senders for payment
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="payment_recipient_name">Payment Recipient Name</Label>
-                  <div className="flex gap-3 mt-2">
-                    <Input id="payment_recipient_name" type="text" value={paymentRecipientName} onChange={e => setPaymentRecipientName(e.target.value)} placeholder="e.g., John Doe" />
-                    <Button onClick={updatePaymentRecipientName} className="min-w-[100px]">
+                  <Label htmlFor="payment_recipient_name" className="text-sm md:text-base text-white">Payment Recipient Name</Label>
+                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                    <Input id="payment_recipient_name" type="text" value={paymentRecipientName} onChange={e => setPaymentRecipientName(e.target.value)} placeholder="e.g., John Doe" className="text-sm" />
+                    <Button onClick={updatePaymentRecipientName} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
                       Update
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-white/60 mt-2">
                     This name will be displayed to senders as the payment recipient
                   </p>
                 </div>
@@ -746,58 +754,58 @@ const Admin = () => {
         </Tabs>
 
         {/* Payment Confirmation Modal - Separate from tabs */}
-        {selectedTransaction && <Card className="mt-6 border-2 border-green-500 shadow-xl">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+        {selectedTransaction && <Card className="mt-4 md:mt-6 border-2 border-green-500 shadow-xl bg-[hsl(220,15%,16%)]">
+            <CardHeader className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg text-white">
+                <CheckCircle className="h-5 w-5 md:h-6 md:w-6 text-green-400" />
                 Confirm Payment Completion
               </CardTitle>
-              <CardDescription className="text-base">
+              <CardDescription className="text-sm md:text-base text-white/80">
                 Transaction to <strong>{selectedTransaction.receiver_name}</strong>
               </CardDescription>
-              <div className="mt-4 p-4 bg-white dark:bg-gray-900 rounded-lg border">
-                <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="mt-3 md:mt-4 p-3 md:p-4 bg-white/5 rounded-lg border border-white/10">
+                <div className="grid grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm">
                   <div>
-                    <p className="text-muted-foreground">Amount</p>
-                    <p className="font-semibold">${selectedTransaction.amount.toFixed(2)}</p>
+                    <p className="text-white/60">Amount</p>
+                    <p className="font-semibold text-white">${selectedTransaction.amount.toFixed(2)}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Fee</p>
-                    <p className="font-semibold">${selectedTransaction.fee.toFixed(2)}</p>
+                    <p className="text-white/60">Fee</p>
+                    <p className="font-semibold text-white">${selectedTransaction.fee.toFixed(2)}</p>
                   </div>
                   {selectedTransaction.sender_number && <div className="col-span-2">
-                      <p className="text-muted-foreground">Sender Number</p>
-                      <p className="font-semibold">{selectedTransaction.sender_number}</p>
+                      <p className="text-white/60">Sender Number</p>
+                      <p className="font-semibold text-white">{selectedTransaction.sender_number}</p>
                     </div>}
                   {selectedTransaction.transaction_id && <div className="col-span-2">
-                      <p className="text-muted-foreground">Transaction ID</p>
-                      <p className="font-semibold">{selectedTransaction.transaction_id}</p>
+                      <p className="text-white/60">Transaction ID</p>
+                      <p className="font-semibold text-white truncate">{selectedTransaction.transaction_id}</p>
                     </div>}
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4 pt-6">
+            <CardContent className="space-y-3 md:space-y-4 pt-4 md:pt-6 p-3 md:p-6">
               <div>
-                <Label htmlFor="sender_name" className="text-base font-semibold">Sender Name *</Label>
-                <Input id="sender_name" placeholder="Enter the name of who made the payment" value={senderName} onChange={e => setSenderName(e.target.value)} className="mt-2 h-12" required />
+                <Label htmlFor="sender_name" className="text-sm md:text-base font-semibold text-white">Sender Name *</Label>
+                <Input id="sender_name" placeholder="Enter the name of who made the payment" value={senderName} onChange={e => setSenderName(e.target.value)} className="mt-2 h-10 md:h-12 text-sm" required />
               </div>
               <div>
-                <Label htmlFor="manual_tid" className="text-base font-semibold">TID Number *</Label>
-                <Input id="manual_tid" placeholder="Enter TID manually (e.g., TIDXXX123)" value={manualTid} onChange={e => setManualTid(e.target.value)} className="mt-2 h-12" required />
-                <p className="text-xs text-muted-foreground mt-1">This TID will be sent to the sender and receiver</p>
+                <Label htmlFor="manual_tid" className="text-sm md:text-base font-semibold text-white">TID Number *</Label>
+                <Input id="manual_tid" placeholder="Enter TID manually (e.g., TIDXXX123)" value={manualTid} onChange={e => setManualTid(e.target.value)} className="mt-2 h-10 md:h-12 text-sm" required />
+                <p className="text-xs text-white/60 mt-1">This TID will be sent to the sender and receiver</p>
               </div>
               <div>
-                <Label htmlFor="rejection_reason" className="text-base font-semibold">Rejection Reason (Optional)</Label>
-                <Textarea id="rejection_reason" placeholder="Enter reason for rejection if rejecting this payment..." value={rejectionReason} onChange={e => setRejectionReason(e.target.value)} className="mt-2 min-h-[80px]" />
-                <p className="text-xs text-muted-foreground mt-1">This will be visible to the sender</p>
+                <Label htmlFor="rejection_reason" className="text-sm md:text-base font-semibold text-white">Rejection Reason (Optional)</Label>
+                <Textarea id="rejection_reason" placeholder="Enter reason for rejection if rejecting this payment..." value={rejectionReason} onChange={e => setRejectionReason(e.target.value)} className="mt-2 min-h-[60px] md:min-h-[80px] text-sm" />
+                <p className="text-xs text-white/60 mt-1">This will be visible to the sender</p>
               </div>
-              <div className="flex gap-3 pt-4">
-                <Button onClick={() => updateTransactionStatus(selectedTransaction.id, "deposited", undefined, "", "", manualTid, senderName)} className="flex-1 bg-emerald-500 hover:bg-emerald-600 h-12 text-base">
-                  <CheckCircle className="h-5 w-5 mr-2" />
+              <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-3 md:pt-4">
+                <Button onClick={() => updateTransactionStatus(selectedTransaction.id, "deposited", undefined, "", "", manualTid, senderName)} className="flex-1 bg-emerald-500 hover:bg-emerald-600 h-10 md:h-12 text-sm md:text-base">
+                  <CheckCircle className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Mark as Deposited
                 </Button>
-                <Button onClick={() => updateTransactionStatus(selectedTransaction.id, "rejected", undefined, "", "", "", "", rejectionReason)} variant="destructive" className="flex-1 h-12 text-base">
-                  <XCircle className="h-5 w-5 mr-2" />
+                <Button onClick={() => updateTransactionStatus(selectedTransaction.id, "rejected", undefined, "", "", "", "", rejectionReason)} variant="destructive" className="flex-1 h-10 md:h-12 text-sm md:text-base">
+                  <XCircle className="h-4 w-4 md:h-5 md:w-5 mr-2" />
                   Reject Payment
                 </Button>
                 <Button variant="outline" onClick={() => {
@@ -805,7 +813,7 @@ const Admin = () => {
               setManualTid("");
               setSenderName("");
               setRejectionReason("");
-            }} className="h-12">
+            }} className="h-10 md:h-12 text-sm md:text-base">
                   Cancel
                 </Button>
               </div>
@@ -814,61 +822,61 @@ const Admin = () => {
 
         {/* KYC Details Dialog */}
         <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto p-4 md:p-6">
             <DialogHeader>
-              <DialogTitle>KYC Verification Details</DialogTitle>
+              <DialogTitle className="text-base md:text-lg">KYC Verification Details</DialogTitle>
             </DialogHeader>
-            {selectedKyc && <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+            {selectedKyc && <div className="space-y-4 md:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Full Name</p>
-                    <p className="font-semibold">{selectedKyc.full_name}</p>
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Full Name</p>
+                    <p className="font-semibold text-sm md:text-base">{selectedKyc.full_name}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Phone Number</p>
-                    <p className="font-semibold">{selectedKyc.phone_number}</p>
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Phone Number</p>
+                    <p className="font-semibold text-sm md:text-base">{selectedKyc.phone_number}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Country</p>
-                    <p className="font-semibold">{selectedKyc.country}</p>
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Country</p>
+                    <p className="font-semibold text-sm md:text-base">{selectedKyc.country}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">ID Type</p>
-                    <p className="font-semibold">{selectedKyc.id_type || "Not provided"}</p>
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground">ID Type</p>
+                    <p className="font-semibold text-sm md:text-base">{selectedKyc.id_type || "Not provided"}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">ID Number</p>
-                    <p className="font-semibold">{selectedKyc.id_number || "Not provided"}</p>
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground">ID Number</p>
+                    <p className="font-semibold text-sm md:text-base">{selectedKyc.id_number || "Not provided"}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Status</p>
-                    <p className="font-semibold">
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Status</p>
+                    <p className="font-semibold text-sm md:text-base">
                       {selectedKyc.verified ? <span className="text-green-600 flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4" />
+                          <CheckCircle className="h-3 w-3 md:h-4 md:w-4" />
                           Verified
                         </span> : <span className="text-yellow-600">Pending</span>}
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">ID Document</p>
-                    {selectedKyc.id_document_url ? <img src={selectedKyc.id_document_url} alt="ID Document" className="w-full max-w-md rounded-lg border" /> : <p className="text-sm text-muted-foreground">No document uploaded</p>}
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground mb-2">ID Document</p>
+                    {selectedKyc.id_document_url ? <img src={selectedKyc.id_document_url} alt="ID Document" className="w-full max-w-md rounded-lg border" /> : <p className="text-xs md:text-sm text-muted-foreground">No document uploaded</p>}
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">Selfie</p>
-                    {selectedKyc.selfie_url ? <img src={selectedKyc.selfie_url} alt="Selfie" className="w-full max-w-md rounded-lg border" /> : <p className="text-sm text-muted-foreground">No selfie uploaded</p>}
+                    <p className="text-xs md:text-sm font-medium text-muted-foreground mb-2">Selfie</p>
+                    {selectedKyc.selfie_url ? <img src={selectedKyc.selfie_url} alt="Selfie" className="w-full max-w-md rounded-lg border" /> : <p className="text-xs md:text-sm text-muted-foreground">No selfie uploaded</p>}
                   </div>
                 </div>
 
-                {!selectedKyc.verified && <div className="flex gap-3 pt-4">
-                    <Button onClick={() => handleKycAction(selectedKyc.id, "approve")} className="flex-1 bg-green-600 hover:bg-green-700 gap-2">
+                {!selectedKyc.verified && <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-3 md:pt-4">
+                    <Button onClick={() => handleKycAction(selectedKyc.id, "approve")} className="flex-1 bg-green-600 hover:bg-green-700 gap-2 h-10 md:h-11 text-sm md:text-base">
                       <CheckCircle className="h-4 w-4" />
                       Approve KYC
                     </Button>
-                    <Button onClick={() => handleKycAction(selectedKyc.id, "decline")} variant="destructive" className="flex-1 gap-2">
+                    <Button onClick={() => handleKycAction(selectedKyc.id, "decline")} variant="destructive" className="flex-1 gap-2 h-10 md:h-11 text-sm md:text-base">
                       <XCircle className="h-4 w-4" />
                       Decline KYC
                     </Button>

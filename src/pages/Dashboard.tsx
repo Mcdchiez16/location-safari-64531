@@ -234,61 +234,61 @@ const Dashboard = () => {
         </div>
 
         {/* Transactions Card */}
-        <div id="transactions-section" className="bg-primary-foreground rounded-3xl p-4 md:p-8 shadow-xl">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+        <div id="transactions-section" className="bg-primary-foreground rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 md:mb-6">
             <div>
-              <h2 className="text-lg md:text-2xl font-bold text-foreground">
+              <h2 className="text-base md:text-2xl font-bold text-foreground">
                 Recent Transactions
               </h2>
               <p className="text-xs md:text-sm text-muted-foreground mt-1">
                 Pending and rejected transactions
               </p>
             </div>
-            <Button onClick={handleDownloadStatement} className="h-9 md:h-11 text-sm md:text-base rounded-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 font-semibold gap-2 w-full sm:w-auto">
-              <Download className="h-4 w-4" />
+            <Button onClick={handleDownloadStatement} className="h-9 md:h-11 text-xs md:text-base rounded-lg md:rounded-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 font-semibold gap-2 w-full sm:w-auto">
+              <Download className="h-3.5 w-3.5 md:h-4 md:w-4" />
               <span className="hidden sm:inline">Download PDF</span>
-              <span className="sm:hidden">PDF</span>
+              <span className="sm:hidden">Download</span>
             </Button>
           </div>
           
           {transactions.length === 0 ? <div className="text-center py-8 md:py-12">
-              <div className="mb-4 flex justify-center">
-                <div className="h-16 w-16 md:h-24 md:w-24 rounded-full bg-muted/30 flex items-center justify-center">
-                  <History className="h-8 w-8 md:h-12 md:w-12 text-muted-foreground" />
+              <div className="mb-3 md:mb-4 flex justify-center">
+                <div className="h-12 w-12 md:h-20 md:w-20 rounded-full bg-muted/30 flex items-center justify-center">
+                  <History className="h-6 w-6 md:h-10 md:w-10 text-muted-foreground" />
                 </div>
               </div>
               <p className="text-muted-foreground mb-1 text-sm md:text-lg font-medium">
                 No recent transactions
               </p>
-              <p className="text-muted-foreground mb-4 text-xs md:text-base">
+              <p className="text-muted-foreground mb-4 text-xs md:text-sm">
                 Your pending and rejected transactions will appear here
               </p>
             </div> : <div className="space-y-2 md:space-y-3">
               {transactions.map(transaction => {
             const isSender = transaction.sender_id === session?.user.id;
-            return <div key={transaction.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-5 border border-border rounded-xl md:rounded-2xl hover:bg-muted/30 transition-colors gap-2 sm:gap-0">
+            return <div key={transaction.id} className="flex flex-col sm:flex-row sm:items-start sm:justify-between p-3 md:p-4 border border-border rounded-lg md:rounded-xl hover:bg-muted/30 transition-colors gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-xs md:text-base text-foreground truncate">
+                      <p className="font-semibold text-sm md:text-base text-foreground mb-1.5">
                         {isSender ? `To: ${transaction.receiver_name}` : `From: ${transaction.sender_name || 'Unknown'}`}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className={`text-xs md:text-sm font-medium ${getStatusColor(transaction.status)}`}>
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(transaction.status)} bg-muted/50`}>
                           {getStatusLabel(transaction.status)}
-                        </p>
-                        {transaction.tid && <p className="text-xs font-semibold text-primary">
-                            • TID: {transaction.tid}
-                          </p>}
+                        </span>
+                        {transaction.tid && <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold text-primary bg-primary/10">
+                            TID: {transaction.tid}
+                          </span>}
                       </div>
-                      {transaction.rejection_reason && isSender && <div className="mt-2 p-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg">
+                      {transaction.rejection_reason && isSender && <div className="mt-2 p-2.5 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg">
                           <p className="text-xs font-semibold text-red-800 dark:text-red-400 mb-1">Rejection Reason:</p>
-                          <p className="text-xs text-red-700 dark:text-red-300">{transaction.rejection_reason}</p>
+                          <p className="text-xs text-red-700 dark:text-red-300 leading-relaxed">{transaction.rejection_reason}</p>
                         </div>}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(transaction.created_at).toLocaleDateString()}
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        {new Date(transaction.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </p>
                     </div>
-                    <div className="text-left sm:text-right">
-                      <p className="font-bold text-sm md:text-base text-foreground">
+                    <div className="text-left sm:text-right shrink-0">
+                      <p className="font-bold text-base md:text-lg text-foreground">
                         {isSender ? '-' : '+'} {transaction.currency} {transaction.amount.toFixed(2)}
                       </p>
                     </div>

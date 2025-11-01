@@ -1,4 +1,4 @@
-import { LayoutDashboard, FileText, Shield, Users, Settings, HelpCircle } from "lucide-react";
+import { LayoutDashboard, FileText, Shield, Users, Settings as SettingsIcon, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminSidebarProps {
@@ -11,7 +11,7 @@ const items = [
   { title: "All Transactions", value: "all", icon: FileText },
   { title: "KYC Verification", value: "kyc", icon: Shield },
   { title: "Users", value: "users", icon: Users },
-  { title: "Settings", value: "settings", icon: Settings },
+  { title: "Settings", value: "settings", icon: SettingsIcon },
   { title: "Support Settings", value: "support", icon: HelpCircle },
 ];
 
