@@ -41,7 +41,7 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
-  return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-3 sm:py-4">
