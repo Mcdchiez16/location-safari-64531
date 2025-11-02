@@ -32,8 +32,8 @@ const Navbar = () => {
     setLoading(false);
   };
 
-  // Don't show navbar on landing or auth pages
-  if (location.pathname === '/' || location.pathname === '/auth') {
+  // Don't show navbar on landing or auth pages, or when user is logged in
+  if (location.pathname === '/' || location.pathname === '/auth' || accountType) {
     return null;
   }
   if (loading) {
