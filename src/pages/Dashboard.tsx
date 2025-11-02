@@ -207,7 +207,7 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-primary-foreground font-medium text-lg">Welcome, {profile?.full_name || 'User'}</h1>
+            <h1 className="text-primary-foreground text-base text-left font-bold">Welcome, {profile?.full_name || 'User'}</h1>
             <p className="text-primary-foreground/80 text-sm">Track your payments and transfers</p>
           </div>
           <Button onClick={() => navigate("/settings")} size="icon" className="rounded-full bg-white/20 hover:bg-white/30 text-white border-none shadow-lg">
@@ -280,7 +280,11 @@ const Dashboard = () => {
                           <p className="text-xs text-red-700 dark:text-red-300 leading-relaxed">{transaction.rejection_reason}</p>
                         </div>}
                       <p className="text-xs text-muted-foreground mt-1.5">
-                        {new Date(transaction.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                        {new Date(transaction.created_at).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
                       </p>
                     </div>
                     <div className="text-left sm:text-right shrink-0">
