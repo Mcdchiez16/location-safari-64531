@@ -207,7 +207,7 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-primary-foreground text-base text-left font-bold">Welcome, {profile?.full_name || 'User'}</h1>
+            <h1 className="text-primary-foreground text-base text-left font-bold">Hi, {profile?.full_name || 'User'}</h1>
             <p className="text-primary-foreground/80 text-sm">Track your payments and transfers</p>
           </div>
           <Button onClick={() => navigate("/settings")} size="icon" className="rounded-full bg-white/20 hover:bg-white/30 text-white border-none shadow-lg">
