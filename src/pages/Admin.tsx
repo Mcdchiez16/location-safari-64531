@@ -377,7 +377,7 @@ const Admin = () => {
                 <p className="text-xs md:text-sm text-white/60 hidden sm:block">Dashboard & Management</p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => navigate('/dashboard')} className="gap-1 md:gap-2 border-white/20 hover:bg-white/10 text-xs md:text-sm h-8 md:h-10 px-2 md:px-4 shrink-0 text-slate-300">
+            <Button variant="outline" onClick={() => navigate('/dashboard')} className="gap-1 md:gap-2 border-white/20 hover:bg-white/10 text-xs md:text-sm h-8 md:h-10 px-2 md:px-4 shrink-0 text-slate-800">
               <ArrowLeft className="h-3 w-3 md:h-4 md:w-4" />
               <span className="hidden sm:inline">Back to Dashboard</span>
               <span className="sm:hidden">Back</span>
