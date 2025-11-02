@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { History, Download } from "lucide-react";
+import { History, Settings as SettingsIcon } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -207,9 +207,12 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-primary-foreground font-medium text-lg">TuraPay</h1>
+            <h1 className="text-primary-foreground font-medium text-lg">Welcome, {profile?.full_name || 'User'}</h1>
             <p className="text-primary-foreground/80 text-sm">Track your payments and transfers</p>
           </div>
+          <Button onClick={() => navigate("/settings")} size="icon" className="rounded-full bg-white/20 hover:bg-white/30 text-white border-none shadow-lg">
+            <SettingsIcon className="h-5 w-5" />
+          </Button>
         </div>
 
         {/* Balance Card */}
@@ -235,20 +238,13 @@ const Dashboard = () => {
 
         {/* Transactions Card */}
         <div id="transactions-section" className="bg-primary-foreground rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-xl">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 md:mb-6">
-            <div>
-              <h2 className="text-base md:text-2xl font-bold text-foreground">
-                Recent Transactions
-              </h2>
-              <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                Pending and rejected transactions
-              </p>
-            </div>
-            <Button onClick={handleDownloadStatement} className="h-9 md:h-11 text-xs md:text-base rounded-lg md:rounded-xl bg-gradient-to-r from-secondary to-secondary/80 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 font-semibold gap-2 w-full sm:w-auto">
-              <Download className="h-3.5 w-3.5 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Download PDF</span>
-              <span className="sm:hidden">Download</span>
-            </Button>
+          <div className="mb-4 md:mb-6">
+            <h2 className="text-base md:text-2xl font-bold text-foreground">
+              Recent Transactions
+            </h2>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">
+              Pending and rejected transactions
+            </p>
           </div>
           
           {transactions.length === 0 ? <div className="text-center py-8 md:py-12">
