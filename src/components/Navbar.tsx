@@ -66,37 +66,7 @@ const Navbar = () => {
   };
   return <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 shadow-lg">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <span className="text-xl font-bold text-white">TuraPay</span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
-            {menuItems.map(item => <Button key={item.path} onClick={() => navigate(item.path)} variant="ghost" className={`text-white hover:bg-white/20 ${location.pathname === item.path ? 'bg-white/20' : ''}`}>
-                <item.icon className="h-4 w-4 mr-2" />
-                {item.label}
-              </Button>)}
-          </nav>
-
-          {/* Mobile Navigation */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-64">
-              <nav className="flex flex-col space-y-2 mt-8">
-                {menuItems.map(item => <Button key={item.path} onClick={() => handleNavigate(item.path)} variant="ghost" className={`justify-start ${location.pathname === item.path ? 'bg-accent' : ''}`}>
-                    <item.icon className="h-4 w-4 mr-2" />
-                    {item.label}
-                  </Button>)}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
+        
       </div>
     </div>;
 };
