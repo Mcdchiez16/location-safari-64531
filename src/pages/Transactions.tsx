@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, Search } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -32,6 +33,7 @@ const Transactions = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -231,30 +233,63 @@ const Transactions = () => {
       <div className="container mx-auto px-4 py-4 md:py-8 max-w-5xl">
         <Card className="border border-gray-200 shadow-sm">
           <CardHeader className="bg-gray-50 border-b border-gray-200 p-4 md:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex-1">
-                <CardTitle className="text-lg md:text-2xl font-bold text-gray-900">Payment History</CardTitle>
-                <p className="text-xs md:text-sm text-gray-600 mt-1">View all your transactions</p>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex-1">
+                  <CardTitle className="text-lg md:text-2xl font-bold text-gray-900">Payment History</CardTitle>
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">View all your transactions</p>
+                </div>
+                <Button
+                  onClick={handleDownloadStatement}
+                  className="bg-blue-600 hover:bg-blue-700 text-white gap-2 text-sm md:text-base h-9 md:h-10 w-full sm:w-auto"
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline">Download PDF</span>
+                  <span className="sm:hidden">PDF</span>
+                </Button>
               </div>
-              <Button
-                onClick={handleDownloadStatement}
-                className="bg-blue-600 hover:bg-blue-700 text-white gap-2 text-sm md:text-base h-9 md:h-10 w-full sm:w-auto"
-              >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Download PDF</span>
-                <span className="sm:hidden">PDF</span>
-              </Button>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search by name, phone, TID or amount..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-white"
+                />
+              </div>
             </div>
           </CardHeader>
           <CardContent className="p-3 md:p-6">
-            {transactions.length === 0 ? (
-              <div className="text-center py-8 md:py-12">
-                <p className="text-gray-600 text-base md:text-lg">No transactions</p>
-                <p className="text-gray-500 text-xs md:text-sm mt-2">Your transactions will appear here</p>
-              </div>
-            ) : (
-              <div className="space-y-2 md:space-y-3">
-                {transactions.map((transaction) => {
+            {(() => {
+              const filteredTransactions = transactions.filter((tx) => {
+                const isSender = tx.sender_id === session?.user.id;
+                const name = isSender ? tx.receiver_name : ((tx as any).sender_profile?.full_name || tx.sender_name || '');
+                const phone = isSender ? tx.receiver_phone : ((tx as any).sender_profile?.phone_number || '');
+                const amount = tx.amount.toString();
+                const tid = tx.tid || '';
+                
+                const query = searchQuery.toLowerCase();
+                return (
+                  name.toLowerCase().includes(query) ||
+                  phone.includes(query) ||
+                  amount.includes(query) ||
+                  tid.toLowerCase().includes(query)
+                );
+              });
+
+              return filteredTransactions.length === 0 ? (
+                <div className="text-center py-8 md:py-12">
+                  <p className="text-gray-600 text-base md:text-lg">
+                    {searchQuery ? 'No matching transactions' : 'No transactions'}
+                  </p>
+                  <p className="text-gray-500 text-xs md:text-sm mt-2">
+                    {searchQuery ? 'Try a different search term' : 'Your transactions will appear here'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 md:space-y-3">
+                  {filteredTransactions.map((transaction) => {
                   const isSender = transaction.sender_id === session?.user.id;
                   return (
                     <div 
@@ -306,9 +341,10 @@ const Transactions = () => {
                       </div>
                     </div>
                   );
-                })}
-              </div>
-            )}
+                  })}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
       </div>
