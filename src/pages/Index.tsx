@@ -133,7 +133,7 @@ const Index = () => {
               <Card className="bg-card/95 backdrop-blur-sm shadow-2xl rounded-3xl border-2 p-6 sm:p-8 max-w-md mx-auto">
                 <div className="space-y-6">
                   <div className="text-center pb-4 border-b">
-                    <h3 className="text-lg sm:text-xl font-bold text-foreground">Calculate Transfer</h3>
+                    <h3 className="text-lg sm:text-xl text-foreground font-bold">Calculate Transfer</h3>
                     <p className="text-sm text-muted-foreground mt-1">See what you'll send and they'll receive</p>
                   </div>
 
@@ -148,11 +148,7 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-center py-2">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-primary to-accent shadow-lg">
-                      <ArrowRight className="h-6 w-6 rotate-90 text-primary-foreground" />
-                    </div>
-                  </div>
+                  
 
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -172,7 +168,7 @@ const Index = () => {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Delivery method</span>
-                      <span className="font-semibold text-foreground">Mobile Money</span>
+                      
                     </div>
                   </div>
 
