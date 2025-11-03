@@ -510,10 +510,18 @@ const Admin = () => {
                                 <strong>Phone:</strong> {transaction.receiver_phone}
                               </p>
                               <p className="text-muted-foreground">
-                                <strong>Amount:</strong> ${transaction.amount.toFixed(2)}
+                                <strong>Country:</strong> {transaction.receiver_country}
                               </p>
                               <p className="text-muted-foreground">
-                                <strong>Fee:</strong> ${transaction.fee.toFixed(2)}
+                                <strong>Amount:</strong> ${transaction.amount.toFixed(2)} USD
+                              </p>
+                              <p className="text-muted-foreground">
+                                <strong>Recipient gets:</strong> {transaction.receiver_country === 'Zambia' 
+                                  ? `${(transaction.amount * (transaction.exchange_rate || 22)).toFixed(2)} ZMW`
+                                  : `$${transaction.amount.toFixed(2)} USD`}
+                              </p>
+                              <p className="text-muted-foreground">
+                                <strong>Fee:</strong> ${transaction.fee.toFixed(2)} USD
                               </p>
                               {transaction.sender_number && <p className="text-muted-foreground">
                                   <strong>Sender #:</strong> {transaction.sender_number}
@@ -579,10 +587,15 @@ const Admin = () => {
                               {getStatusBadge(transaction.status)}
                             </div>
                             <p className="text-xs md:text-sm text-muted-foreground">
-                              To: {transaction.receiver_name} ({transaction.receiver_phone})
+                              To: {transaction.receiver_name} ({transaction.receiver_phone}) - {transaction.receiver_country}
                             </p>
                             <p className="text-xs md:text-sm text-muted-foreground">
-                              Amount: ${transaction.amount.toFixed(2)} | Fee: ${transaction.fee.toFixed(2)}
+                              Amount: ${transaction.amount.toFixed(2)} USD | Recipient gets: {transaction.receiver_country === 'Zambia' 
+                                ? `${(transaction.amount * (transaction.exchange_rate || 22)).toFixed(2)} ZMW`
+                                : `$${transaction.amount.toFixed(2)} USD`}
+                            </p>
+                            <p className="text-xs md:text-sm text-muted-foreground">
+                              Fee: ${transaction.fee.toFixed(2)} USD
                             </p>
                             {transaction.sender_number && <p className="text-xs md:text-sm text-muted-foreground">
                                 <strong>Sender #:</strong> {transaction.sender_number}
