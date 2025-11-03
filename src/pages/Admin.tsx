@@ -95,6 +95,7 @@ const Admin = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [activeTab, setActiveTab] = useState("pending");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [referralPercentage, setReferralPercentage] = useState("");
   useEffect(() => {
     checkAdminAndLoadData();
   }, []);
@@ -197,6 +198,12 @@ const Admin = () => {
       if (paymentRecipientNameSetting) {
         setPaymentRecipientName(paymentRecipientNameSetting.value);
       }
+
+      // Get referral percentage
+      const referralPercentageSetting = settingsData?.find(s => s.key === "referral_percentage");
+      if (referralPercentageSetting) {
+        setReferralPercentage(referralPercentageSetting.value);
+      }
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load admin data");
@@ -249,6 +256,12 @@ const Admin = () => {
         error
       } = await supabase.from("transactions").update(updateData).eq("id", transactionId);
       if (error) throw error;
+
+      // Process referral reward if transaction is deposited
+      if (status === "deposited") {
+        await processReferralReward(transactionId);
+      }
+
       toast.success(`Transaction marked as ${status}. TID: ${tid}`);
       setManualTid("");
       setSenderName("");
@@ -336,6 +349,109 @@ const Admin = () => {
     } catch (error) {
       console.error("Error updating payment recipient name:", error);
       toast.error("Failed to update payment recipient name");
+    }
+  };
+  const updateReferralPercentage = async () => {
+    const percentValue = parseFloat(referralPercentage);
+    if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) {
+      toast.error("Please enter a valid percentage between 0 and 100");
+      return;
+    }
+    try {
+      const {
+        error
+      } = await supabase.from("settings").update({
+        value: referralPercentage
+      }).eq("key", "referral_percentage");
+      if (error) throw error;
+      toast.success("Referral percentage updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating referral percentage:", error);
+      toast.error("Failed to update referral percentage");
+    }
+  };
+  const processReferralReward = async (transactionId: string) => {
+    try {
+      // Get transaction details
+      const { data: transaction } = await supabase
+        .from("transactions")
+        .select("*, receiver_phone, amount")
+        .eq("id", transactionId)
+        .single();
+
+      if (!transaction) return;
+
+      // Get receiver profile to find who referred them
+      const { data: receiverProfile } = await supabase
+        .from("profiles")
+        .select("id, referred_by")
+        .eq("phone_number", transaction.receiver_phone)
+        .maybeSingle();
+
+      if (!receiverProfile || !receiverProfile.referred_by) {
+        // No referrer, skip reward
+        return;
+      }
+
+      // Get referral percentage from settings
+      const { data: setting } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "referral_percentage")
+        .single();
+
+      const percentage = setting ? parseFloat(setting.value) : 5;
+      const rewardAmount = (transaction.amount * percentage) / 100;
+
+      // Check if referral reward already exists for this transaction
+      const { data: existingReward } = await supabase
+        .from("referral_transactions")
+        .select("id")
+        .eq("transaction_id", transactionId)
+        .maybeSingle();
+
+      if (existingReward) {
+        // Reward already processed
+        return;
+      }
+
+      // Create referral transaction record
+      const { error: refError } = await supabase
+        .from("referral_transactions")
+        .insert({
+          referrer_id: receiverProfile.referred_by,
+          referred_user_id: receiverProfile.id,
+          transaction_id: transactionId,
+          reward_amount: rewardAmount,
+          currency: transaction.currency || "USD"
+        });
+
+      if (refError) {
+        console.error("Error creating referral transaction:", refError);
+        return;
+      }
+
+      // Update referrer's earnings
+      const { data: referrerProfile } = await supabase
+        .from("profiles")
+        .select("referral_earnings")
+        .eq("id", receiverProfile.referred_by)
+        .single();
+
+      if (referrerProfile) {
+        await supabase
+          .from("profiles")
+          .update({
+            referral_earnings: (referrerProfile.referral_earnings || 0) + rewardAmount
+          })
+          .eq("id", receiverProfile.referred_by);
+      }
+
+      console.log(`Referral reward of ${rewardAmount} credited to referrer`);
+    } catch (error) {
+      console.error("Error processing referral reward:", error);
+      // Don't throw - let the transaction update succeed even if referral fails
     }
   };
   const filteredTransactions = transactions.filter(transaction => {
@@ -759,6 +875,19 @@ const Admin = () => {
                   </div>
                   <p className="text-xs text-white/60 mt-2">
                     This name will be displayed to senders as the payment recipient
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="referral_percentage" className="text-sm md:text-base text-white">Referral Reward Percentage</Label>
+                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                    <Input id="referral_percentage" type="number" min="0" max="100" step="0.1" value={referralPercentage} onChange={e => setReferralPercentage(e.target.value)} placeholder="e.g., 5" className="text-sm" />
+                    <Button onClick={updateReferralPercentage} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
+                      Update
+                    </Button>
+                  </div>
+                  <p className="text-xs text-white/60 mt-2">
+                    Percentage of transaction amount that referrers earn when their referred users receive money
                   </p>
                 </div>
               </CardContent>

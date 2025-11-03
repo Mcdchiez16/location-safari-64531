@@ -17,6 +17,7 @@ import Admin from "./pages/Admin";
 import AdminAuth from "./pages/AdminAuth";
 import UploadProof from "./pages/UploadProof";
 import Transactions from "./pages/Transactions";
+import Referrals from "./pages/Referrals";
 const queryClient = new QueryClient();
 const App = () => <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -34,6 +35,7 @@ const App = () => <QueryClientProvider client={queryClient}>
           <Route path="/payment-link" element={<PaymentLink />} />
           <Route path="/recipients" element={<Recipients />} />
           <Route path="/transactions" element={<Transactions />} />
+          <Route path="/referrals" element={<Referrals />} />
           <Route path="/admin/login" element={<AdminAuth />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/upload-proof" element={<UploadProof />} />

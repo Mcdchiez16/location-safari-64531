@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { History, Settings as SettingsIcon } from "lucide-react";
+import { History, Settings as SettingsIcon, Gift } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -210,9 +210,14 @@ const Dashboard = () => {
             <h1 className="text-primary-foreground text-base text-left font-bold">Hi, {profile?.full_name?.split(' ')[0] || 'User'}</h1>
             <p className="text-primary-foreground/80 text-sm">Track your payments and transfers</p>
           </div>
-          <Button onClick={() => navigate("/settings")} size="icon" className="rounded-full bg-white/20 hover:bg-white/30 text-white border-none shadow-lg">
-            <SettingsIcon className="h-5 w-5" />
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => navigate("/referrals")} size="icon" className="rounded-full bg-white/20 hover:bg-white/30 text-white border-none shadow-lg">
+              <Gift className="h-5 w-5" />
+            </Button>
+            <Button onClick={() => navigate("/settings")} size="icon" className="rounded-full bg-white/20 hover:bg-white/30 text-white border-none shadow-lg">
+              <SettingsIcon className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Balance Card */}

@@ -51,6 +51,9 @@ export type Database = {
           id_type: string | null
           payment_link_id: string | null
           phone_number: string
+          referral_code: string | null
+          referral_earnings: number | null
+          referred_by: string | null
           selfie_url: string | null
           updated_at: string | null
           verified: boolean | null
@@ -67,6 +70,9 @@ export type Database = {
           id_type?: string | null
           payment_link_id?: string | null
           phone_number: string
+          referral_code?: string | null
+          referral_earnings?: number | null
+          referred_by?: string | null
           selfie_url?: string | null
           updated_at?: string | null
           verified?: boolean | null
@@ -83,11 +89,22 @@ export type Database = {
           id_type?: string | null
           payment_link_id?: string | null
           phone_number?: string
+          referral_code?: string | null
+          referral_earnings?: number | null
+          referred_by?: string | null
           selfie_url?: string | null
           updated_at?: string | null
           verified?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recipients: {
         Row: {
@@ -126,6 +143,58 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_transactions: {
+        Row: {
+          created_at: string | null
+          currency: string
+          id: string
+          referred_user_id: string
+          referrer_id: string
+          reward_amount: number
+          transaction_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string
+          id?: string
+          referred_user_id: string
+          referrer_id: string
+          reward_amount: number
+          transaction_id: string
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string
+          id?: string
+          referred_user_id?: string
+          referrer_id?: string
+          reward_amount?: number
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_transactions_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_transactions_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_transactions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: true
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]

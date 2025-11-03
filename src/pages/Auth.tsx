@@ -20,6 +20,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [country, setCountry] = useState("");
+  const [referralCode, setReferralCode] = useState("");
 
   // Country code mapping
   const countryCodeMap: { [key: string]: string } = {
@@ -44,6 +45,13 @@ const Auth = () => {
   };
 
   useEffect(() => {
+    // Check for referral code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get("ref");
+    if (refCode) {
+      setReferralCode(refCode);
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/dashboard");
@@ -82,7 +90,7 @@ const Auth = () => {
     // Set account type based on country
     const accountType = country === "Zimbabwe" ? "sender" : country === "Zambia" ? "receiver" : "both";
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -98,10 +106,40 @@ const Auth = () => {
 
     if (error) {
       toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+
+    // If referral code was provided, link the new user to referrer
+    if (referralCode && data.user) {
+      try {
+        // Find the referrer by their referral code
+        const { data: referrerProfile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("referral_code", referralCode)
+          .maybeSingle();
+
+        if (referrerProfile) {
+          // Update the new user's profile with the referrer's ID
+          await supabase
+            .from("profiles")
+            .update({ referred_by: referrerProfile.id })
+            .eq("id", data.user.id);
+          
+          toast.success("Account created with referral! You're all set.");
+        } else {
+          toast.success("Account created! Please check your email to verify.");
+        }
+      } catch (err) {
+        console.error("Error linking referral:", err);
+        toast.success("Account created! Please check your email to verify.");
+      }
     } else {
       toast.success("Account created! Please check your email to verify.");
-      navigate("/dashboard");
     }
+
+    navigate("/dashboard");
     setLoading(false);
   };
 
