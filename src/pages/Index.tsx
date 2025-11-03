@@ -50,7 +50,7 @@ const Index = () => {
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-transparent backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 py-3 sm:py-4">
