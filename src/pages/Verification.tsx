@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowLeft, Upload, Shield, FileText, Camera, CheckCircle2 } from "lucide-react";
 
@@ -229,13 +230,18 @@ const Verification = () => {
             <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               <div>
                 <Label htmlFor="idType" className="text-sm font-medium text-gray-700 uppercase tracking-wide">ID Type</Label>
-                <Input
-                  id="idType"
-                  placeholder="National ID / Passport"
-                  value={idType}
-                  onChange={(e) => setIdType(e.target.value)}
-                  className="mt-2 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
+                <Select value={idType} onValueChange={setIdType}>
+                  <SelectTrigger className="mt-2 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white">
+                    <SelectValue placeholder="Select ID type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="National ID">National ID</SelectItem>
+                    <SelectItem value="Passport">Passport</SelectItem>
+                    <SelectItem value="Driver's License">Driver's License</SelectItem>
+                    <SelectItem value="Residence Permit">Residence Permit</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="idNumber" className="text-sm font-medium text-gray-700 uppercase tracking-wide">ID Number</Label>
