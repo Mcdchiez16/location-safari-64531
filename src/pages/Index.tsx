@@ -166,10 +166,7 @@ const Index = () => {
                       <span className="text-muted-foreground">Exchange rate</span>
                       <span className="font-semibold text-foreground">1 USD = {exchangeRate?.toFixed(2)} ZMW</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Delivery method</span>
-                      
-                    </div>
+                    
                   </div>
 
                   <Button onClick={() => navigate("/auth")} className="w-full h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all">
