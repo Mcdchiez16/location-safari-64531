@@ -52,6 +52,9 @@ interface UserProfile {
   id_number?: string;
   id_document_url?: string;
   selfie_url?: string;
+  account_type?: string;
+  referral_code?: string;
+  referral_earnings?: number;
 }
 interface Setting {
   id: string;
@@ -96,6 +99,8 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState("pending");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [referralPercentage, setReferralPercentage] = useState("");
+  const [kycSearchQuery, setKycSearchQuery] = useState("");
+  const [selectedUserTransactions, setSelectedUserTransactions] = useState<Transaction[]>([]);
   useEffect(() => {
     checkAdminAndLoadData();
   }, []);
@@ -272,7 +277,7 @@ const Admin = () => {
       toast.error("Failed to update transaction");
     }
   };
-  const handleKycAction = async (userId: string, action: "approve" | "decline") => {
+  const handleKycAction = async (userId: string, action: "approve" | "decline" | "unverify") => {
     try {
       const {
         error
@@ -280,7 +285,9 @@ const Admin = () => {
         verified: action === "approve"
       }).eq("id", userId);
       if (error) throw error;
-      toast.success(`KYC ${action === "approve" ? "approved" : "declined"} successfully`);
+      
+      const actionText = action === "approve" ? "approved" : action === "unverify" ? "unverified" : "declined";
+      toast.success(`User ${actionText} successfully`);
       setKycDialogOpen(false);
       setSelectedKyc(null);
       loadData();
@@ -289,9 +296,23 @@ const Admin = () => {
       toast.error("Failed to update KYC status");
     }
   };
-  const viewKycDetails = (kyc: UserProfile) => {
+  const viewKycDetails = async (kyc: UserProfile) => {
     setSelectedKyc(kyc);
     setKycDialogOpen(true);
+    
+    // Load user's transactions
+    try {
+      const { data: userTransactions } = await supabase
+        .from("transactions")
+        .select("*")
+        .or(`sender_id.eq.${kyc.id},receiver_phone.eq.${kyc.phone_number}`)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      
+      setSelectedUserTransactions(userTransactions || []);
+    } catch (error) {
+      console.error("Error loading user transactions:", error);
+    }
   };
   const updateTransferFee = async () => {
     const feeValue = parseFloat(newTransferFee);
@@ -755,12 +776,34 @@ const Admin = () => {
           <TabsContent value="kyc" className="space-y-4 md:space-y-6">
             <Card className="bg-[hsl(220,15%,16%)] border-white/10">
               <CardHeader className="p-4 md:p-6">
-                <CardTitle className="text-base md:text-lg text-white">KYC Verification Requests</CardTitle>
-                <CardDescription className="text-white/60 text-xs md:text-sm">Review and verify user identification documents</CardDescription>
+                <CardTitle className="text-base md:text-lg text-white">User Management & KYC</CardTitle>
+                <CardDescription className="text-white/60 text-xs md:text-sm">Review user information and manage verification status</CardDescription>
+                
+                {/* Search */}
+                <div className="mt-3 md:mt-4">
+                  <Input 
+                    placeholder="Search by name, phone, or ID number..." 
+                    value={kycSearchQuery} 
+                    onChange={e => setKycSearchQuery(e.target.value)} 
+                    className="w-full text-sm" 
+                  />
+                </div>
               </CardHeader>
               <CardContent className="p-3 md:p-6">
                 <div className="space-y-3 md:space-y-4">
-                  {kycRequests.length === 0 ? <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">No KYC requests</p> : kycRequests.map(kyc => <Card key={kyc.id} className="p-3 md:p-4 bg-card">
+                  {kycRequests
+                    .filter(kyc => 
+                      kyc.full_name.toLowerCase().includes(kycSearchQuery.toLowerCase()) ||
+                      kyc.phone_number.includes(kycSearchQuery) ||
+                      (kyc.id_number && kyc.id_number.toLowerCase().includes(kycSearchQuery.toLowerCase()))
+                    )
+                    .length === 0 ? <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">No users found</p> : kycRequests
+                    .filter(kyc => 
+                      kyc.full_name.toLowerCase().includes(kycSearchQuery.toLowerCase()) ||
+                      kyc.phone_number.includes(kycSearchQuery) ||
+                      (kyc.id_number && kyc.id_number.toLowerCase().includes(kycSearchQuery.toLowerCase()))
+                    )
+                    .map(kyc => <Card key={kyc.id} className="p-3 md:p-4 bg-card">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
                           <div className="flex items-center gap-3 md:gap-4 min-w-0">
                             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -768,11 +811,14 @@ const Admin = () => {
                             </div>
                             <div className="min-w-0">
                               <p className="font-semibold text-sm md:text-base text-foreground truncate">{kyc.full_name}</p>
-                              <p className="text-xs md:text-sm text-muted-foreground">{kyc.phone_number}</p>
+                              <p className="text-xs md:text-sm text-muted-foreground">{kyc.phone_number} • {kyc.country}</p>
                               <p className="text-xs text-muted-foreground truncate">
                                 {kyc.id_type && kyc.id_number ? `${kyc.id_type} - ${kyc.id_number}` : "No ID info"}
                               </p>
-                              <div className="flex items-center gap-2 mt-1">
+                              <p className="text-xs text-muted-foreground">
+                                Balance: ${kyc.balance.toFixed(2)}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 {kyc.verified ? <span className="text-xs px-2 py-0.5 md:py-1 rounded-full bg-green-500/10 text-green-600 flex items-center gap-1">
                                     <CheckCircle className="h-3 w-3" />
                                     Verified
@@ -788,8 +834,8 @@ const Admin = () => {
                           </div>
                           <Button onClick={() => viewKycDetails(kyc)} variant="outline" size="sm" className="gap-2 text-xs md:text-sm h-8 md:h-9 shrink-0">
                             <Eye className="h-3 w-3 md:h-4 md:w-4" />
-                            <span className="hidden sm:inline">Review KYC</span>
-                            <span className="sm:hidden">Review</span>
+                            <span className="hidden sm:inline">View Details</span>
+                            <span className="sm:hidden">View</span>
                           </Button>
                         </div>
                       </Card>)}
@@ -964,65 +1010,123 @@ const Admin = () => {
 
         {/* KYC Details Dialog */}
         <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto p-4 md:p-6">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 md:p-6">
             <DialogHeader>
-              <DialogTitle className="text-base md:text-lg">KYC Verification Details</DialogTitle>
+              <DialogTitle className="text-base md:text-lg">User Details & Verification</DialogTitle>
             </DialogHeader>
             {selectedKyc && <div className="space-y-4 md:space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Full Name</p>
-                    <p className="font-semibold text-sm md:text-base">{selectedKyc.full_name}</p>
+                {/* User Information */}
+                <Card className="p-4 bg-muted/50">
+                  <h3 className="font-semibold text-sm md:text-base mb-3">User Information</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">Full Name</p>
+                      <p className="font-semibold text-sm md:text-base">{selectedKyc.full_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">Phone Number</p>
+                      <p className="font-semibold text-sm md:text-base">{selectedKyc.phone_number}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">Country</p>
+                      <p className="font-semibold text-sm md:text-base">{selectedKyc.country}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">Balance</p>
+                      <p className="font-semibold text-sm md:text-base text-green-600">${selectedKyc.balance.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">Account Type</p>
+                      <p className="font-semibold text-sm md:text-base">{selectedKyc.account_type || "Standard"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">Member Since</p>
+                      <p className="font-semibold text-sm md:text-base">{new Date(selectedKyc.created_at).toLocaleDateString()}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Phone Number</p>
-                    <p className="font-semibold text-sm md:text-base">{selectedKyc.phone_number}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Country</p>
-                    <p className="font-semibold text-sm md:text-base">{selectedKyc.country}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground">ID Type</p>
-                    <p className="font-semibold text-sm md:text-base">{selectedKyc.id_type || "Not provided"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground">ID Number</p>
-                    <p className="font-semibold text-sm md:text-base">{selectedKyc.id_number || "Not provided"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground">Status</p>
-                    <p className="font-semibold text-sm md:text-base">
-                      {selectedKyc.verified ? <span className="text-green-600 flex items-center gap-1">
-                          <CheckCircle className="h-3 w-3 md:h-4 md:w-4" />
-                          Verified
-                        </span> : <span className="text-yellow-600">Pending</span>}
-                    </p>
-                  </div>
-                </div>
+                </Card>
 
-                <div className="space-y-3 md:space-y-4">
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground mb-2">ID Document</p>
-                    {selectedKyc.id_document_url ? <img src={selectedKyc.id_document_url} alt="ID Document" className="w-full max-w-md rounded-lg border" /> : <p className="text-xs md:text-sm text-muted-foreground">No document uploaded</p>}
+                {/* KYC Information */}
+                <Card className="p-4 bg-muted/50">
+                  <h3 className="font-semibold text-sm md:text-base mb-3">Identification Documents</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mb-4">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">ID Type</p>
+                      <p className="font-semibold text-sm md:text-base">{selectedKyc.id_type || "Not provided"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">ID Number</p>
+                      <p className="font-semibold text-sm md:text-base">{selectedKyc.id_number || "Not provided"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground">Verification Status</p>
+                      <p className="font-semibold text-sm md:text-base">
+                        {selectedKyc.verified ? <span className="text-green-600 flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 md:h-4 md:w-4" />
+                            Verified
+                          </span> : <span className="text-yellow-600">Pending Verification</span>}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <p className="text-xs md:text-sm font-medium text-muted-foreground mb-2">Selfie</p>
-                    {selectedKyc.selfie_url ? <img src={selectedKyc.selfie_url} alt="Selfie" className="w-full max-w-md rounded-lg border" /> : <p className="text-xs md:text-sm text-muted-foreground">No selfie uploaded</p>}
-                  </div>
-                </div>
+                  <div className="space-y-3 md:space-y-4">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground mb-2">ID Document</p>
+                      {selectedKyc.id_document_url ? <img src={selectedKyc.id_document_url} alt="ID Document" className="w-full max-w-md rounded-lg border" /> : <p className="text-xs md:text-sm text-muted-foreground">No document uploaded</p>}
+                    </div>
 
-                {!selectedKyc.verified && <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-3 md:pt-4">
-                    <Button onClick={() => handleKycAction(selectedKyc.id, "approve")} className="flex-1 bg-green-600 hover:bg-green-700 gap-2 h-10 md:h-11 text-sm md:text-base">
-                      <CheckCircle className="h-4 w-4" />
-                      Approve KYC
-                    </Button>
-                    <Button onClick={() => handleKycAction(selectedKyc.id, "decline")} variant="destructive" className="flex-1 gap-2 h-10 md:h-11 text-sm md:text-base">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-muted-foreground mb-2">Selfie</p>
+                      {selectedKyc.selfie_url ? <img src={selectedKyc.selfie_url} alt="Selfie" className="w-full max-w-md rounded-lg border" /> : <p className="text-xs md:text-sm text-muted-foreground">No selfie uploaded</p>}
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Recent Transactions */}
+                <Card className="p-4 bg-muted/50">
+                  <h3 className="font-semibold text-sm md:text-base mb-3">Recent Transactions</h3>
+                  {selectedUserTransactions.length === 0 ? (
+                    <p className="text-xs md:text-sm text-muted-foreground">No transactions found</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {selectedUserTransactions.map(trans => (
+                        <div key={trans.id} className="p-2 bg-background rounded text-xs md:text-sm">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">{trans.receiver_name}</p>
+                              <p className="text-muted-foreground">${trans.amount.toFixed(2)} USD</p>
+                            </div>
+                            {getStatusBadge(trans.status)}
+                          </div>
+                          <p className="text-muted-foreground text-xs mt-1">
+                            {new Date(trans.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-3 md:pt-4">
+                  {!selectedKyc.verified ? (
+                    <>
+                      <Button onClick={() => handleKycAction(selectedKyc.id, "approve")} className="flex-1 bg-green-600 hover:bg-green-700 gap-2 h-10 md:h-11 text-sm md:text-base">
+                        <CheckCircle className="h-4 w-4" />
+                        Approve & Verify
+                      </Button>
+                      <Button onClick={() => handleKycAction(selectedKyc.id, "decline")} variant="destructive" className="flex-1 gap-2 h-10 md:h-11 text-sm md:text-base">
+                        <XCircle className="h-4 w-4" />
+                        Decline
+                      </Button>
+                    </>
+                  ) : (
+                    <Button onClick={() => handleKycAction(selectedKyc.id, "unverify")} variant="destructive" className="flex-1 gap-2 h-10 md:h-11 text-sm md:text-base">
                       <XCircle className="h-4 w-4" />
-                      Decline KYC
+                      Unverify User
                     </Button>
-                  </div>}
+                  )}
+                </div>
               </div>}
           </DialogContent>
         </Dialog>
