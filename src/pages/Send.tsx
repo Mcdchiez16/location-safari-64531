@@ -33,6 +33,7 @@ const Send = () => {
   const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
   const [paymentRecipientName, setPaymentRecipientName] = useState("TuraPay");
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
+  const [unverifiedLimit, setUnverifiedLimit] = useState(20);
   const [senderNumber, setSenderNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [senderVerified, setSenderVerified] = useState(false);
@@ -62,6 +63,7 @@ const Send = () => {
     fetchPaymentNumber();
     fetchPaymentRecipientName();
     fetchTransferFee();
+    fetchUnverifiedLimit();
 
     // Fetch exchange rate
     fetchExchangeRate();
@@ -121,6 +123,17 @@ const Send = () => {
       }
     } catch (error) {
       console.error('Error fetching transfer fee:', error);
+    }
+  };
+  const fetchUnverifiedLimit = async () => {
+    try {
+      const { data, error } = await supabase.from("settings").select("value").eq("key", "unverified_send_limit").maybeSingle();
+      if (!error && data) {
+        const v = parseFloat(data.value);
+        if (!isNaN(v) && v >= 0) setUnverifiedLimit(v);
+      }
+    } catch (error) {
+      console.error('Error fetching unverified send limit:', error);
     }
   };
   const fetchExchangeRate = async () => {
@@ -228,9 +241,9 @@ const Send = () => {
       return;
     }
     
-    // Check if unverified user is trying to send more than $20
-    if (!senderVerified && numAmount > 20) {
-      toast.error("Unverified users can only send up to $20 USD. Please complete verification to send larger amounts.");
+    // Check if unverified user is trying to send more than allowed limit
+    if (!senderVerified && numAmount > unverifiedLimit) {
+      toast.error(`Unverified users can only send up to $${unverifiedLimit} USD. Please complete verification to send larger amounts.`);
       return;
     }
     

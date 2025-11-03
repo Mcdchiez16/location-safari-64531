@@ -99,6 +99,7 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState("pending");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [referralPercentage, setReferralPercentage] = useState("");
+  const [unverifiedLimit, setUnverifiedLimit] = useState("");
   const [kycSearchQuery, setKycSearchQuery] = useState("");
   const [selectedUserTransactions, setSelectedUserTransactions] = useState<Transaction[]>([]);
   useEffect(() => {
@@ -208,6 +209,12 @@ const Admin = () => {
       const referralPercentageSetting = settingsData?.find(s => s.key === "referral_percentage");
       if (referralPercentageSetting) {
         setReferralPercentage(referralPercentageSetting.value);
+      }
+
+      // Get unverified send limit
+      const unverifiedLimitSetting = settingsData?.find(s => s.key === "unverified_send_limit");
+      if (unverifiedLimitSetting) {
+        setUnverifiedLimit(unverifiedLimitSetting.value);
       }
     } catch (error) {
       console.error("Error loading data:", error);
@@ -988,6 +995,19 @@ const Admin = () => {
                   </div>
                   <p className="text-xs text-white/60 mt-2">
                     This name will be displayed to senders as the payment recipient
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="unverified_limit" className="text-sm md:text-base text-white">Unverified Send Limit (USD)</Label>
+                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                    <Input id="unverified_limit" type="number" min="0" step="0.01" value={unverifiedLimit} onChange={e => setUnverifiedLimit(e.target.value)} placeholder="e.g., 20" className="text-sm" />
+                    <Button onClick={updateUnverifiedLimit} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
+                      Update
+                    </Button>
+                  </div>
+                  <p className="text-xs text-white/60 mt-2">
+                    Maximum USD amount unverified users can send
                   </p>
                 </div>
 
