@@ -366,23 +366,26 @@ const Send = () => {
               </div>
 
               {receiverProfile && (
-                <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mt-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-2xl">
+                <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6 mt-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl flex-shrink-0">
                       {receiverProfile.full_name.charAt(0)}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold text-foreground">{receiverProfile.full_name}</h3>
-                        <CheckCircle2 className="h-5 w-5 text-primary" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <h3 className="text-base sm:text-lg font-bold text-foreground truncate">{receiverProfile.full_name}</h3>
+                        <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                         {receiverProfile.verified && (
                           <div className="flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full">
-                            <Shield className="h-4 w-4" />
+                            <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
                             <span className="text-xs font-medium">Verified</span>
                           </div>
                         )}
                       </div>
-                      <p className="text-muted-foreground">{receiverProfile.phone_number}</p>
+                      <div className="inline-flex items-center gap-2 bg-background/60 px-3 py-1.5 rounded-lg border border-border">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-mono font-medium text-foreground">{receiverProfile.phone_number}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -438,6 +441,14 @@ const Send = () => {
                 {amount && parseFloat(amount) > 0 && (
                   <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
                     <div className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">You send</span>
+                        <span className="font-medium text-foreground">${parseFloat(amount).toFixed(2)} USD</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Transfer fee ({transferFeePercentage}%)</span>
+                        <span className="font-medium text-foreground">${calculateFee(parseFloat(amount)).toFixed(2)} USD</span>
+                      </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Exchange rate</span>
                         <span className="font-medium text-foreground">1 USD = {exchangeRate} ZMW</span>
