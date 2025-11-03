@@ -116,7 +116,7 @@ const Auth = () => {
           phone_number: phoneNumber,
           country: country,
           account_type: accountType,
-          referred_by: cleanedRef
+          referred_by: cleanedRef || null
         },
         emailRedirectTo: `${window.location.origin}/dashboard`,
       },
@@ -128,37 +128,9 @@ const Auth = () => {
       return;
     }
 
-    try {
-      let referrerId: string | null = null;
-      if (referralCode) {
-        const { data: referrerProfile } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("referral_code", cleanedRef)
-          .maybeSingle();
-        referrerId = referrerProfile?.id ?? null;
-      }
-
-      if (data.user) {
-        const payload: any = {
-          id: data.user.id,
-          full_name: fullName,
-          phone_number: phoneNumber,
-          country,
-          account_type: accountType,
-        };
-        if (referrerId) payload.referred_by = referrerId;
-
-        await supabase
-          .from("profiles")
-          .upsert(payload, { onConflict: 'id' });
-      }
-
-      toast.success(referrerId ? "Account created with referral! You're all set." : "Account created! Please check your email to verify.");
-    } catch (err) {
-      console.error("Error saving profile/referral:", err);
-      toast.success("Account created! Please check your email to verify.");
-    }
+    // The handle_new_user trigger will handle the referral relationship
+    // No need to manually update profile here - trigger does it
+    toast.success(referralCode ? "Account created with referral! You're all set." : "Account created! Please check your email to verify.");
 
     // Show KYC upload option instead of navigating immediately
     if (data.user) {

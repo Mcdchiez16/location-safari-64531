@@ -399,6 +399,24 @@ const Admin = () => {
       toast.error("Failed to update referral percentage");
     }
   };
+  const updateUnverifiedLimit = async () => {
+    const limit = parseFloat(unverifiedLimit);
+    if (isNaN(limit) || limit < 0) {
+      toast.error("Please enter a valid non-negative amount");
+      return;
+    }
+    try {
+      const { error } = await supabase.from("settings").update({
+        value: unverifiedLimit
+      }).eq("key", "unverified_send_limit");
+      if (error) throw error;
+      toast.success("Unverified send limit updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating unverified send limit:", error);
+      toast.error("Failed to update unverified send limit");
+    }
+  };
   const processReferralReward = async (transactionId: string) => {
     try {
       // Get transaction details
