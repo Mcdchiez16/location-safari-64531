@@ -359,6 +359,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      find_profile_by_payment_link: {
+        Args: { _link: string }
+        Returns: {
+          full_name: string
+          id: string
+          payment_link_id: string
+          phone_number: string
+          verified: boolean
+        }[]
+      }
+      find_profile_by_phone: {
+        Args: { _phone: string }
+        Returns: {
+          full_name: string
+          id: string
+          payment_link_id: string
+          phone_number: string
+          verified: boolean
+        }[]
+      }
       generate_payment_link_id: { Args: never; Returns: string }
       generate_tid: { Args: never; Returns: string }
       has_role: {

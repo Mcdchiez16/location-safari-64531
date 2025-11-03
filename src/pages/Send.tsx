@@ -153,16 +153,16 @@ const Send = () => {
     }
     setLoading(true);
     try {
-      // If it's a payment link ID (no digits or mostly letters), search directly
+      // If it's a payment link ID (no digits or mostly letters), use backend RPC to bypass RLS safely
       if (!/\d{3,}/.test(searchValue)) {
-        const {
-          data,
-          error
-        } = await supabase.from("profiles").select("id, full_name, phone_number, payment_link_id, verified").eq("payment_link_id", searchValue.trim()).maybeSingle();
-        if (error && error.code !== "PGRST116") throw error;
-        if (data) {
-          setReceiverProfile(data);
-          toast.success(`Receiver found: ${data.full_name}`);
+        const { data, error } = await supabase.rpc('find_profile_by_payment_link', {
+          _link: searchValue.trim(),
+        });
+        if (error) throw error;
+        const profile = Array.isArray(data) ? data[0] : data;
+        if (profile) {
+          setReceiverProfile(profile as ReceiverProfile);
+          toast.success(`Receiver found: ${profile.full_name}`);
         } else {
           toast.error("Receiver not found. Please check the payment link.");
           setReceiverProfile(null);
@@ -171,36 +171,16 @@ const Send = () => {
         return;
       }
 
-      // For phone numbers, first try normalizing
-      const {
-        data: normalizedData,
-        error: normalizeError
-      } = await supabase.rpc('normalize_phone_number', {
-        phone: searchValue
+      // Phone lookup via RPC (handles normalization and RLS)
+      const { data, error } = await supabase.rpc('find_profile_by_phone', {
+        _phone: searchValue,
       });
-      if (normalizeError) {
-        console.error("Normalization error:", normalizeError);
-        // Fallback to raw search if normalization fails
-      }
-      const normalizedPhone = normalizedData || searchValue;
-
-      // Search by normalized phone
-      let {
-        data,
-        error
-      } = await supabase.from("profiles").select("id, full_name, phone_number, payment_link_id, verified").eq("phone_number", normalizedPhone).maybeSingle();
-
-      // If not found with normalized, try raw phone as fallback
-      if (!data && normalizedPhone !== searchValue) {
-        const fallback = await supabase.from("profiles").select("id, full_name, phone_number, payment_link_id, verified").eq("phone_number", searchValue.trim()).maybeSingle();
-        data = fallback.data;
-        error = fallback.error;
-      }
-      if (error && error.code !== "PGRST116") throw error;
-      if (data) {
-        setReceiverProfile(data);
+      if (error) throw error;
+      const profile = Array.isArray(data) ? data[0] : data;
+      if (profile) {
+        setReceiverProfile(profile as ReceiverProfile);
         setLookupValue("");
-        toast.success(`Receiver found: ${data.full_name}`);
+        toast.success(`Receiver found: ${profile.full_name}`);
       } else {
         toast.error("Receiver not found. Please check the phone number or payment link.");
         setReceiverProfile(null);
