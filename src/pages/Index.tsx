@@ -52,24 +52,29 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-background/95 via-primary/10 to-background/95 backdrop-blur-lg border-b border-primary/20 shadow-lg">
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              <span className="text-xl sm:text-2xl text-primary font-bold">TuraPay</span>
+            <div className="flex items-center space-x-2 sm:space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
+              <div className="bg-gradient-to-br from-primary to-accent p-2 rounded-xl shadow-lg group-hover:shadow-primary/50 transition-all">
+                <Globe2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+              </div>
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                TuraPay
+              </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
               {exchangeRate && (
-                <div className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary/10 rounded-full">
-                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                  <span className="text-xs sm:text-sm font-semibold text-primary">
+                <div className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse" />
+                  <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                     1 USD = {exchangeRate.toFixed(2)} ZMW
                   </span>
                 </div>
               )}
               <Button 
                 onClick={() => navigate("/auth")} 
-                className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-10"
+                className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-10 bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all"
               >
                 Get Started
               </Button>
