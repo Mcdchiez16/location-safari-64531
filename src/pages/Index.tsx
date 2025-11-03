@@ -87,8 +87,11 @@ const Index = () => {
           backgroundPosition: 'center',
         }}
       >
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/90 to-background/95" />
+        {/* Animated Gradient Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-accent/20 to-background/40 animate-gradient-shift" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-background/70" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.15),transparent_50%)]" />
         
         {/* Content */}
         <div className="container mx-auto px-4 relative z-10">
@@ -213,8 +216,10 @@ const Index = () => {
       </section>
 
       {/* Trust Indicators */}
-      <section className="py-12 sm:py-16 bg-muted/50">
-        <div className="container mx-auto px-4">
+      <section className="relative py-12 sm:py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1),transparent_70%)]" />
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">Trusted by Thousands</h2>
@@ -243,8 +248,10 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-20 md:py-24 bg-background">
-        <div className="container mx-auto px-4">
+      <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Why Choose TuraPay?</h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -297,8 +304,10 @@ const Index = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 sm:py-20 md:py-24 bg-muted/50">
-        <div className="container mx-auto px-4">
+      <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-primary/5 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.1),transparent_60%)]" />
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
             <p className="text-lg md:text-xl text-muted-foreground">Send money in 3 simple steps</p>
