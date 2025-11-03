@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import heroBackground from "@/assets/landing-hero-bg.jpg";
+import heroBackground from "@/assets/hero-fintech-bg.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
