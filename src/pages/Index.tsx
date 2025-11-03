@@ -52,7 +52,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-gradient-to-r from-background/95 via-primary/10 to-background/95 backdrop-blur-lg border-b border-primary/20 shadow-lg">
+      <header className="sticky top-0 z-50 bg-transparent backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
@@ -83,20 +83,24 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section with Background Image */}
-      <section 
-        className="relative overflow-hidden py-20 sm:py-24 md:py-32 lg:py-40"
-        style={{
-          backgroundImage: `url(${heroBackground})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+      {/* Hero Section with Video Background */}
+      <section className="relative overflow-hidden py-20 sm:py-24 md:py-32 lg:py-40">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="https://cdn.pixabay.com/video/2022/10/30/137183-765044158_large.mp4" type="video/mp4" />
+        </video>
+        
         {/* Animated Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-accent/20 to-background/40 animate-gradient-shift" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-background/60 via-transparent to-background/70" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-accent/30 to-background/50" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-background/70 via-transparent to-background/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.2),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.2),transparent_50%)]" />
         
         {/* Content */}
         <div className="container mx-auto px-4 relative z-10">
