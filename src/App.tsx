@@ -18,6 +18,15 @@ import AdminAuth from "./pages/AdminAuth";
 import UploadProof from "./pages/UploadProof";
 import Transactions from "./pages/Transactions";
 import Referrals from "./pages/Referrals";
+import AboutUs from "./pages/AboutUs";
+import HowItWorks from "./pages/HowItWorks";
+import Pricing from "./pages/Pricing";
+import HelpCenter from "./pages/HelpCenter";
+import ContactUs from "./pages/ContactUs";
+import FAQs from "./pages/FAQs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Security from "./pages/Security";
 const queryClient = new QueryClient();
 const App = () => <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -36,6 +45,15 @@ const App = () => <QueryClientProvider client={queryClient}>
           <Route path="/recipients" element={<Recipients />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/referrals" element={<Referrals />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/faqs" element={<FAQs />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/security" element={<Security />} />
           <Route path="/admin/login" element={<AdminAuth />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/upload-proof" element={<UploadProof />} />

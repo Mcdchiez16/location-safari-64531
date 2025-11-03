@@ -354,27 +354,27 @@ const Index = () => {
             <div>
               <h3 className="font-semibold text-base mb-3 text-foreground">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="hover:text-primary cursor-pointer transition-colors">About Us</li>
-                <li className="hover:text-primary cursor-pointer transition-colors">How It Works</li>
-                <li className="hover:text-primary cursor-pointer transition-colors">Pricing</li>
+                <li onClick={() => navigate("/about-us")} className="hover:text-primary cursor-pointer transition-colors">About Us</li>
+                <li onClick={() => navigate("/how-it-works")} className="hover:text-primary cursor-pointer transition-colors">How It Works</li>
+                <li onClick={() => navigate("/pricing")} className="hover:text-primary cursor-pointer transition-colors">Pricing</li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold text-base mb-3 text-foreground">Support</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="hover:text-primary cursor-pointer transition-colors">Help Center</li>
-                <li className="hover:text-primary cursor-pointer transition-colors">Contact Us</li>
-                <li className="hover:text-primary cursor-pointer transition-colors">FAQs</li>
+                <li onClick={() => navigate("/help-center")} className="hover:text-primary cursor-pointer transition-colors">Help Center</li>
+                <li onClick={() => navigate("/contact-us")} className="hover:text-primary cursor-pointer transition-colors">Contact Us</li>
+                <li onClick={() => navigate("/faqs")} className="hover:text-primary cursor-pointer transition-colors">FAQs</li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold text-base mb-3 text-foreground">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="hover:text-primary cursor-pointer transition-colors">Privacy Policy</li>
-                <li className="hover:text-primary cursor-pointer transition-colors">Terms of Service</li>
-                <li className="hover:text-primary cursor-pointer transition-colors">Security</li>
+                <li onClick={() => navigate("/privacy-policy")} className="hover:text-primary cursor-pointer transition-colors">Privacy Policy</li>
+                <li onClick={() => navigate("/terms-of-service")} className="hover:text-primary cursor-pointer transition-colors">Terms of Service</li>
+                <li onClick={() => navigate("/security")} className="hover:text-primary cursor-pointer transition-colors">Security</li>
               </ul>
             </div>
           </div>
