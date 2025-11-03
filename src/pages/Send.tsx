@@ -404,7 +404,7 @@ const Send = () => {
               <div className="p-8">
                 <div className="mb-6">
                   <Label htmlFor="amount" className="text-sm font-medium text-foreground block mb-2">
-                    Amount to Send
+                    Recipient will receive (in USD)
                   </Label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg">$</span>
@@ -421,6 +421,7 @@ const Send = () => {
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg">USD</span>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2">This is the amount your recipient will receive before conversion to ZMW</p>
                 </div>
 
                 <div className="mb-6">
@@ -442,12 +443,18 @@ const Send = () => {
                   <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">You send</span>
+                        <span className="text-muted-foreground">Recipient gets</span>
                         <span className="font-medium text-foreground">${parseFloat(amount).toFixed(2)} USD</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Transfer fee ({transferFeePercentage}%)</span>
-                        <span className="font-medium text-foreground">${calculateFee(parseFloat(amount)).toFixed(2)} USD</span>
+                        <span className="font-medium text-foreground">+ ${calculateFee(parseFloat(amount)).toFixed(2)} USD</span>
+                      </div>
+                      <div className="border-t border-primary/20 pt-2 mt-2 mb-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-foreground font-semibold text-lg">Total you send</span>
+                          <span className="font-bold text-xl text-foreground">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)} USD</span>
+                        </div>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Exchange rate</span>
@@ -455,7 +462,7 @@ const Send = () => {
                       </div>
                       <div className="border-t border-primary/20 pt-3 mt-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-foreground font-medium">Recipient gets</span>
+                          <span className="text-foreground font-medium">Recipient receives</span>
                           <span className="font-bold text-2xl text-primary">{recipientGets} ZMW</span>
                         </div>
                       </div>
