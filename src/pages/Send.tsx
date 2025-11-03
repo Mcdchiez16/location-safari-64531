@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 interface ReceiverProfile {
   id: string;
   full_name: string;
@@ -17,7 +16,6 @@ interface ReceiverProfile {
   payment_link_id: string;
   verified: boolean;
 }
-
 const Send = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -37,9 +35,12 @@ const Send = () => {
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
   const [senderNumber, setSenderNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({
+      data: {
+        session
+      }
+    }) => {
       if (!session) {
         navigate("/auth");
       } else {
@@ -64,15 +65,12 @@ const Send = () => {
     const interval = setInterval(fetchExchangeRate, 300000); // Update every 5 minutes
     return () => clearInterval(interval);
   }, [navigate, searchParams]);
-
   const fetchPaymentNumber = async () => {
     try {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("value")
-        .eq("key", "payment_number")
-        .maybeSingle();
-      
+      const {
+        data,
+        error
+      } = await supabase.from("settings").select("value").eq("key", "payment_number").maybeSingle();
       if (!error && data) {
         setPaymentNumber(data.value);
       }
@@ -80,15 +78,12 @@ const Send = () => {
       console.error('Error fetching payment number:', error);
     }
   };
-
   const fetchPaymentRecipientName = async () => {
     try {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("value")
-        .eq("key", "payment_recipient_name")
-        .maybeSingle();
-      
+      const {
+        data,
+        error
+      } = await supabase.from("settings").select("value").eq("key", "payment_recipient_name").maybeSingle();
       if (!error && data) {
         setPaymentRecipientName(data.value);
       }
@@ -96,15 +91,12 @@ const Send = () => {
       console.error('Error fetching payment recipient name:', error);
     }
   };
-
   const fetchTransferFee = async () => {
     try {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("value")
-        .eq("key", "transfer_fee_percentage")
-        .maybeSingle();
-      
+      const {
+        data,
+        error
+      } = await supabase.from("settings").select("value").eq("key", "transfer_fee_percentage").maybeSingle();
       if (!error && data) {
         setTransferFeePercentage(parseFloat(data.value));
       }
@@ -112,13 +104,11 @@ const Send = () => {
       console.error('Error fetching transfer fee:', error);
     }
   };
-
   const fetchExchangeRate = async () => {
     try {
       // Try multiple APIs for better accuracy
       let response = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=ZMW');
       let data = await response.json();
-      
       if (data.rates && data.rates.ZMW) {
         setExchangeRate(data.rates.ZMW);
         setLastUpdated(new Date());
@@ -126,7 +116,6 @@ const Send = () => {
         // Fallback API
         response = await fetch('https://open.er-api.com/v6/latest/USD');
         data = await response.json();
-        
         if (data.rates && data.rates.ZMW) {
           setExchangeRate(data.rates.ZMW);
           setLastUpdated(new Date());
@@ -137,27 +126,21 @@ const Send = () => {
       toast.error('Could not fetch live exchange rate');
     }
   };
-
   const handleLookup = async (value?: string) => {
     const searchValue = value || lookupValue;
     if (!searchValue) {
       toast.error("Please enter a phone number or payment link");
       return;
     }
-
     setLoading(true);
-
     try {
       // If it's a payment link ID (no digits or mostly letters), search directly
       if (!/\d{3,}/.test(searchValue)) {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id, full_name, phone_number, payment_link_id, verified")
-          .eq("payment_link_id", searchValue.trim())
-          .maybeSingle();
-
+        const {
+          data,
+          error
+        } = await supabase.from("profiles").select("id, full_name, phone_number, payment_link_id, verified").eq("payment_link_id", searchValue.trim()).maybeSingle();
         if (error && error.code !== "PGRST116") throw error;
-
         if (data) {
           setReceiverProfile(data);
           toast.success(`Receiver found: ${data.full_name}`);
@@ -170,37 +153,31 @@ const Send = () => {
       }
 
       // For phone numbers, first try normalizing
-      const { data: normalizedData, error: normalizeError } = await supabase
-        .rpc('normalize_phone_number', { phone: searchValue });
-
+      const {
+        data: normalizedData,
+        error: normalizeError
+      } = await supabase.rpc('normalize_phone_number', {
+        phone: searchValue
+      });
       if (normalizeError) {
         console.error("Normalization error:", normalizeError);
         // Fallback to raw search if normalization fails
       }
-
       const normalizedPhone = normalizedData || searchValue;
 
       // Search by normalized phone
-      let { data, error } = await supabase
-        .from("profiles")
-        .select("id, full_name, phone_number, payment_link_id, verified")
-        .eq("phone_number", normalizedPhone)
-        .maybeSingle();
+      let {
+        data,
+        error
+      } = await supabase.from("profiles").select("id, full_name, phone_number, payment_link_id, verified").eq("phone_number", normalizedPhone).maybeSingle();
 
       // If not found with normalized, try raw phone as fallback
       if (!data && normalizedPhone !== searchValue) {
-        const fallback = await supabase
-          .from("profiles")
-          .select("id, full_name, phone_number, payment_link_id, verified")
-          .eq("phone_number", searchValue.trim())
-          .maybeSingle();
-        
+        const fallback = await supabase.from("profiles").select("id, full_name, phone_number, payment_link_id, verified").eq("phone_number", searchValue.trim()).maybeSingle();
         data = fallback.data;
         error = fallback.error;
       }
-
       if (error && error.code !== "PGRST116") throw error;
-
       if (data) {
         setReceiverProfile(data);
         setLookupValue("");
@@ -214,14 +191,13 @@ const Send = () => {
       toast.error("Error searching for receiver");
       setReceiverProfile(null);
     }
-
     setLoading(false);
   };
 
   // Handle lookup value change with auto-lookup for 9-digit numbers
   const handleLookupChange = (value: string) => {
     setLookupValue(value);
-    
+
     // Clear existing timer
     if (autoLookupTimer) {
       clearTimeout(autoLookupTimer);
@@ -233,7 +209,7 @@ const Send = () => {
 
     // Extract just the digits (excluding + and country code)
     const digitsOnly = cleaned.replace(/^\+\d{1,3}/, '').replace(/\D/g, '');
-    
+
     // Auto-lookup when 9 digits are entered
     if (digitsOnly.length === 9) {
       const timer = setTimeout(() => {
@@ -242,56 +218,46 @@ const Send = () => {
       setAutoLookupTimer(timer);
     }
   };
-
   const calculateFee = (amount: number) => {
-    return (amount * transferFeePercentage) / 100;
+    return amount * transferFeePercentage / 100;
   };
-
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
-    
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
-
     if (!payoutMethod) {
       toast.error("Please select a payout method");
       return;
     }
-
     setShowPaymentInstructions(true);
   };
-
   const handleConfirmPayment = async () => {
     if (!senderNumber.trim()) {
       toast.error("Please enter your sender number");
       return;
     }
-
     if (!transactionId.trim()) {
       toast.error("Please enter the transaction ID");
       return;
     }
-
     if (!userId || !receiverProfile) {
       toast.error("Please select a receiver first");
       return;
     }
-
     setLoading(true);
-
     const transferFee = calculateFee(parseFloat(amount));
 
     // Fetch sender name from current user's profile
-    const { data: senderProfile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", userId)
-      .single();
-
-    const { error, data } = await supabase.from("transactions").insert({
+    const {
+      data: senderProfile
+    } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
+    const {
+      error,
+      data
+    } = await supabase.from("transactions").insert({
       sender_id: userId,
       sender_name: senderProfile?.full_name || "",
       receiver_name: receiverProfile.full_name,
@@ -304,9 +270,8 @@ const Send = () => {
       payout_method: payoutMethod,
       status: "pending",
       sender_number: senderNumber,
-      transaction_id: transactionId,
+      transaction_id: transactionId
     }).select();
-
     if (error) {
       toast.error("Failed to create transaction");
       console.error(error);
@@ -314,14 +279,10 @@ const Send = () => {
       toast.success("Transaction submitted successfully! Awaiting admin approval.");
       navigate("/dashboard");
     }
-
     setLoading(false);
   };
-
   const recipientGets = amount ? (parseFloat(amount) * exchangeRate).toFixed(2) : "0.00";
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-4">
@@ -332,11 +293,7 @@ const Send = () => {
               </div>
               <span className="text-xl font-semibold text-foreground">TuraPay</span>
             </div>
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/dashboard')} 
-              className="gap-2"
-            >
+            <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
             </Button>
@@ -373,38 +330,19 @@ const Send = () => {
                   Phone Number (9 digits)
                 </Label>
                 <div className="flex gap-3 mt-2">
-                  <Input
-                    id="lookup"
-                    type="text"
-                    placeholder="+260123456789"
-                    value={lookupValue}
-                    onChange={(e) => handleLookupChange(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button
-                    onClick={() => handleLookup()}
-                    disabled={loading}
-                    size="lg"
-                    className="min-w-[100px]"
-                  >
-                    {loading ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    ) : (
-                      "Search"
-                    )}
+                  <Input id="lookup" type="text" placeholder="+260123456789" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="flex-1" />
+                  <Button onClick={() => handleLookup()} disabled={loading} size="lg" className="min-w-[100px]">
+                    {loading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : "Search"}
                   </Button>
                 </div>
-                {lookupValue && (
-                  <p className="text-xs text-muted-foreground mt-2">
+                {lookupValue && <p className="text-xs text-muted-foreground mt-2">
                     {lookupValue.replace(/^\+\d{1,3}/, '').replace(/\D/g, '').length}/9 digits
-                  </p>
-                )}
+                  </p>}
               </div>
             </div>
           </div>
 
-          {receiverProfile && (
-            <div className="p-8 pt-0">
+          {receiverProfile && <div className="p-8 pt-0">
                 <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl flex-shrink-0">
@@ -414,12 +352,10 @@ const Send = () => {
                       <div className="flex flex-wrap items-center gap-2 mb-2">
                         <h3 className="text-base sm:text-lg font-bold text-foreground truncate">{receiverProfile.full_name}</h3>
                         <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
-                        {receiverProfile.verified && (
-                          <div className="flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full">
+                        {receiverProfile.verified && <div className="flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full">
                             <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
                             <span className="text-xs font-medium">Verified</span>
-                          </div>
-                        )}
+                          </div>}
                       </div>
                       <div className="inline-flex items-center gap-2 bg-background/60 px-3 py-1.5 rounded-lg border border-border">
                         <User className="h-4 w-4 text-muted-foreground" />
@@ -428,13 +364,11 @@ const Send = () => {
                     </div>
                   </div>
                 </div>
-            </div>
-          )}
+            </div>}
         </div>
 
         {/* Send Money Form */}
-        {receiverProfile && !showPaymentInstructions && (
-          <form onSubmit={handleProceedToPayment}>
+        {receiverProfile && !showPaymentInstructions && <form onSubmit={handleProceedToPayment}>
             <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden mb-6">
               <div className="px-8 py-6 border-b border-border">
                 <h2 className="text-2xl font-bold text-foreground">Transfer Amount</h2>
@@ -446,17 +380,7 @@ const Send = () => {
                   </Label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg">$</span>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      min="1"
-                      placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="pl-10 pr-16 h-16 text-2xl font-semibold focus:border-primary"
-                      required
-                    />
+                    <Input id="amount" type="number" step="0.01" min="1" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="pl-10 pr-16 h-16 text-2xl font-semibold focus:border-primary" required />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg">USD</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">This is the amount your recipient will receive before conversion to ZMW</p>
@@ -477,13 +401,9 @@ const Send = () => {
                   </Select>
                 </div>
 
-                {amount && parseFloat(amount) > 0 && (
-                  <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
+                {amount && parseFloat(amount) > 0 && <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
                     <div className="space-y-3">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Recipient gets</span>
-                        <span className="font-medium text-foreground">${parseFloat(amount).toFixed(2)} USD</span>
-                      </div>
+                      
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Transfer fee ({transferFeePercentage}%)</span>
                         <span className="font-medium text-foreground">+ ${calculateFee(parseFloat(amount)).toFixed(2)} USD</span>
@@ -505,24 +425,17 @@ const Send = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
 
-                <Button 
-                  type="submit" 
-                  className="w-full mt-8 h-14 text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg" 
-                  disabled={loading || !amount || parseFloat(amount) <= 0 || !payoutMethod}
-                >
+                <Button type="submit" className="w-full mt-8 h-14 text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg" disabled={loading || !amount || parseFloat(amount) <= 0 || !payoutMethod}>
                   Continue to Payment
                 </Button>
               </div>
             </div>
-          </form>
-        )}
+          </form>}
 
         {/* Payment Instructions */}
-        {receiverProfile && showPaymentInstructions && (
-          <div className="space-y-6">
+        {receiverProfile && showPaymentInstructions && <div className="space-y-6">
             <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
               <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Payment Instructions</h2>
@@ -559,15 +472,7 @@ const Send = () => {
                       <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
                         Your Phone Number *
                       </Label>
-                      <Input
-                        id="senderNumber"
-                        type="text"
-                        placeholder="e.g., +263 77 123 4567"
-                        value={senderNumber}
-                        onChange={(e) => setSenderNumber(e.target.value)}
-                        className="h-12 text-base"
-                        required
-                      />
+                      <Input id="senderNumber" type="text" placeholder="e.g., +263 77 123 4567" value={senderNumber} onChange={e => setSenderNumber(e.target.value)} className="h-12 text-base" required />
                       <p className="text-xs text-muted-foreground mt-2">
                         Enter the phone number you used to send the payment
                       </p>
@@ -577,15 +482,7 @@ const Send = () => {
                       <Label htmlFor="transactionId" className="text-sm font-medium text-foreground mb-2 block">
                         Transaction ID *
                       </Label>
-                      <Input
-                        id="transactionId"
-                        type="text"
-                        placeholder="e.g., CO250822.1552.F38050 or F38050"
-                        value={transactionId}
-                        onChange={(e) => setTransactionId(e.target.value)}
-                        className="h-12 text-base"
-                        required
-                      />
+                      <Input id="transactionId" type="text" placeholder="e.g., CO250822.1552.F38050 or F38050" value={transactionId} onChange={e => setTransactionId(e.target.value)} className="h-12 text-base" required />
                       <p className="text-xs text-muted-foreground mt-2">
                         Enter the transaction ID from your payment confirmation
                       </p>
@@ -610,29 +507,18 @@ const Send = () => {
                 </div>
 
                 <div className="space-y-3 pt-4">
-                  <Button 
-                    onClick={handleConfirmPayment}
-                    className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
-                    disabled={loading || !senderNumber.trim() || !transactionId.trim()}
-                  >
+                  <Button onClick={handleConfirmPayment} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={loading || !senderNumber.trim() || !transactionId.trim()}>
                     {loading ? "Processing..." : "Submit Transaction"}
                   </Button>
 
-                  <Button 
-                    variant="outline"
-                    onClick={() => setShowPaymentInstructions(false)}
-                    className="w-full h-10 sm:h-12 text-sm sm:text-base"
-                  >
+                  <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
                     Go Back
                   </Button>
                 </div>
               </div>
             </Card>
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Send;
