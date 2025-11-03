@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeftRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { z } from "zod";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -90,6 +91,14 @@ const Auth = () => {
     // Set account type based on country
     const accountType = country === "Zimbabwe" ? "sender" : country === "Zambia" ? "receiver" : "both";
 
+    const cleanedRef = referralCode.trim().toLowerCase();
+    const refSchema = z.string().trim().regex(/^[a-z0-9]+$/i).min(4).max(32);
+    if (referralCode && !refSchema.safeParse(cleanedRef).success) {
+      toast.error("Invalid referral code format");
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -99,6 +108,7 @@ const Auth = () => {
           phone_number: phoneNumber,
           country: country,
           account_type: accountType,
+          referred_by: cleanedRef
         },
         emailRedirectTo: `${window.location.origin}/dashboard`,
       },
@@ -275,6 +285,17 @@ const Auth = () => {
                           {phoneNumber.replace(countryCodeMap[country], '').length}/9 digits
                         </p>
                       )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="referralCode">Referral Code (optional)</Label>
+                      <Input
+                        id="referralCode"
+                        type="text"
+                        placeholder="e.g. abcd1234"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value.trim())}
+                        maxLength={32}
+                      />
                     </div>
                   </>
                 )}
