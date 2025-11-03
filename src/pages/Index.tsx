@@ -6,13 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroBackground from "@/assets/hero-fintech-bg.jpg";
-
 const Index = () => {
   const navigate = useNavigate();
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [amount, setAmount] = useState(100);
   const [transferFeePercentage, setTransferFeePercentage] = useState(12);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,12 +26,10 @@ const Index = () => {
 
       // Fetch transfer fee from database
       try {
-        const { data, error } = await supabase
-          .from('settings')
-          .select('value')
-          .eq('key', 'transfer_fee_percentage')
-          .single();
-        
+        const {
+          data,
+          error
+        } = await supabase.from('settings').select('value').eq('key', 'transfer_fee_percentage').single();
         if (!error && data) {
           setTransferFeePercentage(parseFloat(data.value));
         }
@@ -41,16 +37,12 @@ const Index = () => {
         console.error('Error fetching transfer fee:', error);
       }
     };
-
     fetchData();
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
-
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10">
+  return <div className="min-h-screen bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-transparent backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 py-3 sm:py-4">
@@ -64,18 +56,13 @@ const Index = () => {
               </span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              {exchangeRate && (
-                <div className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+              {exchangeRate && <div className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
                   <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse" />
                   <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                     1 USD = {exchangeRate.toFixed(2)} ZMW
                   </span>
-                </div>
-              )}
-              <Button 
-                onClick={() => navigate("/auth")} 
-                className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-10 bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all"
-              >
+                </div>}
+              <Button onClick={() => navigate("/auth")} className="text-xs sm:text-sm px-3 sm:px-6 h-8 sm:h-10 bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all">
                 Get Started
               </Button>
             </div>
@@ -86,10 +73,9 @@ const Index = () => {
       {/* Hero Section with Image Background */}
       <section className="relative overflow-hidden py-20 sm:py-24 md:py-32 lg:py-40">
         {/* Image Background */}
-        <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroBackground})` }}
-        />
+        <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{
+        backgroundImage: `url(${heroBackground})`
+      }} />
         
         {/* Animated Gradient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-accent/40 to-background/60 animate-fade-in" />
@@ -114,7 +100,7 @@ const Index = () => {
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed text-slate-50 md:text-base font-semibold">
                 Send money instantly with competitive rates and zero hassle. Your trusted partner for seamless cross-border payments.
               </p>
 
@@ -135,11 +121,7 @@ const Index = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                <Button 
-                  size="lg" 
-                  onClick={() => navigate("/auth")} 
-                  className="h-12 sm:h-14 px-8 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
-                >
+                <Button size="lg" onClick={() => navigate("/auth")} className="h-12 sm:h-14 px-8 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                   Start Sending Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -161,13 +143,7 @@ const Index = () => {
                       You send
                     </label>
                     <div className="relative">
-                      <Input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(Number(e.target.value) || 0)}
-                        className="pr-20 h-14 text-2xl font-bold border-2 focus:border-primary"
-                        min="1"
-                      />
+                      <Input type="number" value={amount} onChange={e => setAmount(Number(e.target.value) || 0)} className="pr-20 h-14 text-2xl font-bold border-2 focus:border-primary" min="1" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-lg text-primary">USD</span>
                     </div>
                   </div>
@@ -184,12 +160,7 @@ const Index = () => {
                       They receive
                     </label>
                     <div className="relative">
-                      <Input
-                        type="text"
-                        value={recipientGets}
-                        readOnly
-                        className="pr-20 h-14 text-2xl font-bold bg-muted/50 border-2"
-                      />
+                      <Input type="text" value={recipientGets} readOnly className="pr-20 h-14 text-2xl font-bold bg-muted/50 border-2" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-lg text-primary">ZMW</span>
                     </div>
                   </div>
@@ -205,10 +176,7 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={() => navigate("/auth")} 
-                    className="w-full h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all"
-                  >
+                  <Button onClick={() => navigate("/auth")} className="w-full h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all">
                     Continue to Send
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
@@ -318,30 +286,25 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                step: "1",
-                title: "Create Your Account",
-                description: "Sign up in seconds with your phone and email. Quick verification process.",
-                icon: "👤",
-                color: "from-blue-500 to-purple-500"
-              },
-              {
-                step: "2",
-                title: "Enter Transfer Details",
-                description: "Choose your recipient and enter the amount you want to send.",
-                icon: "💰",
-                color: "from-purple-500 to-pink-500"
-              },
-              {
-                step: "3",
-                title: "Complete Payment",
-                description: "Pay securely via mobile money and your recipient gets funds instantly.",
-                icon: "✅",
-                color: "from-pink-500 to-red-500"
-              }
-            ].map((item, index) => (
-              <div key={index} className="relative">
+            {[{
+            step: "1",
+            title: "Create Your Account",
+            description: "Sign up in seconds with your phone and email. Quick verification process.",
+            icon: "👤",
+            color: "from-blue-500 to-purple-500"
+          }, {
+            step: "2",
+            title: "Enter Transfer Details",
+            description: "Choose your recipient and enter the amount you want to send.",
+            icon: "💰",
+            color: "from-purple-500 to-pink-500"
+          }, {
+            step: "3",
+            title: "Complete Payment",
+            description: "Pay securely via mobile money and your recipient gets funds instantly.",
+            icon: "✅",
+            color: "from-pink-500 to-red-500"
+          }].map((item, index) => <div key={index} className="relative">
                 <Card className="p-8 text-center hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-card to-card/50">
                   <div className={`inline-flex w-20 h-20 rounded-3xl items-center justify-center mb-6 shadow-xl bg-gradient-to-br ${item.color}`}>
                     <span className="text-4xl">{item.icon}</span>
@@ -352,15 +315,12 @@ const Index = () => {
                   <h3 className="text-xl font-bold mb-3 text-foreground">{item.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
                 </Card>
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 left-full w-full h-1 -translate-x-4 -translate-y-1/2">
+                {index < 2 && <div className="hidden md:block absolute top-1/2 left-full w-full h-1 -translate-x-4 -translate-y-1/2">
                     <div className="w-8 h-8 absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
                       <ArrowRight className="h-8 w-8 text-primary" />
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  </div>}
+              </div>)}
           </div>
         </div>
       </section>
@@ -375,11 +335,7 @@ const Index = () => {
           <p className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl mx-auto leading-relaxed">
             Join thousands of people sending money across borders with TuraPay. Fast, secure, and reliable.
           </p>
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/auth")} 
-            className="h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-bold bg-background text-primary hover:bg-background/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105"
-          >
+          <Button size="lg" onClick={() => navigate("/auth")} className="h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-bold bg-background text-primary hover:bg-background/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
             Create Free Account
             <ArrowRight className="ml-2 h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
@@ -434,8 +390,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
