@@ -854,22 +854,89 @@ const Admin = () => {
               <CardContent className="p-3 md:p-6">
                 <div className="space-y-3 md:space-y-4">
                   {users.length === 0 ? <p className="text-center text-muted-foreground py-6 md:py-8 text-sm">No users found</p> : users.map(user => <Card key={user.id} className="p-3 md:p-4 bg-card">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                          <div className="min-w-0">
-                            <h4 className="font-semibold text-sm md:text-base text-foreground truncate">{user.full_name}</h4>
-                            <p className="text-xs md:text-sm text-muted-foreground">
-                              {user.phone_number} | {user.country}
-                            </p>
-                            <p className="text-xs md:text-sm text-muted-foreground">
-                              Balance: ${user.balance.toFixed(2)}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Joined: {new Date(user.created_at).toLocaleDateString()}
-                            </p>
+                        <div className="space-y-3">
+                          {/* Basic Info */}
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold text-sm md:text-base text-foreground">{user.full_name}</h4>
+                                {user.verified ? <Badge className="bg-green-500 text-xs">Verified</Badge> : <Badge className="bg-yellow-500 text-xs">Unverified</Badge>}
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
+                                <div>
+                                  <span className="text-muted-foreground">Phone:</span>
+                                  <span className="ml-2 font-medium">{user.phone_number}</span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Country:</span>
+                                  <span className="ml-2 font-medium">{user.country}</span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Balance:</span>
+                                  <span className="ml-2 font-medium text-green-600">${user.balance.toFixed(2)}</span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Joined:</span>
+                                  <span className="ml-2 font-medium">{new Date(user.created_at).toLocaleDateString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => viewKycDetails(user)}
+                              className="gap-2 text-xs"
+                            >
+                              <Eye className="h-3 w-3" />
+                              View Details
+                            </Button>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {user.verified ? <Badge className="bg-green-500 text-xs">Verified</Badge> : <Badge className="bg-yellow-500 text-xs">Unverified</Badge>}
+                          
+                          {/* Additional Info */}
+                          <div className="pt-3 border-t border-border/50">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                              <div>
+                                <span className="text-muted-foreground">Account Type:</span>
+                                <span className="ml-2 font-medium">{user.account_type || "Standard"}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Referral Code:</span>
+                                <span className="ml-2 font-medium font-mono">{user.referral_code || "N/A"}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Referral Earnings:</span>
+                                <span className="ml-2 font-medium text-emerald-600">${(user.referral_earnings || 0).toFixed(2)}</span>
+                              </div>
+                            </div>
                           </div>
+                          
+                          {/* KYC Info */}
+                          {(user.id_type || user.id_number || user.id_document_url || user.selfie_url) && (
+                            <div className="pt-3 border-t border-border/50">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                {user.id_type && (
+                                  <div>
+                                    <span className="text-muted-foreground">ID Type:</span>
+                                    <span className="ml-2 font-medium">{user.id_type}</span>
+                                  </div>
+                                )}
+                                {user.id_number && (
+                                  <div>
+                                    <span className="text-muted-foreground">ID Number:</span>
+                                    <span className="ml-2 font-medium">{user.id_number}</span>
+                                  </div>
+                                )}
+                                <div>
+                                  <span className="text-muted-foreground">ID Document:</span>
+                                  <span className="ml-2 font-medium">{user.id_document_url ? "✓ Uploaded" : "Not uploaded"}</span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Selfie:</span>
+                                  <span className="ml-2 font-medium">{user.selfie_url ? "✓ Uploaded" : "Not uploaded"}</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </Card>)}
                 </div>
