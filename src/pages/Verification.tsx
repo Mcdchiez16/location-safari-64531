@@ -339,21 +339,32 @@ const Verification = () => {
                     <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full mb-3 md:mb-4">
                       <Camera className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
                     </div>
-                    <p className="text-sm md:text-base text-gray-900 font-semibold mb-1 md:mb-2">Upload selfie</p>
+                    <p className="text-sm md:text-base text-gray-900 font-semibold mb-1 md:mb-2">Take a selfie</p>
                     <p className="text-xs md:text-sm text-gray-500 mb-3 md:mb-4">
-                      JPG, PNG • Max 5MB
+                      Hold your ID document next to your face
                     </p>
+                    <Button
+                      type="button"
+                      onClick={() => document.getElementById('selfie-input')?.click()}
+                      disabled={uploading}
+                      className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+                    >
+                      <Camera className="h-4 w-4" />
+                      Open Camera
+                    </Button>
                   </div>
                 )}
                 <Input
+                  id="selfie-input"
                   type="file"
                   accept="image/*"
+                  capture="user"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleFileUpload(file, 'selfie');
                   }}
                   disabled={uploading}
-                  className="mt-4 cursor-pointer border-gray-300"
+                  className="hidden"
                 />
               </div>
             </div>
