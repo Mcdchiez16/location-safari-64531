@@ -83,24 +83,19 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section with Video Background */}
+      {/* Hero Section with Image Background */}
       <section className="relative overflow-hidden py-20 sm:py-24 md:py-32 lg:py-40">
-        {/* Video Background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="https://cdn.pixabay.com/video/2022/10/30/137183-765044158_large.mp4" type="video/mp4" />
-        </video>
+        {/* Image Background */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroBackground})` }}
+        />
         
         {/* Animated Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-accent/30 to-background/50" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-background/70 via-transparent to-background/80" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.2),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.2),transparent_50%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-accent/40 to-background/60 animate-fade-in" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-background/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.3),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.3),transparent_50%)]" />
         
         {/* Content */}
         <div className="container mx-auto px-4 relative z-10">
