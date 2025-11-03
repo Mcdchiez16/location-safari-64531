@@ -363,7 +363,7 @@ const Send = () => {
               <Search className="h-6 w-6" />
               Find Receiver
             </h2>
-            <p className="text-primary-foreground/90 mt-1">Enter phone number or payment link to find receiver</p>
+            <p className="text-primary-foreground/90 mt-1">Enter phone number to find receiver</p>
           </div>
 
           <div className="p-8">
@@ -376,7 +376,7 @@ const Send = () => {
                   <Input
                     id="lookup"
                     type="text"
-                    placeholder="+260123456789 or payment link"
+                    placeholder="+260123456789"
                     value={lookupValue}
                     onChange={(e) => handleLookupChange(e.target.value)}
                     className="flex-1"
