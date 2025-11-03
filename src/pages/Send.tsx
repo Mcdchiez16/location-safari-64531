@@ -25,6 +25,7 @@ const Send = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [lookupValue, setLookupValue] = useState("");
   const [receiverProfile, setReceiverProfile] = useState<ReceiverProfile | null>(null);
+  const [autoLookupTimer, setAutoLookupTimer] = useState<NodeJS.Timeout | null>(null);
   const [amount, setAmount] = useState("");
   const [exchangeRate, setExchangeRate] = useState(27.5);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -217,6 +218,31 @@ const Send = () => {
     setLoading(false);
   };
 
+  // Handle lookup value change with auto-lookup for 9-digit numbers
+  const handleLookupChange = (value: string) => {
+    setLookupValue(value);
+    
+    // Clear existing timer
+    if (autoLookupTimer) {
+      clearTimeout(autoLookupTimer);
+    }
+
+    // Only allow numbers and + symbol
+    const cleaned = value.replace(/[^\d+]/g, '');
+    setLookupValue(cleaned);
+
+    // Extract just the digits (excluding + and country code)
+    const digitsOnly = cleaned.replace(/^\+\d{1,3}/, '').replace(/\D/g, '');
+    
+    // Auto-lookup when 9 digits are entered
+    if (digitsOnly.length === 9) {
+      const timer = setTimeout(() => {
+        handleLookup(cleaned);
+      }, 500); // Small delay to avoid triggering too quickly
+      setAutoLookupTimer(timer);
+    }
+  };
+
   const calculateFee = (amount: number) => {
     return (amount * transferFeePercentage) / 100;
   };
@@ -344,29 +370,42 @@ const Send = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="lookup" className="text-sm font-medium text-foreground">
-                  Phone Number
+                  Phone Number (9 digits)
                 </Label>
                 <div className="flex gap-3 mt-2">
                   <Input
                     id="lookup"
                     type="text"
-                    placeholder="+260..."
+                    placeholder="+260123456789 or payment link"
                     value={lookupValue}
-                    onChange={(e) => setLookupValue(e.target.value)}
-                    className="h-12"
+                    onChange={(e) => handleLookupChange(e.target.value)}
+                    className="flex-1"
                   />
-                  <Button 
+                  <Button
                     onClick={() => handleLookup()}
                     disabled={loading}
-                    className="bg-gradient-to-r from-primary to-accent px-8"
+                    size="lg"
+                    className="min-w-[100px]"
                   >
-                    {loading ? "Searching..." : "Search"}
+                    {loading ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    ) : (
+                      "Search"
+                    )}
                   </Button>
                 </div>
+                {lookupValue && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {lookupValue.replace(/^\+\d{1,3}/, '').replace(/\D/g, '').length}/9 digits
+                  </p>
+                )}
               </div>
+            </div>
+          </div>
 
-              {receiverProfile && (
-                <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6 mt-4">
+          {receiverProfile && (
+            <div className="p-8 pt-0">
+                <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl flex-shrink-0">
                       {receiverProfile.full_name.charAt(0)}
@@ -389,9 +428,8 @@ const Send = () => {
                     </div>
                   </div>
                 </div>
-              )}
             </div>
-          </div>
+          )}
         </div>
 
         {/* Send Money Form */}

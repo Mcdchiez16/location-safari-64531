@@ -21,6 +21,28 @@ const Auth = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [country, setCountry] = useState("");
 
+  // Country code mapping
+  const countryCodeMap: { [key: string]: string } = {
+    "Zambia": "+260",
+    "Zimbabwe": "+263"
+  };
+
+  // Handle country change and auto-populate country code
+  const handleCountryChange = (value: string) => {
+    setCountry(value);
+    const countryCode = countryCodeMap[value];
+    if (countryCode) {
+      setPhoneNumber(countryCode);
+    }
+  };
+
+  // Handle phone number change with validation
+  const handlePhoneNumberChange = (value: string) => {
+    // Only allow numbers and + symbol
+    const cleaned = value.replace(/[^\d+]/g, '');
+    setPhoneNumber(cleaned);
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -173,27 +195,33 @@ const Auth = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phoneNumber">Phone Number</Label>
-                      <Input
-                        id="phoneNumber"
-                        type="tel"
-                        placeholder="+263..."
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
                       <Label htmlFor="country">Country</Label>
-                      <Select value={country} onValueChange={setCountry} required>
+                      <Select value={country} onValueChange={handleCountryChange} required>
                         <SelectTrigger>
                           <SelectValue placeholder="Select your country" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Zimbabwe">Zimbabwe</SelectItem>
                           <SelectItem value="Zambia">Zambia</SelectItem>
+                          <SelectItem value="Zimbabwe">Zimbabwe</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNumber">Phone Number (9 digits)</Label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        placeholder={country ? `${countryCodeMap[country]}123456789` : "Select country first"}
+                        value={phoneNumber}
+                        onChange={(e) => handlePhoneNumberChange(e.target.value)}
+                        required
+                        maxLength={13}
+                      />
+                      {phoneNumber && country && (
+                        <p className="text-xs text-muted-foreground">
+                          {phoneNumber.replace(countryCodeMap[country], '').length}/9 digits
+                        </p>
+                      )}
                     </div>
                   </>
                 )}
