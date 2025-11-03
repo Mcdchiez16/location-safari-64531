@@ -106,10 +106,7 @@ const Index = () => {
 
               {/* Key Benefits */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto lg:mx-0">
-                <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm p-3 rounded-lg border">
-                  <CheckCircle className="h-5 w-5 text-primary shrink-0" />
-                  <span className="text-sm font-medium">Instant Transfer</span>
-                </div>
+                
                 <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm p-3 rounded-lg border">
                   <Lock className="h-5 w-5 text-primary shrink-0" />
                   <span className="text-sm font-medium">100% Secure</span>
