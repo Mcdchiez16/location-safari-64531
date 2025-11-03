@@ -120,32 +120,35 @@ const Auth = () => {
       return;
     }
 
-    // If referral code was provided, link the new user to referrer
-    if (referralCode && data.user) {
-      try {
-        // Find the referrer by their referral code
+    try {
+      let referrerId: string | null = null;
+      if (referralCode) {
         const { data: referrerProfile } = await supabase
           .from("profiles")
           .select("id")
-          .eq("referral_code", referralCode)
+          .eq("referral_code", cleanedRef)
           .maybeSingle();
-
-        if (referrerProfile) {
-          // Update the new user's profile with the referrer's ID
-          await supabase
-            .from("profiles")
-            .update({ referred_by: referrerProfile.id })
-            .eq("id", data.user.id);
-          
-          toast.success("Account created with referral! You're all set.");
-        } else {
-          toast.success("Account created! Please check your email to verify.");
-        }
-      } catch (err) {
-        console.error("Error linking referral:", err);
-        toast.success("Account created! Please check your email to verify.");
+        referrerId = referrerProfile?.id ?? null;
       }
-    } else {
+
+      if (data.user) {
+        const payload: any = {
+          id: data.user.id,
+          full_name: fullName,
+          phone_number: phoneNumber,
+          country,
+          account_type: accountType,
+        };
+        if (referrerId) payload.referred_by = referrerId;
+
+        await supabase
+          .from("profiles")
+          .upsert(payload, { onConflict: 'id' });
+      }
+
+      toast.success(referrerId ? "Account created with referral! You're all set." : "Account created! Please check your email to verify.");
+    } catch (err) {
+      console.error("Error saving profile/referral:", err);
       toast.success("Account created! Please check your email to verify.");
     }
 
