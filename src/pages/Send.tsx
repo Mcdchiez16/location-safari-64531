@@ -35,6 +35,7 @@ const Send = () => {
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
   const [senderNumber, setSenderNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
+  const [senderVerified, setSenderVerified] = useState(false);
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -45,6 +46,8 @@ const Send = () => {
         navigate("/auth");
       } else {
         setUserId(session.user.id);
+        // Fetch sender's verification status
+        fetchSenderProfile(session.user.id);
       }
     });
 
@@ -65,6 +68,22 @@ const Send = () => {
     const interval = setInterval(fetchExchangeRate, 300000); // Update every 5 minutes
     return () => clearInterval(interval);
   }, [navigate, searchParams]);
+  const fetchSenderProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("verified")
+        .eq("id", userId)
+        .single();
+      
+      if (!error && data) {
+        setSenderVerified(data.verified || false);
+      }
+    } catch (error) {
+      console.error('Error fetching sender profile:', error);
+    }
+  };
+
   const fetchPaymentNumber = async () => {
     try {
       const {
@@ -228,6 +247,13 @@ const Send = () => {
       toast.error("Please enter a valid amount");
       return;
     }
+    
+    // Check if unverified user is trying to send more than $20
+    if (!senderVerified && numAmount > 20) {
+      toast.error("Unverified users can only send up to $20 USD. Please complete verification to send larger amounts.");
+      return;
+    }
+    
     if (!payoutMethod) {
       toast.error("Please select a payout method");
       return;
