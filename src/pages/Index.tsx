@@ -3,17 +3,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock, Menu, X } from "lucide-react";
+import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import InteractiveBackground from "@/components/InteractiveBackground";
 import logo from "@/assets/logo.png";
 const Index = () => {
@@ -22,7 +13,6 @@ const Index = () => {
   const [amount, setAmount] = useState(100);
   const [transferFeePercentage, setTransferFeePercentage] = useState(12);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,73 +73,6 @@ const Index = () => {
               </span>
             </div>
 
-            {/* Desktop Navigation */}
-            <NavigationMenu className="hidden lg:flex">
-              <NavigationMenuList className="space-x-1">
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground font-medium text-sm h-9">
-                    Company
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <div
-                            onClick={() => navigate("/about-us")}
-                            className="flex h-full w-full select-none flex-col justify-end rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 p-6 no-underline outline-none cursor-pointer hover:shadow-lg transition-all"
-                          >
-                            <div className="mb-2 text-lg font-medium text-foreground">About TuraPay</div>
-                            <p className="text-sm leading-tight text-muted-foreground">
-                              Learn about our mission to revolutionize cross-border payments
-                            </p>
-                          </div>
-                        </NavigationMenuLink>
-                      </li>
-                      <li onClick={() => navigate("/how-it-works")} className="cursor-pointer hover:bg-accent/10 p-3 rounded-lg transition-all">
-                        <div className="text-sm font-medium text-foreground">How It Works</div>
-                        <p className="text-sm text-muted-foreground">Simple 3-step process</p>
-                      </li>
-                      <li onClick={() => navigate("/pricing")} className="cursor-pointer hover:bg-accent/10 p-3 rounded-lg transition-all">
-                        <div className="text-sm font-medium text-foreground">Pricing</div>
-                        <p className="text-sm text-muted-foreground">Transparent rates</p>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground font-medium text-sm h-9">
-                    Support
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[300px] gap-3 p-4">
-                      <li onClick={() => navigate("/help-center")} className="cursor-pointer hover:bg-accent/10 p-3 rounded-lg transition-all">
-                        <div className="text-sm font-medium text-foreground">Help Center</div>
-                        <p className="text-sm text-muted-foreground">Find answers quickly</p>
-                      </li>
-                      <li onClick={() => navigate("/contact-us")} className="cursor-pointer hover:bg-accent/10 p-3 rounded-lg transition-all">
-                        <div className="text-sm font-medium text-foreground">Contact Us</div>
-                        <p className="text-sm text-muted-foreground">Get in touch</p>
-                      </li>
-                      <li onClick={() => navigate("/faqs")} className="cursor-pointer hover:bg-accent/10 p-3 rounded-lg transition-all">
-                        <div className="text-sm font-medium text-foreground">FAQs</div>
-                        <p className="text-sm text-muted-foreground">Common questions</p>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    onClick={() => navigate("/security")}
-                    className="cursor-pointer group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
-                  >
-                    Security
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
               {exchangeRate && (
@@ -163,59 +86,10 @@ const Index = () => {
 
               <Button 
                 onClick={() => navigate("/auth")} 
-                className="hidden sm:flex px-5 h-9 text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold"
+                className="px-5 h-9 text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold"
               >
                 Get Started
               </Button>
-
-              {/* Mobile Menu */}
-              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild className="lg:hidden">
-                  <Button variant="ghost" size="icon" className="lg:hidden">
-                    <Menu className="h-6 w-6" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                  <nav className="flex flex-col gap-4 mt-8">
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-lg mb-3 text-primary">Company</h3>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate("/about-us"); setIsMobileMenuOpen(false); }}>
-                        About Us
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate("/how-it-works"); setIsMobileMenuOpen(false); }}>
-                        How It Works
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate("/pricing"); setIsMobileMenuOpen(false); }}>
-                        Pricing
-                      </Button>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-lg mb-3 text-primary">Support</h3>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate("/help-center"); setIsMobileMenuOpen(false); }}>
-                        Help Center
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate("/contact-us"); setIsMobileMenuOpen(false); }}>
-                        Contact Us
-                      </Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate("/faqs"); setIsMobileMenuOpen(false); }}>
-                        FAQs
-                      </Button>
-                    </div>
-
-                    <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate("/security"); setIsMobileMenuOpen(false); }}>
-                      Security
-                    </Button>
-
-                    <Button 
-                      onClick={() => { navigate("/auth"); setIsMobileMenuOpen(false); }} 
-                      className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary"
-                    >
-                      Get Started
-                    </Button>
-                  </nav>
-                </SheetContent>
-              </Sheet>
             </div>
           </div>
         </div>
