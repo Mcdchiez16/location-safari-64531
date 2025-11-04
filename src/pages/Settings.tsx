@@ -120,7 +120,7 @@ const Settings = () => {
               <img 
                 src={logo} 
                 alt="TuraPay Logo" 
-                className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-contain shadow-xl bg-white/95 p-1.5 hover:shadow-primary/70 hover:scale-105 transition-all border-2 border-primary/20" 
+                className="w-8 h-8 md:w-10 md:h-10 rounded-xl object-cover shadow-md hover:shadow-lg transition-shadow" 
               />
               <span className="text-lg md:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">TuraPay</span>
             </div>

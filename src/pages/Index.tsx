@@ -52,7 +52,7 @@ const Index = () => {
               <img 
                 src={logo} 
                 alt="TuraPay Logo" 
-                className="h-12 w-12 sm:h-14 sm:w-14 rounded-xl object-contain shadow-xl bg-white/95 p-1.5 group-hover:shadow-primary/70 group-hover:scale-105 transition-all border-2 border-primary/20" 
+                className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all" 
               />
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 TuraPay
