@@ -308,7 +308,11 @@ const Send = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <img src={logo} alt="TuraPay Logo" className="w-8 h-8 rounded-lg shadow-lg" />
+              <img 
+                src={logo} 
+                alt="TuraPay Logo" 
+                className="w-8 h-8 rounded-lg object-cover shadow-lg" 
+              />
               <span className="text-xl font-semibold text-foreground">TuraPay</span>
             </div>
             <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ArrowLeft, User, Shield, QrCode, LogOut, Mail, Settings as SettingsIcon, Lock, HelpCircle, CheckCircle, AlertCircle, Phone, Info } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import logo from "@/assets/logo.png";
 
 interface Profile {
   id: string;
@@ -116,9 +117,11 @@ const Settings = () => {
         <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 md:space-x-3">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-base md:text-lg">T</span>
-              </div>
+              <img 
+                src={logo} 
+                alt="TuraPay Logo" 
+                className="w-8 h-8 md:w-10 md:h-10 rounded-xl object-cover shadow-md hover:shadow-lg transition-shadow" 
+              />
               <span className="text-lg md:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">TuraPay</span>
             </div>
             <Button 
