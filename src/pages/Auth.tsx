@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeftRight, Upload } from "lucide-react";
+import { ArrowLeftRight, Upload, Lock, Mail, User as UserIcon, Phone, Globe, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 
@@ -319,47 +319,89 @@ const Auth = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-        <CardHeader className="space-y-4">
-          <Link to="/" className="flex items-center gap-2 justify-center group">
-            <div className="bg-primary p-2 rounded-lg group-hover:bg-accent transition-colors">
-              <ArrowLeftRight className="h-5 w-5 text-primary-foreground group-hover:text-accent-foreground" />
-            </div>
-            <span className="text-2xl font-bold text-primary">TuraPay</span>
-          </Link>
-          <CardTitle className="text-2xl text-center">
-            {showForgotPassword ? "Reset Password" : isLogin ? "Welcome back" : "Create account"}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {showForgotPassword
-              ? "Enter your email to receive a password reset link"
-              : isLogin
-              ? "Sign in to your account to continue"
-              : "Sign up to start sending money across borders"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {showForgotPassword ? (
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="reset-email">Email</Label>
-                <Input
-                  id="reset-email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5">
+          {/* Floating Orbs */}
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-[float_20s_ease-in-out_infinite]" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-[float_25s_ease-in-out_infinite_reverse]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-3xl animate-[float_30s_ease-in-out_infinite]" />
+          
+          {/* Decorative Elements */}
+          <div className="absolute top-10 right-20 w-2 h-2 bg-primary rounded-full animate-pulse" />
+          <div className="absolute bottom-40 left-32 w-1.5 h-1.5 bg-accent rounded-full animate-pulse delay-300" />
+          <div className="absolute top-1/3 right-1/4 w-2.5 h-2.5 bg-secondary rounded-full animate-pulse delay-700" />
+        </div>
+
+        {/* Main Card with Glass Effect */}
+        <Card className="w-full max-w-md relative z-10 backdrop-blur-xl bg-card/80 border-2 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <CardHeader className="space-y-6 pb-8">
+            <Link 
+              to="/" 
+              className="flex items-center gap-3 justify-center group transition-all duration-300"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500" />
+                <div className="relative bg-gradient-to-br from-primary to-accent p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <ArrowLeftRight className="h-6 w-6 text-primary-foreground" />
+                </div>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <span className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
+                TuraPay
+              </span>
+            </Link>
+            
+            <div className="space-y-2">
+              <CardTitle className="text-3xl text-center font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                {showForgotPassword ? "Reset Password" : isLogin ? "Welcome back" : "Create account"}
+              </CardTitle>
+              <CardDescription className="text-center text-base">
+                {showForgotPassword
+                  ? "Enter your email to receive a password reset link"
+                  : isLogin
+                  ? "Sign in to your account to continue"
+                  : "Sign up to start sending money across borders"}
+              </CardDescription>
+            </div>
+            
+            {/* Security Badge */}
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <Shield className="w-3.5 h-3.5" />
+              <span>Secured with 256-bit encryption</span>
+            </div>
+          </CardHeader>
+        <CardContent className="space-y-6">
+          {showForgotPassword ? (
+            <form onSubmit={handleForgotPassword} className="space-y-5">
+              <div className="space-y-2 group">
+                <Label htmlFor="reset-email" className="text-sm font-medium flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-primary" />
+                  Email
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                  />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                </div>
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-300" 
+                disabled={loading}
+              >
                 {loading ? "Sending..." : "Send Reset Link"}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full"
+                className="w-full h-11"
                 onClick={() => {
                   setShowForgotPassword(false);
                   setEmail("");
@@ -370,24 +412,35 @@ const Auth = () => {
             </form>
           ) : (
             <>
-              <form onSubmit={isLogin ? handleLogin : handleSignup} className="space-y-4">
+              <form onSubmit={isLogin ? handleLogin : handleSignup} className="space-y-5">
                 {!isLogin && (
                   <>
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">Full Name</Label>
-                      <Input
-                        id="fullName"
-                        type="text"
-                        placeholder="John Doe"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        required
-                      />
+                    <div className="space-y-2 group">
+                      <Label htmlFor="fullName" className="text-sm font-medium flex items-center gap-2">
+                        <UserIcon className="w-4 h-4 text-primary" />
+                        Full Name
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="fullName"
+                          type="text"
+                          placeholder="John Doe"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          required
+                          className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                        />
+                        <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
+                    
+                    <div className="space-y-2 group">
+                      <Label htmlFor="country" className="text-sm font-medium flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-primary" />
+                        Country
+                      </Label>
                       <Select value={country} onValueChange={handleCountryChange} required>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20">
                           <SelectValue placeholder="Select your country" />
                         </SelectTrigger>
                         <SelectContent>
@@ -396,25 +449,36 @@ const Auth = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phoneNumber">Phone Number (9 digits)</Label>
-                      <Input
-                        id="phoneNumber"
-                        type="tel"
-                        placeholder={country ? `${countryCodeMap[country]}123456789` : "Select country first"}
-                        value={phoneNumber}
-                        onChange={(e) => handlePhoneNumberChange(e.target.value)}
-                        required
-                        maxLength={13}
-                      />
+                    
+                    <div className="space-y-2 group">
+                      <Label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-primary" />
+                        Phone Number (9 digits)
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          placeholder={country ? `${countryCodeMap[country]}123456789` : "Select country first"}
+                          value={phoneNumber}
+                          onChange={(e) => handlePhoneNumberChange(e.target.value)}
+                          required
+                          maxLength={13}
+                          className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                        />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      </div>
                       {phoneNumber && country && (
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground pl-10">
                           {phoneNumber.replace(countryCodeMap[country], '').length}/9 digits
                         </p>
                       )}
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="referralCode">Referral Code (optional)</Label>
+                    
+                    <div className="space-y-2 group">
+                      <Label htmlFor="referralCode" className="text-sm font-medium">
+                        Referral Code (optional)
+                      </Label>
                       <Input
                         id="referralCode"
                         type="text"
@@ -422,52 +486,89 @@ const Auth = () => {
                         value={referralCode}
                         onChange={(e) => setReferralCode(e.target.value.trim())}
                         maxLength={32}
+                        className="h-12 transition-all duration-300 focus:shadow-lg focus:shadow-accent/20"
                       />
                     </div>
                   </>
                 )}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                
+                <div className="space-y-2 group">
+                  <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-primary" />
+                    Email
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                    />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  </div>
                 </div>
-                <div className="space-y-2">
+                
+                <div className="space-y-2 group">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-primary" />
+                      Password
+                    </Label>
                     {isLogin && (
                       <button
                         type="button"
                         onClick={() => setShowForgotPassword(true)}
-                        className="text-xs text-primary hover:underline"
+                        className="text-xs text-primary hover:text-accent transition-colors duration-200 font-medium"
                       >
                         Forgot password?
                       </button>
                     )}
                   </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                    />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Please wait..." : isLogin ? "Sign In" : "Sign Up"}
+                
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90" 
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-primary-foreground/20 border-t-primary-foreground rounded-full animate-spin" />
+                      Please wait...
+                    </span>
+                  ) : (
+                    isLogin ? "Sign In" : "Sign Up"
+                  )}
                 </Button>
               </form>
 
-              <div className="mt-6 text-center text-sm">
+              <div className="mt-6 text-center">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-card px-4 text-muted-foreground">or</span>
+                  </div>
+                </div>
                 <button
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-primary hover:underline"
+                  className="mt-4 text-sm font-medium text-primary hover:text-accent transition-colors duration-200"
                 >
                   {isLogin
                     ? "Don't have an account? Sign up"
