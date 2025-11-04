@@ -14,7 +14,6 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import heroBackground from "@/assets/hero-fintech-elegant.jpg";
 import logo from "@/assets/logo.png";
 const Index = () => {
   const navigate = useNavigate();
@@ -221,18 +220,21 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Section with Image Background */}
+      {/* Hero Section with Animated Background */}
       <section className="relative overflow-hidden py-20 sm:py-24 md:py-32 lg:py-40">
-        {/* Image Background */}
-        <div className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat" style={{
-        backgroundImage: `url(${heroBackground})`
-      }} />
+        {/* Animated Background Layers */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-background"></div>
+        
+        {/* Animated Gradient Orbs */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }}></div>
+        <div className="absolute top-20 right-0 w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }}></div>
+        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }}></div>
         
         {/* Animated Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-accent/40 to-background/60 animate-fade-in" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-background/90" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.3),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.3),transparent_50%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-accent/20 to-transparent animate-fade-in"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-background/70 via-transparent to-background/80"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.4),transparent_50%)] animate-pulse" style={{ animationDuration: '8s' }}></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.4),transparent_50%)] animate-pulse" style={{ animationDuration: '7s', animationDelay: '1s' }}></div>
         
         {/* Content */}
         <div className="container mx-auto px-4 relative z-10">
