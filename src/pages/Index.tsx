@@ -14,7 +14,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import heroBackground from "@/assets/hero-fintech-bg.jpg";
+import heroBackground from "@/assets/hero-fintech-elegant.jpg";
 import logo from "@/assets/logo.png";
 const Index = () => {
   const navigate = useNavigate();
@@ -72,22 +72,22 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
+            <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => navigate("/")}>
               <img 
                 src={logo} 
                 alt="TuraPay Logo" 
-                className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" 
+                className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" 
               />
-              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 TuraPay
               </span>
             </div>
 
             {/* Desktop Navigation */}
             <NavigationMenu className="hidden lg:flex">
-              <NavigationMenuList className="space-x-2">
+              <NavigationMenuList className="space-x-1">
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground font-medium">
+                  <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground font-medium text-sm h-9">
                     Company
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -118,7 +118,7 @@ const Index = () => {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground font-medium">
+                  <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 text-foreground font-medium text-sm h-9">
                     Support
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -142,7 +142,7 @@ const Index = () => {
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     onClick={() => navigate("/security")}
-                    className="cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                    className="cursor-pointer group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
                   >
                     Security
                   </NavigationMenuLink>
@@ -163,7 +163,7 @@ const Index = () => {
 
               <Button 
                 onClick={() => navigate("/auth")} 
-                className="hidden sm:flex px-6 h-10 bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold"
+                className="hidden sm:flex px-5 h-9 text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold"
               >
                 Get Started
               </Button>
