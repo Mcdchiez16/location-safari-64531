@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock } from "lucide-react";
+import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock, User, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import InteractiveBackground from "@/components/InteractiveBackground";
 import logo from "@/assets/logo.png";
@@ -287,24 +287,26 @@ const Index = () => {
             step: "1",
             title: "Create Your Account",
             description: "Sign up in seconds with your phone and email. Quick verification process.",
-            icon: "👤",
+            icon: User,
             color: "from-blue-500 to-purple-500"
           }, {
             step: "2",
             title: "Enter Transfer Details",
             description: "Choose your recipient and enter the amount you want to send.",
-            icon: "💰",
+            icon: Wallet,
             color: "from-purple-500 to-pink-500"
           }, {
             step: "3",
             title: "Complete Payment",
             description: "Pay securely via mobile money and your recipient gets funds instantly.",
-            icon: "✅",
+            icon: CheckCircle,
             color: "from-pink-500 to-red-500"
-          }].map((item, index) => <div key={index} className="relative">
+          }].map((item, index) => {
+            const IconComponent = item.icon;
+            return <div key={index} className="relative">
                 <Card className="p-8 text-center hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-card to-card/50">
                   <div className={`inline-flex w-20 h-20 rounded-3xl items-center justify-center mb-6 shadow-xl bg-gradient-to-br ${item.color}`}>
-                    <span className="text-4xl">{item.icon}</span>
+                    <IconComponent className="w-10 h-10 text-white" />
                   </div>
                   <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl shadow-lg">
                     {item.step}
@@ -315,9 +317,10 @@ const Index = () => {
                 {index < 2 && <div className="hidden md:block absolute top-1/2 left-full w-full h-1 -translate-x-4 -translate-y-1/2">
                     <div className="w-8 h-8 absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
                       <ArrowRight className="h-8 w-8 text-primary" />
-                    </div>
+                     </div>
                   </div>}
-              </div>)}
+              </div>
+            })}
           </div>
         </div>
       </section>
