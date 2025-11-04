@@ -323,23 +323,23 @@ const Send = () => {
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Hero Section */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-3 flex items-center gap-3">
-            <SendIcon className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 flex items-center gap-2 sm:gap-3">
+            <SendIcon className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             Send Money
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
             Send money to Zambia instantly via mobile money
           </p>
         </div>
 
         {/* Lookup Section */}
         <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden mb-6">
-          <div className="bg-gradient-to-r from-primary to-accent px-8 py-6">
-            <h2 className="text-xl font-semibold text-primary-foreground flex items-center gap-3">
-              <Search className="h-6 w-6" />
+          <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-4 sm:py-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-primary-foreground flex items-center gap-2 sm:gap-3">
+              <Search className="h-5 w-5 sm:h-6 sm:w-6" />
               Find Receiver
             </h2>
-            <p className="text-primary-foreground/90 mt-1">Enter phone number to find receiver</p>
+            <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Enter phone number to find receiver</p>
           </div>
 
           <div className="p-8">
@@ -389,18 +389,18 @@ const Send = () => {
         {/* Send Money Form */}
         {receiverProfile && !showPaymentInstructions && <form onSubmit={handleProceedToPayment}>
             <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden mb-6">
-              <div className="px-8 py-6 border-b border-border">
-                <h2 className="text-2xl font-bold text-foreground">Transfer Amount</h2>
+              <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-border">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Transfer Amount</h2>
               </div>
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 <div className="mb-6">
                   <Label htmlFor="amount" className="text-sm font-medium text-foreground block mb-2">
                     Recipient will receive (in USD)
                   </Label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg">$</span>
-                    <Input id="amount" type="number" step="0.01" min="1" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="pl-10 pr-16 h-16 text-2xl font-semibold focus:border-primary" required />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-lg">USD</span>
+                    <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-base sm:text-lg">$</span>
+                    <Input id="amount" type="number" step="0.01" min="1" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} className="pl-8 sm:pl-10 pr-12 sm:pr-16 h-12 sm:h-16 text-xl sm:text-2xl font-semibold focus:border-primary" required />
+                    <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold text-sm sm:text-base">USD</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">This is the amount your recipient will receive before conversion to ZMW</p>
                 </div>
@@ -420,33 +420,33 @@ const Send = () => {
                   </Select>
                 </div>
 
-                {amount && parseFloat(amount) > 0 && <div className="bg-primary/10 rounded-xl p-6 border border-primary/20">
+                {amount && parseFloat(amount) > 0 && <div className="bg-primary/10 rounded-xl p-4 sm:p-6 border border-primary/20">
                     <div className="space-y-3">
                       
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-muted-foreground">Transfer fee ({transferFeePercentage}%)</span>
                         <span className="font-medium text-foreground">+ ${calculateFee(parseFloat(amount)).toFixed(2)} USD</span>
                       </div>
                       <div className="border-t border-primary/20 pt-2 mt-2 mb-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-foreground font-semibold text-lg">Total you send</span>
-                          <span className="font-bold text-xl text-foreground">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)} USD</span>
+                          <span className="text-foreground font-semibold text-sm sm:text-base lg:text-lg">Total you send</span>
+                          <span className="font-bold text-base sm:text-lg lg:text-xl text-foreground">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)} USD</span>
                         </div>
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-muted-foreground">Exchange rate</span>
                         <span className="font-medium text-foreground">1 USD = {exchangeRate} ZMW</span>
                       </div>
                       <div className="border-t border-primary/20 pt-3 mt-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-foreground font-medium">Recipient receives</span>
-                          <span className="font-bold text-2xl text-primary">{recipientGets} ZMW</span>
+                          <span className="text-foreground font-medium text-sm sm:text-base">Recipient receives</span>
+                          <span className="font-bold text-lg sm:text-xl lg:text-2xl text-primary">{recipientGets} ZMW</span>
                         </div>
                       </div>
                     </div>
                   </div>}
 
-                <Button type="submit" className="w-full mt-8 h-14 text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg" disabled={loading || !amount || parseFloat(amount) <= 0 || !payoutMethod}>
+                <Button type="submit" className="w-full mt-6 sm:mt-8 h-12 sm:h-14 text-base sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg" disabled={loading || !amount || parseFloat(amount) <= 0 || !payoutMethod}>
                   Continue to Payment
                 </Button>
               </div>
@@ -470,11 +470,11 @@ const Send = () => {
                   </div>
                   <div className="ml-11 bg-secondary/10 rounded-xl p-4 sm:p-6 border-2 border-secondary/30">
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Send this amount:</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}</p>
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}</p>
                     <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
-                      <p className="text-xl sm:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
-                      <p className="text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
+                      <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
+                      <p className="text-xs sm:text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
                     </div>
                   </div>
