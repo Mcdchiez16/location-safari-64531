@@ -13,7 +13,6 @@ const Index = () => {
   const [amount, setAmount] = useState(100);
   const [transferFeePercentage, setTransferFeePercentage] = useState(12);
   const [isScrolled, setIsScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -54,20 +53,12 @@ const Index = () => {
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
   return <div className="min-h-screen bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10">
       {/* Elegant Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-background/80 backdrop-blur-xl shadow-lg border-b border-primary/10' 
-          : 'bg-transparent backdrop-blur-md border-b border-white/5'
-      }`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-background/80 backdrop-blur-xl shadow-lg border-b border-primary/10' : 'bg-transparent backdrop-blur-md border-b border-white/5'}`}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => navigate("/")}>
-              <img 
-                src={logo} 
-                alt="TuraPay Logo" 
-                className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" 
-              />
+              <img src={logo} alt="TuraPay Logo" className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" />
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 TuraPay
               </span>
@@ -75,19 +66,14 @@ const Index = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-              {exchangeRate && (
-                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+              {exchangeRate && <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
                   <TrendingUp className="h-4 w-4 text-primary animate-pulse" />
                   <span className="text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                     1 USD = {exchangeRate.toFixed(2)} ZMW
                   </span>
-                </div>
-              )}
+                </div>}
 
-              <Button 
-                onClick={() => navigate("/auth")} 
-                className="px-5 h-9 text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold"
-              >
+              <Button onClick={() => navigate("/auth")} className="px-5 h-9 text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold">
                 Get Started
               </Button>
             </div>
@@ -121,7 +107,7 @@ const Index = () => {
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed text-slate-50 md:text-base font-semibold">
+              <p className="text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed md:text-base font-semibold text-slate-950">
                 Send money instantly with competitive rates and zero hassle. Your trusted partner for seamless cross-border payments.
               </p>
 
