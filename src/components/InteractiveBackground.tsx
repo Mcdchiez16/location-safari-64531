@@ -2,19 +2,20 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useRef, useMemo, useState } from 'react';
 import * as THREE from 'three';
 
-function AnimatedTorus({ position, scale, color }: { position: [number, number, number], scale: number, color: string }) {
+function FloatingSphere({ position, scale, color }: { position: [number, number, number], scale: number, color: string }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.position.x = position[0] + Math.sin(state.clock.elapsedTime * 0.3) * 0.8;
-      meshRef.current.position.y = position[1] + Math.cos(state.clock.elapsedTime * 0.4) * 0.6;
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.2;
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+      meshRef.current.position.x = position[0] + Math.sin(state.clock.elapsedTime * 0.5 + position[0]) * 1.2;
+      meshRef.current.position.y = position[1] + Math.cos(state.clock.elapsedTime * 0.3 + position[1]) * 0.8;
+      meshRef.current.position.z = position[2] + Math.sin(state.clock.elapsedTime * 0.4) * 0.5;
+      meshRef.current.rotation.x += 0.01;
+      meshRef.current.rotation.y += 0.01;
       
       if (hovered) {
-        meshRef.current.scale.lerp(new THREE.Vector3(scale * 1.3, scale * 1.3, scale * 1.3), 0.1);
+        meshRef.current.scale.lerp(new THREE.Vector3(scale * 1.5, scale * 1.5, scale * 1.5), 0.1);
       } else {
         meshRef.current.scale.lerp(new THREE.Vector3(scale, scale, scale), 0.1);
       }
@@ -28,42 +29,44 @@ function AnimatedTorus({ position, scale, color }: { position: [number, number, 
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
     >
-      <torusGeometry args={[1, 0.4, 16, 100]} />
+      <icosahedronGeometry args={[1, 1]} />
       <meshStandardMaterial
         color={color}
         transparent
-        opacity={0.7}
-        roughness={0.1}
-        metalness={0.9}
+        opacity={0.6}
+        roughness={0.2}
+        metalness={0.8}
         emissive={color}
-        emissiveIntensity={0.3}
+        emissiveIntensity={0.4}
+        wireframe={false}
       />
     </mesh>
   );
 }
 
-function AnimatedRing({ position, scale, color }: { position: [number, number, number], scale: number, color: string }) {
+function AnimatedCube({ position, scale, color }: { position: [number, number, number], scale: number, color: string }) {
   const meshRef = useRef<THREE.Mesh>(null);
   
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.5;
-      meshRef.current.rotation.z = state.clock.elapsedTime * 0.4;
-      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.6) * 0.4;
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.3;
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.2;
+      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.5;
     }
   });
 
   return (
     <mesh ref={meshRef} position={position}>
-      <torusGeometry args={[1.5, 0.1, 16, 100]} />
+      <boxGeometry args={[scale * 1.5, scale * 1.5, scale * 1.5]} />
       <meshStandardMaterial
         color={color}
         transparent
-        opacity={0.5}
-        roughness={0.3}
-        metalness={0.7}
+        opacity={0.4}
+        roughness={0.4}
+        metalness={0.6}
         emissive={color}
-        emissiveIntensity={0.2}
+        emissiveIntensity={0.3}
+        wireframe
       />
     </mesh>
   );
@@ -75,23 +78,25 @@ function FloatingParticles() {
   const mousePosition = useRef({ x: 0, y: 0 });
 
   const particles = useMemo(() => {
-    const count = 150;
+    const count = 200;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     
     for (let i = 0; i < count * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 25;
-      positions[i + 1] = (Math.random() - 0.5) * 25;
-      positions[i + 2] = (Math.random() - 0.5) * 15;
+      positions[i] = (Math.random() - 0.5) * 30;
+      positions[i + 1] = (Math.random() - 0.5) * 30;
+      positions[i + 2] = (Math.random() - 0.5) * 20;
       
-      // Elegant color palette: gold, teal, rose gold
+      // Vibrant color palette: purple, cyan, coral, lime
       const colorChoice = Math.random();
-      if (colorChoice < 0.33) {
-        colors[i] = 0.85; colors[i + 1] = 0.65; colors[i + 2] = 0.13; // Gold
-      } else if (colorChoice < 0.66) {
-        colors[i] = 0.13; colors[i + 1] = 0.82; colors[i + 2] = 0.78; // Teal
+      if (colorChoice < 0.25) {
+        colors[i] = 0.67; colors[i + 1] = 0.33; colors[i + 2] = 0.93; // Purple
+      } else if (colorChoice < 0.5) {
+        colors[i] = 0.0; colors[i + 1] = 0.9; colors[i + 2] = 0.95; // Cyan
+      } else if (colorChoice < 0.75) {
+        colors[i] = 1.0; colors[i + 1] = 0.45; colors[i + 2] = 0.45; // Coral
       } else {
-        colors[i] = 0.92; colors[i + 1] = 0.58; colors[i + 2] = 0.69; // Rose gold
+        colors[i] = 0.6; colors[i + 1] = 0.95; colors[i + 2] = 0.3; // Lime
       }
     }
     
@@ -146,10 +151,10 @@ function FloatingParticles() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.08}
+        size={0.1}
         vertexColors
         transparent
-        opacity={0.8}
+        opacity={0.9}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
       />
@@ -164,20 +169,22 @@ function InteractiveBackground() {
         camera={{ position: [0, 0, 10], fov: 75 }}
         style={{ background: 'transparent' }}
       >
-        <ambientLight intensity={0.6} />
-        <pointLight position={[10, 10, 10]} intensity={1.2} color="#d4af37" />
-        <pointLight position={[-10, -10, -10]} intensity={0.8} color="#14b8a6" />
-        <pointLight position={[0, 10, 5]} intensity={0.6} color="#eb9ca7" />
-        <spotLight position={[5, 5, 5]} intensity={0.5} color="#ffd700" angle={0.5} penumbra={1} />
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} intensity={1.5} color="#a855f7" />
+        <pointLight position={[-10, -10, -10]} intensity={1.2} color="#06b6d4" />
+        <pointLight position={[0, 10, 5]} intensity={1.0} color="#f87171" />
+        <pointLight position={[-5, -5, 5]} intensity={0.8} color="#84cc16" />
+        <spotLight position={[5, 5, 5]} intensity={0.7} color="#c084fc" angle={0.6} penumbra={1} />
         
-        {/* Elegant animated torus shapes */}
-        <AnimatedTorus position={[-4, 0, -2]} scale={0.8} color="#d4af37" />
-        <AnimatedTorus position={[4, 1, -3]} scale={0.6} color="#14b8a6" />
-        <AnimatedTorus position={[0, -2, -1]} scale={0.7} color="#eb9ca7" />
+        {/* Floating spheres */}
+        <FloatingSphere position={[-3, 0, -2]} scale={0.6} color="#a855f7" />
+        <FloatingSphere position={[3, 1, -3]} scale={0.5} color="#06b6d4" />
+        <FloatingSphere position={[0, -2, -1]} scale={0.7} color="#f87171" />
+        <FloatingSphere position={[-2, 2, -4]} scale={0.4} color="#84cc16" />
         
-        {/* Animated rings */}
-        <AnimatedRing position={[-2, 2, -4]} scale={1} color="#ffd700" />
-        <AnimatedRing position={[3, -1, -2]} scale={0.8} color="#5eead4" />
+        {/* Animated cubes */}
+        <AnimatedCube position={[4, -1, -2]} scale={0.8} color="#c084fc" />
+        <AnimatedCube position={[-4, 1, -3]} scale={0.6} color="#22d3ee" />
         
         <FloatingParticles />
       </Canvas>
