@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroBackground from "@/assets/hero-fintech-bg.jpg";
+import logo from "@/assets/logo.png";
 const Index = () => {
   const navigate = useNavigate();
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
@@ -48,9 +49,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
-              <div className="bg-gradient-to-br from-primary to-accent p-2 rounded-xl shadow-lg group-hover:shadow-primary/50 transition-all">
-                <Globe2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="TuraPay Logo" className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl shadow-lg group-hover:shadow-primary/50 transition-all" />
               <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 TuraPay
               </span>

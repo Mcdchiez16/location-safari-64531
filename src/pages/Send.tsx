@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import logo from "@/assets/logo.png";
 interface ReceiverProfile {
   id: string;
   full_name: string;
@@ -307,9 +308,7 @@ const Send = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-sm">T</span>
-              </div>
+              <img src={logo} alt="TuraPay Logo" className="w-8 h-8 rounded-lg shadow-lg" />
               <span className="text-xl font-semibold text-foreground">TuraPay</span>
             </div>
             <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">
