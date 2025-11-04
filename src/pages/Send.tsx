@@ -311,7 +311,7 @@ const Send = () => {
               <img 
                 src={logo} 
                 alt="TuraPay Logo" 
-                className="w-8 h-8 rounded-lg object-cover shadow-lg" 
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-contain shadow-xl bg-white/95 p-1.5 hover:shadow-primary/70 hover:scale-105 transition-all border-2 border-primary/20" 
               />
               <span className="text-xl font-semibold text-foreground">TuraPay</span>
             </div>
