@@ -9,7 +9,27 @@ import { toast } from "sonner";
 import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { z } from "zod";
 import logo from "@/assets/logo.png";
+
+// Validation schemas
+const transactionSchema = z.object({
+  amount: z.number()
+    .positive({ message: "Amount must be greater than 0" })
+    .max(1000000, { message: "Amount cannot exceed $1,000,000" })
+    .refine((val) => Number.isFinite(val), { message: "Invalid amount" }),
+  senderNumber: z.string()
+    .trim()
+    .min(1, { message: "Sender number is required" })
+    .regex(/^\+?[\d\s\-()]+$/, { message: "Invalid phone number format" })
+    .max(20, { message: "Phone number too long" }),
+  transactionId: z.string()
+    .trim()
+    .min(1, { message: "Transaction ID is required" })
+    .regex(/^[a-zA-Z0-9\-_]+$/, { message: "Transaction ID must be alphanumeric" })
+    .max(50, { message: "Transaction ID too long" })
+});
+
 interface ReceiverProfile {
   id: string;
   full_name: string;
@@ -255,18 +275,28 @@ const Send = () => {
     setShowPaymentInstructions(true);
   };
   const handleConfirmPayment = async () => {
-    if (!senderNumber.trim()) {
-      toast.error("Please enter your sender number");
+    // Validate inputs using zod schema
+    try {
+      const validatedData = transactionSchema.parse({
+        amount: parseFloat(amount),
+        senderNumber: senderNumber,
+        transactionId: transactionId
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+        return;
+      }
+      toast.error("Invalid input data");
       return;
     }
-    if (!transactionId.trim()) {
-      toast.error("Please enter the transaction ID");
-      return;
-    }
+
     if (!userId || !receiverProfile) {
       toast.error("Please select a receiver first");
       return;
     }
+    
     setLoading(true);
     const transferFee = calculateFee(parseFloat(amount));
 
