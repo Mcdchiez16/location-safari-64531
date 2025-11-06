@@ -101,26 +101,11 @@ const Auth = () => {
 
     const cleanedRef = referralCode.trim().toLowerCase();
 
-    // Validate and verify referral code exists
+    // Validate referral code format (actual linking handled in backend)
     if (cleanedRef) {
       const refSchema = z.string().trim().regex(/^[a-z0-9]+$/i).min(4).max(32);
       if (!refSchema.safeParse(cleanedRef).success) {
         toast.error("Invalid referral code format");
-        setLoading(false);
-        return;
-      }
-
-      // Verify the referral code exists (case-insensitive search)
-      const { data: referrerProfile, error: referrerError } = await supabase
-        .from("profiles")
-        .select("id")
-        .ilike("referral_code", cleanedRef)
-        .maybeSingle();
-
-      if (referrerError) {
-        console.error("Error looking up referrer:", referrerError);
-      } else if (!referrerProfile) {
-        toast.error("Referral code not found. Please check and try again.");
         setLoading(false);
         return;
       }
