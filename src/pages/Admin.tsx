@@ -100,6 +100,7 @@ const Admin = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [referralPercentage, setReferralPercentage] = useState("");
   const [unverifiedLimit, setUnverifiedLimit] = useState("");
+  const [maxTransferLimit, setMaxTransferLimit] = useState("");
   const [kycSearchQuery, setKycSearchQuery] = useState("");
   const [selectedUserTransactions, setSelectedUserTransactions] = useState<Transaction[]>([]);
   useEffect(() => {
@@ -215,6 +216,12 @@ const Admin = () => {
       const unverifiedLimitSetting = settingsData?.find(s => s.key === "unverified_send_limit");
       if (unverifiedLimitSetting) {
         setUnverifiedLimit(unverifiedLimitSetting.value);
+      }
+
+      // Get max transfer limit
+      const maxTransferLimitSetting = settingsData?.find(s => s.key === "max_transfer_limit");
+      if (maxTransferLimitSetting) {
+        setMaxTransferLimit(maxTransferLimitSetting.value);
       }
     } catch (error) {
       console.error("Error loading data:", error);
@@ -415,6 +422,25 @@ const Admin = () => {
     } catch (error) {
       console.error("Error updating unverified send limit:", error);
       toast.error("Failed to update unverified send limit");
+    }
+  };
+
+  const updateMaxTransferLimit = async () => {
+    const limit = parseFloat(maxTransferLimit);
+    if (isNaN(limit) || limit <= 0) {
+      toast.error("Please enter a valid positive amount");
+      return;
+    }
+    try {
+      const { error } = await supabase.from("settings").update({
+        value: maxTransferLimit
+      }).eq("key", "max_transfer_limit");
+      if (error) throw error;
+      toast.success("Maximum transfer limit updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating max transfer limit:", error);
+      toast.error("Failed to update max transfer limit");
     }
   };
   const processReferralReward = async (transactionId: string) => {
@@ -1039,6 +1065,19 @@ const Admin = () => {
                   </div>
                   <p className="text-xs text-white/60 mt-2">
                     Percentage of transaction amount that referrers earn when their referred users receive money
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="max_transfer_limit" className="text-sm md:text-base text-white">Maximum Transfer Limit (USD)</Label>
+                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                    <Input id="max_transfer_limit" type="number" min="1" step="100" value={maxTransferLimit} onChange={e => setMaxTransferLimit(e.target.value)} placeholder="e.g., 10000" className="text-sm" />
+                    <Button onClick={updateMaxTransferLimit} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
+                      Update
+                    </Button>
+                  </div>
+                  <p className="text-xs text-white/60 mt-2">
+                    Maximum USD amount any user can transfer in a single transaction
                   </p>
                 </div>
               </CardContent>

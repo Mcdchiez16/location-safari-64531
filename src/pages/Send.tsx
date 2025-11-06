@@ -55,6 +55,7 @@ const Send = () => {
   const [paymentRecipientName, setPaymentRecipientName] = useState("TuraPay");
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
   const [unverifiedLimit, setUnverifiedLimit] = useState(20);
+  const [maxTransferLimit, setMaxTransferLimit] = useState(10000);
   const [senderNumber, setSenderNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [senderVerified, setSenderVerified] = useState(false);
@@ -85,6 +86,7 @@ const Send = () => {
     fetchPaymentRecipientName();
     fetchTransferFee();
     fetchUnverifiedLimit();
+    fetchMaxTransferLimit();
 
     // Fetch exchange rate
     fetchExchangeRate();
@@ -155,6 +157,18 @@ const Send = () => {
       }
     } catch (error) {
       console.error('Error fetching unverified send limit:', error);
+    }
+  };
+
+  const fetchMaxTransferLimit = async () => {
+    try {
+      const { data, error } = await supabase.from("settings").select("value").eq("key", "max_transfer_limit").maybeSingle();
+      if (!error && data) {
+        const limit = parseFloat(data.value);
+        if (!isNaN(limit) && limit > 0) setMaxTransferLimit(limit);
+      }
+    } catch (error) {
+      console.error('Error fetching max transfer limit:', error);
     }
   };
   const fetchExchangeRate = async () => {
@@ -289,6 +303,13 @@ const Send = () => {
         return;
       }
       toast.error("Invalid input data");
+      return;
+    }
+
+    // Check against maximum transfer limit
+    const numAmount = parseFloat(amount);
+    if (numAmount > maxTransferLimit) {
+      toast.error(`Transfer amount cannot exceed $${maxTransferLimit.toLocaleString()} USD. Please contact support for larger transfers.`);
       return;
     }
 
