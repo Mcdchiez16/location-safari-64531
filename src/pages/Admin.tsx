@@ -103,6 +103,9 @@ const Admin = () => {
   const [maxTransferLimit, setMaxTransferLimit] = useState("");
   const [kycSearchQuery, setKycSearchQuery] = useState("");
   const [selectedUserTransactions, setSelectedUserTransactions] = useState<Transaction[]>([]);
+  const [referralEnabled, setReferralEnabled] = useState(true);
+  const [referralPayoutThreshold, setReferralPayoutThreshold] = useState("");
+  const [usersAboveThreshold, setUsersAboveThreshold] = useState<UserProfile[]>([]);
   useEffect(() => {
     checkAdminAndLoadData();
   }, []);
@@ -223,6 +226,23 @@ const Admin = () => {
       if (maxTransferLimitSetting) {
         setMaxTransferLimit(maxTransferLimitSetting.value);
       }
+
+      // Get referral enabled setting
+      const referralEnabledSetting = settingsData?.find(s => s.key === "referral_enabled");
+      if (referralEnabledSetting) {
+        setReferralEnabled(referralEnabledSetting.value === "true");
+      }
+
+      // Get referral payout threshold
+      const referralThresholdSetting = settingsData?.find(s => s.key === "referral_payout_threshold");
+      if (referralThresholdSetting) {
+        setReferralPayoutThreshold(referralThresholdSetting.value);
+      }
+
+      // Get users with earnings above threshold
+      const threshold = referralThresholdSetting ? parseFloat(referralThresholdSetting.value) : 50;
+      const usersAbove = usersData?.filter(u => (u.referral_earnings || 0) >= threshold) || [];
+      setUsersAboveThreshold(usersAbove);
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load admin data");
@@ -441,6 +461,41 @@ const Admin = () => {
     } catch (error) {
       console.error("Error updating max transfer limit:", error);
       toast.error("Failed to update max transfer limit");
+    }
+  };
+
+  const toggleReferralProgram = async () => {
+    try {
+      const newValue = !referralEnabled;
+      const { error } = await supabase.from("settings").update({
+        value: newValue.toString()
+      }).eq("key", "referral_enabled");
+      if (error) throw error;
+      setReferralEnabled(newValue);
+      toast.success(`Referral program ${newValue ? "enabled" : "disabled"}`);
+      loadData();
+    } catch (error) {
+      console.error("Error toggling referral program:", error);
+      toast.error("Failed to update referral program status");
+    }
+  };
+
+  const updatePayoutThreshold = async () => {
+    const threshold = parseFloat(referralPayoutThreshold);
+    if (isNaN(threshold) || threshold < 0) {
+      toast.error("Please enter a valid non-negative amount");
+      return;
+    }
+    try {
+      const { error } = await supabase.from("settings").update({
+        value: referralPayoutThreshold
+      }).eq("key", "referral_payout_threshold");
+      if (error) throw error;
+      toast.success("Payout threshold updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating payout threshold:", error);
+      toast.error("Failed to update payout threshold");
     }
   };
   const processReferralReward = async (transactionId: string) => {
@@ -1068,18 +1123,85 @@ const Admin = () => {
                   </p>
                 </div>
 
-                <div>
-                  <Label htmlFor="max_transfer_limit" className="text-sm md:text-base text-white">Maximum Transfer Limit (USD)</Label>
-                  <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
-                    <Input id="max_transfer_limit" type="number" min="1" step="100" value={maxTransferLimit} onChange={e => setMaxTransferLimit(e.target.value)} placeholder="e.g., 10000" className="text-sm" />
-                    <Button onClick={updateMaxTransferLimit} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
-                      Update
-                    </Button>
-                  </div>
-                  <p className="text-xs text-white/60 mt-2">
-                    Maximum USD amount any user can transfer in a single transaction
-                  </p>
-                </div>
+                 <div>
+                   <Label htmlFor="max_transfer_limit" className="text-sm md:text-base text-white">Maximum Transfer Limit (USD)</Label>
+                   <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                     <Input id="max_transfer_limit" type="number" min="1" step="100" value={maxTransferLimit} onChange={e => setMaxTransferLimit(e.target.value)} placeholder="e.g., 10000" className="text-sm" />
+                     <Button onClick={updateMaxTransferLimit} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
+                       Update
+                     </Button>
+                   </div>
+                   <p className="text-xs text-white/60 mt-2">
+                     Maximum USD amount any user can transfer in a single transaction
+                   </p>
+                 </div>
+
+                 <div className="pt-4 border-t border-white/10">
+                   <h3 className="text-base md:text-lg font-semibold text-white mb-4">Referral Program Management</h3>
+                   
+                   <div className="space-y-4">
+                     <div>
+                       <Label htmlFor="referral_enabled" className="text-sm md:text-base text-white">Referral Program Status</Label>
+                       <div className="flex items-center gap-3 mt-2">
+                         <Button 
+                           onClick={toggleReferralProgram}
+                           variant={referralEnabled ? "default" : "outline"}
+                           className="min-w-[120px] text-sm md:text-base h-9 md:h-10"
+                         >
+                           {referralEnabled ? "Enabled" : "Disabled"}
+                         </Button>
+                         <span className="text-xs text-white/60">
+                           {referralEnabled ? "Users can earn referral rewards" : "Referral program is disabled"}
+                         </span>
+                       </div>
+                     </div>
+
+                     <div>
+                       <Label htmlFor="payout_threshold" className="text-sm md:text-base text-white">Payout Threshold (USD)</Label>
+                       <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mt-2">
+                         <Input 
+                           id="payout_threshold" 
+                           type="number" 
+                           min="0" 
+                           step="10" 
+                           value={referralPayoutThreshold} 
+                           onChange={e => setReferralPayoutThreshold(e.target.value)} 
+                           placeholder="e.g., 50" 
+                           className="text-sm" 
+                         />
+                         <Button onClick={updatePayoutThreshold} className="min-w-[100px] text-sm md:text-base h-9 md:h-10">
+                           Update
+                         </Button>
+                       </div>
+                       <p className="text-xs text-white/60 mt-2">
+                         Minimum amount users must earn before appearing in payout notifications
+                       </p>
+                     </div>
+
+                     {usersAboveThreshold.length > 0 && (
+                       <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                         <h4 className="text-sm md:text-base font-semibold text-yellow-400 mb-3 flex items-center gap-2">
+                           <DollarSign className="h-4 w-4" />
+                           Users Ready for Payout ({usersAboveThreshold.length})
+                         </h4>
+                         <div className="space-y-2 max-h-60 overflow-y-auto">
+                           {usersAboveThreshold.map(user => (
+                             <div key={user.id} className="flex items-center justify-between p-3 bg-white/5 rounded border border-white/10">
+                               <div>
+                                 <p className="text-sm font-medium text-white">{user.full_name}</p>
+                                 <p className="text-xs text-white/60">{user.phone_number}</p>
+                               </div>
+                               <div className="text-right">
+                                 <p className="text-sm font-bold text-emerald-400">${(user.referral_earnings || 0).toFixed(2)}</p>
+                                 <p className="text-xs text-white/60">Referral Code: {user.referral_code}</p>
+                               </div>
+                             </div>
+                           ))}
+                         </div>
+                       </div>
+                     )}
+                   </div>
+                 </div>
               </CardContent>
             </Card>
           </TabsContent>
