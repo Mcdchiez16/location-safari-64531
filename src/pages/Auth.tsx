@@ -338,43 +338,43 @@ const Auth = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
-        {/* Animated Background Elements */}
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-2 sm:p-4 md:p-6">
+        {/* Animated Background - Hidden on mobile for better performance */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5">
-          {/* Floating Orbs */}
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-[float_20s_ease-in-out_infinite]" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-[float_25s_ease-in-out_infinite_reverse]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-3xl animate-[float_30s_ease-in-out_infinite]" />
+          {/* Floating Orbs - Adjusted for mobile */}
+          <div className="absolute top-10 sm:top-20 left-5 sm:left-10 w-40 sm:w-72 h-40 sm:h-72 bg-primary/10 rounded-full blur-3xl animate-[float_20s_ease-in-out_infinite]" />
+          <div className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-48 sm:w-96 h-48 sm:h-96 bg-accent/10 rounded-full blur-3xl animate-[float_25s_ease-in-out_infinite_reverse]" />
+          <div className="hidden sm:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-3xl animate-[float_30s_ease-in-out_infinite]" />
           
-          {/* Decorative Elements */}
-          <div className="absolute top-10 right-20 w-2 h-2 bg-primary rounded-full animate-pulse" />
-          <div className="absolute bottom-40 left-32 w-1.5 h-1.5 bg-accent rounded-full animate-pulse delay-300" />
-          <div className="absolute top-1/3 right-1/4 w-2.5 h-2.5 bg-secondary rounded-full animate-pulse delay-700" />
+          {/* Decorative Elements - Hidden on mobile */}
+          <div className="hidden sm:block absolute top-10 right-20 w-2 h-2 bg-primary rounded-full animate-pulse" />
+          <div className="hidden sm:block absolute bottom-40 left-32 w-1.5 h-1.5 bg-accent rounded-full animate-pulse delay-300" />
+          <div className="hidden sm:block absolute top-1/3 right-1/4 w-2.5 h-2.5 bg-secondary rounded-full animate-pulse delay-700" />
         </div>
 
         {/* Main Card with Glass Effect */}
-        <Card className="w-full max-w-md relative z-10 backdrop-blur-xl bg-card/80 border-2 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <CardHeader className="space-y-6 pb-8">
+        <Card className="w-full max-w-md relative z-10 backdrop-blur-xl bg-card/80 border-2 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 mx-auto">
+          <CardHeader className="space-y-4 sm:space-y-6 pb-6 sm:pb-8 px-4 sm:px-6 pt-6 sm:pt-8">
             <Link 
               to="/" 
-              className="flex items-center gap-3 justify-center group transition-all duration-300"
+              className="flex items-center gap-2 sm:gap-3 justify-center group transition-all duration-300"
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500" />
-                <div className="relative bg-gradient-to-br from-primary to-accent p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <ArrowLeftRight className="h-6 w-6 text-primary-foreground" />
+                <div className="relative bg-gradient-to-br from-primary to-accent p-2 sm:p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <ArrowLeftRight className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
                 </div>
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
+              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
                 TuraPay
               </span>
             </Link>
             
-            <div className="space-y-2">
-              <CardTitle className="text-3xl text-center font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <div className="space-y-1.5 sm:space-y-2">
+              <CardTitle className="text-2xl sm:text-3xl text-center font-bold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
                 {showForgotPassword ? "Reset Password" : isLogin ? "Welcome back" : "Create account"}
               </CardTitle>
-              <CardDescription className="text-center text-base">
+              <CardDescription className="text-center text-sm sm:text-base px-2">
                 {showForgotPassword
                   ? "Enter your email to receive a password reset link"
                   : isLogin
@@ -385,16 +385,16 @@ const Auth = () => {
             
             {/* Security Badge */}
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <Shield className="w-3.5 h-3.5" />
-              <span>Secured with 256-bit encryption</span>
+              <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span className="text-[10px] sm:text-xs">Secured with 256-bit encryption</span>
             </div>
           </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-6 sm:pb-8">
           {showForgotPassword ? (
-            <form onSubmit={handleForgotPassword} className="space-y-5">
+            <form onSubmit={handleForgotPassword} className="space-y-4 sm:space-y-5">
               <div className="space-y-2 group">
                 <Label htmlFor="reset-email" className="text-sm font-medium flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-primary" />
+                  <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                   Email
                 </Label>
                 <div className="relative">
@@ -405,14 +405,14 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                    className="pl-10 h-11 sm:h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20 text-sm sm:text-base"
                   />
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 </div>
               </div>
               <Button 
                 type="submit" 
-                className="w-full h-12 text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-300" 
+                className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-300" 
                 disabled={loading}
               >
                 {loading ? "Sending..." : "Send Reset Link"}
@@ -420,7 +420,7 @@ const Auth = () => {
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full h-11"
+                className="w-full h-10 sm:h-11 text-sm sm:text-base"
                 onClick={() => {
                   setShowForgotPassword(false);
                   setEmail("");
@@ -431,12 +431,12 @@ const Auth = () => {
             </form>
           ) : (
             <>
-              <form onSubmit={isLogin ? handleLogin : handleSignup} className="space-y-5">
+              <form onSubmit={isLogin ? handleLogin : handleSignup} className="space-y-4 sm:space-y-5">
                 {!isLogin && (
                   <>
                     <div className="space-y-2 group">
                       <Label htmlFor="fullName" className="text-sm font-medium flex items-center gap-2">
-                        <UserIcon className="w-4 h-4 text-primary" />
+                        <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                         Full Name
                       </Label>
                       <div className="relative">
@@ -447,7 +447,7 @@ const Auth = () => {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           required
-                          className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                          className="pl-10 h-11 sm:h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20 text-sm sm:text-base"
                         />
                         <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       </div>
@@ -455,11 +455,11 @@ const Auth = () => {
                     
                     <div className="space-y-2 group">
                       <Label htmlFor="country" className="text-sm font-medium flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-primary" />
+                        <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                         Country
                       </Label>
                       <Select value={country} onValueChange={handleCountryChange} required>
-                        <SelectTrigger className="h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20">
+                        <SelectTrigger className="h-11 sm:h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20 text-sm sm:text-base">
                           <SelectValue placeholder="Select your country" />
                         </SelectTrigger>
                         <SelectContent>
@@ -471,8 +471,8 @@ const Auth = () => {
                     
                     <div className="space-y-2 group">
                       <Label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-primary" />
-                        Phone Number (9 digits)
+                        <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                        Phone Number
                       </Label>
                       <div className="relative">
                         <Input
@@ -483,12 +483,12 @@ const Auth = () => {
                           onChange={(e) => handlePhoneNumberChange(e.target.value)}
                           required
                           maxLength={13}
-                          className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                          className="pl-10 h-11 sm:h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20 text-sm sm:text-base"
                         />
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       </div>
                       {phoneNumber && country && (
-                        <p className="text-xs text-muted-foreground pl-10">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground pl-10">
                           {phoneNumber.replace(countryCodeMap[country], '').length}/9 digits
                         </p>
                       )}
@@ -496,7 +496,7 @@ const Auth = () => {
                     
                     <div className="space-y-2 group">
                       <Label htmlFor="referralCode" className="text-sm font-medium">
-                        Referral Code (optional)
+                        Referral Code <span className="text-muted-foreground text-xs">(Optional)</span>
                       </Label>
                       <Input
                         id="referralCode"
@@ -505,7 +505,7 @@ const Auth = () => {
                         value={referralCode}
                         onChange={(e) => setReferralCode(e.target.value.trim())}
                         maxLength={32}
-                        className="h-12 transition-all duration-300 focus:shadow-lg focus:shadow-accent/20"
+                        className="h-11 sm:h-12 transition-all duration-300 focus:shadow-lg focus:shadow-accent/20 text-sm sm:text-base"
                       />
                     </div>
                   </>
@@ -513,7 +513,7 @@ const Auth = () => {
                 
                 <div className="space-y-2 group">
                   <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-primary" />
+                    <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                     Email
                   </Label>
                   <div className="relative">
@@ -524,7 +524,7 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                      className="pl-10 h-11 sm:h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20 text-sm sm:text-base"
                     />
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   </div>
@@ -533,14 +533,14 @@ const Auth = () => {
                 <div className="space-y-2 group">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-primary" />
+                      <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                       Password
                     </Label>
                     {isLogin && (
                       <button
                         type="button"
                         onClick={() => setShowForgotPassword(true)}
-                        className="text-xs text-primary hover:text-accent transition-colors duration-200 font-medium"
+                        className="text-[10px] sm:text-xs text-primary hover:text-accent transition-colors duration-200 font-medium"
                       >
                         Forgot password?
                       </button>
@@ -554,7 +554,7 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="pl-10 h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20"
+                      className="pl-10 h-11 sm:h-12 transition-all duration-300 focus:shadow-lg focus:shadow-primary/20 text-sm sm:text-base"
                     />
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   </div>
@@ -562,13 +562,13 @@ const Auth = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90" 
+                  className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90" 
                   disabled={loading}
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-primary-foreground/20 border-t-primary-foreground rounded-full animate-spin" />
-                      Please wait...
+                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-primary-foreground/20 border-t-primary-foreground rounded-full animate-spin" />
+                      <span className="text-sm sm:text-base">Please wait...</span>
                     </span>
                   ) : (
                     isLogin ? "Sign In" : "Sign Up"
@@ -576,23 +576,33 @@ const Auth = () => {
                 </Button>
               </form>
 
-              <div className="mt-6 text-center">
-                <div className="relative">
+              <div className="mt-4 sm:mt-6 text-center">
+                <div className="relative mb-4">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border"></div>
+                    <div className="w-full border-t border-border/50"></div>
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="bg-card px-4 text-muted-foreground">or</span>
+                    <span className="bg-card px-3 py-1 text-muted-foreground text-[10px] sm:text-xs rounded-full">
+                      {isLogin ? "New to TuraPay?" : "Already have an account?"}
+                    </span>
                   </div>
                 </div>
-                <button
-                  onClick={() => setIsLogin(!isLogin)}
-                  className="mt-4 text-sm font-medium text-primary hover:text-accent transition-colors duration-200"
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setEmail("");
+                    setPassword("");
+                    setFullName("");
+                    setPhoneNumber("");
+                    setCountry("");
+                    setReferralCode("");
+                  }}
+                  className="w-full h-10 sm:h-11 text-sm sm:text-base font-semibold border-2 hover:bg-primary/5 transition-all duration-300"
                 >
-                  {isLogin
-                    ? "Don't have an account? Sign up"
-                    : "Already have an account? Sign in"}
-                </button>
+                  {isLogin ? "Create an account" : "Sign in instead"}
+                </Button>
               </div>
             </>
           )}
