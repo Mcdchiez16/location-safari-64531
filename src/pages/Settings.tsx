@@ -33,11 +33,10 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadProfile();
-    loadSupportSettings();
+    loadData();
   }, []);
 
-  const loadProfile = async () => {
+  const loadData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
@@ -45,32 +44,36 @@ const Settings = () => {
       return;
     }
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name, phone_number, country, verified, payment_link_id, account_type")
-      .eq("id", session.user.id)
-      .single();
+    try {
+      // Load both profile and support settings in parallel
+      const [profileResult, supportResult] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, phone_number, country, verified, payment_link_id, account_type")
+          .eq("id", session.user.id)
+          .maybeSingle(),
+        supabase
+          .from("support_settings")
+          .select("*")
+          .limit(1)
+          .maybeSingle()
+      ]);
 
-    if (error) {
-      toast.error("Error loading profile");
-      console.error(error);
-    } else {
-      setProfile({ ...data, email: session.user.email || '' });
-    }
-    setLoading(false);
-  };
+      if (profileResult.error) {
+        toast.error("Error loading profile");
+        console.error(profileResult.error);
+      } else if (profileResult.data) {
+        setProfile({ ...profileResult.data, email: session.user.email || '' });
+      }
 
-  const loadSupportSettings = async () => {
-    const { data, error } = await supabase
-      .from("support_settings")
-      .select("*")
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error loading support settings:", error);
-    } else if (data) {
-      setSupportSettings(data);
+      if (supportResult.data) {
+        setSupportSettings(supportResult.data);
+      }
+    } catch (error) {
+      console.error("Error loading data:", error);
+      toast.error("Error loading settings");
+    } finally {
+      setLoading(false);
     }
   };
 

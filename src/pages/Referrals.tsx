@@ -44,57 +44,57 @@ const Referrals = () => {
   };
 
   const loadReferralData = async (userId: string) => {
-    // Get user's referral code and earnings
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("referral_code, referral_earnings")
-      .eq("id", userId)
-      .single();
+    try {
+      // Load all data in parallel for faster loading
+      const [profileResult, countResult, transactionsResult, settingsResult] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("referral_code, referral_earnings")
+          .eq("id", userId)
+          .maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("referred_by", userId),
+        supabase
+          .from("referral_transactions")
+          .select(`
+            id,
+            referred_user_id,
+            reward_amount,
+            currency,
+            created_at,
+            profiles!referral_transactions_referred_user_id_fkey (
+              full_name,
+              phone_number
+            )
+          `)
+          .eq("referrer_id", userId)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("settings")
+          .select("value")
+          .eq("key", "referral_percentage")
+          .maybeSingle()
+      ]);
 
-    if (profile) {
-      setReferralCode(profile.referral_code || "");
-      setReferralEarnings(Number(profile.referral_earnings || 0));
+      if (profileResult.data) {
+        setReferralCode(profileResult.data.referral_code || "");
+        setReferralEarnings(Number(profileResult.data.referral_earnings || 0));
+      }
+
+      setReferralCount(countResult.count || 0);
+      setReferralTransactions(transactionsResult.data as any || []);
+
+      if (settingsResult.data) {
+        setReferralPercentage(Number(settingsResult.data.value));
+      }
+    } catch (error) {
+      console.error("Error loading referral data:", error);
+      toast.error("Error loading referral data");
+    } finally {
+      setLoading(false);
     }
-
-    // Get count of referred users
-    const { count } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .eq("referred_by", userId);
-
-    setReferralCount(count || 0);
-
-    // Get referral transactions
-    const { data: transactions } = await supabase
-      .from("referral_transactions")
-      .select(`
-        id,
-        referred_user_id,
-        reward_amount,
-        currency,
-        created_at,
-        profiles!referral_transactions_referred_user_id_fkey (
-          full_name,
-          phone_number
-        )
-      `)
-      .eq("referrer_id", userId)
-      .order("created_at", { ascending: false });
-
-    setReferralTransactions(transactions as any || []);
-
-    // Get referral percentage from settings
-    const { data: settings } = await supabase
-      .from("settings")
-      .select("value")
-      .eq("key", "referral_percentage")
-      .single();
-
-    if (settings) {
-      setReferralPercentage(Number(settings.value));
-    }
-
-    setLoading(false);
   };
 
   const copyReferralLink = () => {

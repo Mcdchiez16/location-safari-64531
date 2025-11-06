@@ -100,11 +100,30 @@ const Auth = () => {
     const accountType = country === "Zimbabwe" ? "sender" : country === "Zambia" ? "receiver" : "both";
 
     const cleanedRef = referralCode.trim().toLowerCase();
-    const refSchema = z.string().trim().regex(/^[a-z0-9]+$/i).min(4).max(32);
-    if (referralCode && !refSchema.safeParse(cleanedRef).success) {
-      toast.error("Invalid referral code format");
-      setLoading(false);
-      return;
+
+    // Validate and verify referral code exists
+    if (cleanedRef) {
+      const refSchema = z.string().trim().regex(/^[a-z0-9]+$/i).min(4).max(32);
+      if (!refSchema.safeParse(cleanedRef).success) {
+        toast.error("Invalid referral code format");
+        setLoading(false);
+        return;
+      }
+
+      // Verify the referral code exists
+      const { data: referrerProfile, error: referrerError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("referral_code", cleanedRef)
+        .maybeSingle();
+
+      if (referrerError) {
+        console.error("Error looking up referrer:", referrerError);
+      } else if (!referrerProfile) {
+        toast.error("Referral code not found. Please check and try again.");
+        setLoading(false);
+        return;
+      }
     }
 
     const { data, error } = await supabase.auth.signUp({
