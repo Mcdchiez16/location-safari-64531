@@ -66,10 +66,10 @@ const Index = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-              {exchangeRate && <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
-                  <TrendingUp className="h-4 w-4 text-primary animate-pulse" />
-                  <span className="text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    1 USD = {exchangeRate.toFixed(2)} ZMW
+              {exchangeRate && <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse" />
+                  <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
+                    $1 = {exchangeRate.toFixed(2)} ZMW
                   </span>
                 </div>}
 

@@ -110,11 +110,11 @@ const Auth = () => {
         return;
       }
 
-      // Verify the referral code exists
+      // Verify the referral code exists (case-insensitive search)
       const { data: referrerProfile, error: referrerError } = await supabase
         .from("profiles")
         .select("id")
-        .eq("referral_code", cleanedRef)
+        .ilike("referral_code", cleanedRef)
         .maybeSingle();
 
       if (referrerError) {
