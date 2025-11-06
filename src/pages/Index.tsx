@@ -65,16 +65,16 @@ const Index = () => {
             </div>
 
             {/* Right Side Actions */}
-            <div className="flex items-center gap-4">
-              {exchangeRate && <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
-                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse" />
-                  <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
-                    $1 = {exchangeRate.toFixed(2)} ZMW
+            <div className="flex items-center gap-2 sm:gap-4">
+              {exchangeRate && <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse flex-shrink-0" />
+                  <span className="text-[10px] sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
+                    ${exchangeRate.toFixed(2)}
                   </span>
                 </div>}
 
-              <Button onClick={() => navigate("/auth")} className="px-5 h-9 text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold">
-                Get Started
+              <Button onClick={() => navigate("/auth")} className="px-3 sm:px-5 h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap">
+                Start
               </Button>
             </div>
           </div>
