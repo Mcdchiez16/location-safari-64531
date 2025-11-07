@@ -147,7 +147,7 @@ const Index = () => {
                       You send
                     </label>
                     <div className="relative">
-                      <Input type="number" value={amount} onChange={e => setAmount(Number(e.target.value) || 0)} className="pr-20 h-12 text-xl sm:h-14 sm:text-2xl font-bold border-2 focus:border-primary" min="1" />
+                      <Input type="number" value={amount} onChange={e => setAmount(Number(e.target.value) || 0)} className="pr-20 h-12 text-lg sm:h-14 sm:text-xl font-bold border-2 focus:border-primary" min="1" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-primary">USD</span>
                     </div>
                   </div>
@@ -160,7 +160,7 @@ const Index = () => {
                       They receive
                     </label>
                     <div className="relative">
-                      <Input type="text" value={recipientGets} readOnly className="pr-20 h-12 text-xl sm:h-14 sm:text-2xl font-bold bg-muted/50 border-2" />
+                      <Input type="text" value={recipientGets} readOnly className="pr-20 h-12 text-lg sm:h-14 sm:text-xl font-bold bg-muted/50 border-2" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-primary">ZMW</span>
                     </div>
                   </div>
