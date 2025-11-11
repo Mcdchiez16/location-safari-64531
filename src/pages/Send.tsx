@@ -254,9 +254,10 @@ const Send = () => {
 
     // Auto-lookup when 9 digits are entered
     if (cleaned.length === 9) {
+      const fullNumber = countryCode + cleaned;
       const timer = setTimeout(() => {
-        handleLookup();
-      }, 500); // Small delay to avoid triggering too quickly
+        handleLookup(fullNumber);
+      }, 500);
       setAutoLookupTimer(timer);
     }
   };
