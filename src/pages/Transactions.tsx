@@ -63,46 +63,31 @@ const Transactions = () => {
       .eq("id", userId)
       .maybeSingle();
 
-    // Load sent transactions with receiver info
-    const { data: sent, error: sentError } = await supabase
-      .from("transactions")
-      .select("*")
-      .eq("sender_id", userId)
-      .order("created_at", { ascending: false });
+    // Load sent and received transactions in parallel with profiles joined
+    const [sentResult, receivedResult] = await Promise.all([
+      supabase
+        .from("transactions")
+        .select(`
+          *,
+          profiles!transactions_sender_id_fkey(full_name, phone_number)
+        `)
+        .eq("sender_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(100),
+      
+      supabase
+        .from("transactions")
+        .select(`
+          *,
+          profiles!transactions_sender_id_fkey(full_name, phone_number)
+        `)
+        .eq("receiver_phone", profileData?.phone_number || '')
+        .order("created_at", { ascending: false })
+        .limit(100)
+    ]);
 
-    // Load received transactions
-    const { data: received, error: receivedError } = await supabase
-      .from("transactions")
-      .select("*")
-      .eq("receiver_phone", profileData?.phone_number || '')
-      .order("created_at", { ascending: false });
-
-    // For each transaction, fetch sender name
-    if (sent) {
-      for (const tx of sent) {
-        const { data: senderProfile } = await supabase
-          .from("profiles")
-          .select("full_name, phone_number")
-          .eq("id", tx.sender_id)
-          .maybeSingle();
-        if (senderProfile) {
-          (tx as any).sender_profile = senderProfile;
-        }
-      }
-    }
-
-    if (received) {
-      for (const tx of received) {
-        const { data: senderProfile } = await supabase
-          .from("profiles")
-          .select("full_name, phone_number")
-          .eq("id", tx.sender_id)
-          .maybeSingle();
-        if (senderProfile) {
-          (tx as any).sender_profile = senderProfile;
-        }
-      }
-    }
+    const { data: sent, error: sentError } = sentResult;
+    const { data: received, error: receivedError } = receivedResult;
 
     if (sentError) console.error("Error loading sent:", sentError);
     if (receivedError) console.error("Error loading received:", receivedError);
@@ -197,10 +182,36 @@ const Transactions = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-primary">
-        <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <p className="text-center text-primary-foreground">Loading...</p>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+          <div className="container mx-auto px-4 py-3 md:py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 md:space-x-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-base md:text-lg">T</span>
+                </div>
+                <span className="text-lg md:text-2xl font-bold text-gray-900">TuraPay</span>
+              </div>
+            </div>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-8 max-w-5xl">
+          <Card className="border border-gray-200 shadow-sm">
+            <CardHeader className="bg-gray-50 border-b border-gray-200">
+              <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse" />
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="p-5 border border-gray-200 rounded-xl animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-3" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3 mb-2" />
+                    <div className="h-3 bg-gray-200 rounded w-1/4" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
