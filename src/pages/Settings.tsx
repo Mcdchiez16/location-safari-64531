@@ -7,7 +7,10 @@ import { toast } from "sonner";
 import { ArrowLeft, User, Shield, QrCode, LogOut, Mail, Settings as SettingsIcon, Lock, HelpCircle, CheckCircle, AlertCircle, Phone, Info } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import logo from "@/assets/logo.png";
+import QRCode from "react-qr-code";
 
 interface Profile {
   id: string;
@@ -31,10 +34,111 @@ const Settings = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [supportSettings, setSupportSettings] = useState<SupportSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [showMfaDialog, setShowMfaDialog] = useState(false);
+  const [mfaQrCode, setMfaQrCode] = useState("");
+  const [mfaSecret, setMfaSecret] = useState("");
+  const [verifyCode, setVerifyCode] = useState("");
 
   useEffect(() => {
     loadData();
+    checkMfaStatus();
   }, []);
+
+  const checkMfaStatus = async () => {
+    try {
+      const { data, error } = await supabase.auth.mfa.listFactors();
+      if (!error && data) {
+        const hasVerifiedFactor = data.totp.some(factor => factor.status === 'verified');
+        setMfaEnabled(hasVerifiedFactor);
+      }
+    } catch (error) {
+      console.error("Error checking MFA status:", error);
+    }
+  };
+
+  const handleEnableMfa = async () => {
+    try {
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: 'totp',
+        friendlyName: 'TuraPay 2FA'
+      });
+
+      if (error) {
+        toast.error("Failed to enable 2FA: " + error.message);
+        return;
+      }
+
+      if (data) {
+        setMfaQrCode(data.totp.qr_code);
+        setMfaSecret(data.totp.secret);
+        setShowMfaDialog(true);
+      }
+    } catch (error) {
+      console.error("Error enabling MFA:", error);
+      toast.error("Failed to enable 2FA");
+    }
+  };
+
+  const handleVerifyMfa = async () => {
+    if (!verifyCode || verifyCode.length !== 6) {
+      toast.error("Please enter a valid 6-digit code");
+      return;
+    }
+
+    try {
+      const factors = await supabase.auth.mfa.listFactors();
+      if (factors.error || !factors.data) {
+        toast.error("Failed to verify 2FA");
+        return;
+      }
+
+      const factor = factors.data.totp[0];
+      if (!factor) {
+        toast.error("No factor found");
+        return;
+      }
+
+      const { error } = await supabase.auth.mfa.challengeAndVerify({
+        factorId: factor.id,
+        code: verifyCode
+      });
+
+      if (error) {
+        toast.error("Invalid code. Please try again.");
+        return;
+      }
+
+      toast.success("Two-Factor Authentication enabled successfully!");
+      setShowMfaDialog(false);
+      setVerifyCode("");
+      setMfaEnabled(true);
+    } catch (error) {
+      console.error("Error verifying MFA:", error);
+      toast.error("Failed to verify 2FA");
+    }
+  };
+
+  const handleDisableMfa = async () => {
+    try {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      if (!factors || factors.totp.length === 0) return;
+
+      const factor = factors.totp[0];
+      const { error } = await supabase.auth.mfa.unenroll({ factorId: factor.id });
+
+      if (error) {
+        toast.error("Failed to disable 2FA: " + error.message);
+        return;
+      }
+
+      toast.success("Two-Factor Authentication disabled");
+      setMfaEnabled(false);
+    } catch (error) {
+      console.error("Error disabling MFA:", error);
+      toast.error("Failed to disable 2FA");
+    }
+  };
 
   const loadData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -297,13 +401,28 @@ const Settings = () => {
                         <p className="text-xs md:text-sm text-gray-600 mt-1">Add an extra layer of security to your account</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-400" />
-                        <span className="text-xs md:text-sm font-medium text-gray-600">Not enabled</span>
+                        <div className={`w-2 h-2 rounded-full ${mfaEnabled ? 'bg-green-500' : 'bg-gray-400'}`} />
+                        <span className={`text-xs md:text-sm font-medium ${mfaEnabled ? 'text-green-600' : 'text-gray-600'}`}>
+                          {mfaEnabled ? 'Enabled' : 'Not enabled'}
+                        </span>
                       </div>
                     </div>
-                    <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all">
-                      Enable Security Features
-                    </Button>
+                    {mfaEnabled ? (
+                      <Button 
+                        onClick={handleDisableMfa}
+                        variant="outline"
+                        className="w-full sm:w-auto border-red-600 text-red-600 hover:bg-red-50 px-6 py-2 rounded-lg font-medium transition-all"
+                      >
+                        Disable 2FA
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={handleEnableMfa}
+                        className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
+                      >
+                        Enable Two-Factor Authentication
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -390,6 +509,56 @@ const Settings = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={showMfaDialog} onOpenChange={setShowMfaDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Enable Two-Factor Authentication</DialogTitle>
+            <DialogDescription>
+              Scan this QR code with your authenticator app (like Google Authenticator or Authy)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex justify-center p-4 bg-white rounded-lg border">
+              {mfaQrCode && <QRCode value={mfaQrCode} size={200} />}
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">Or enter this code manually:</p>
+              <code className="block p-2 bg-gray-100 rounded text-sm break-all">{mfaSecret}</code>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Enter the 6-digit code from your app:</label>
+              <Input
+                type="text"
+                placeholder="000000"
+                value={verifyCode}
+                onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                maxLength={6}
+                className="text-center text-lg tracking-widest"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowMfaDialog(false);
+                  setVerifyCode("");
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleVerifyMfa}
+                disabled={verifyCode.length !== 6}
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+              >
+                Verify & Enable
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
