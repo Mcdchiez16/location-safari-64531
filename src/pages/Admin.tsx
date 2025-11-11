@@ -729,7 +729,7 @@ const Admin = () => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="pending" className="space-y-4 md:space-y-6">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto bg-[hsl(220,15%,16%)] border border-white/10 h-auto">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 lg:w-auto bg-[hsl(220,15%,16%)] border border-white/10 h-auto">
             <TabsTrigger value="pending" className="gap-1 text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">
               <Badge className="bg-yellow-500/20 text-yellow-400 border-0 text-xs hidden sm:inline-flex">{stats.pending}</Badge>
               <span className="hidden sm:inline">Pending</span>
@@ -744,6 +744,10 @@ const Admin = () => {
             <TabsTrigger value="settings" className="text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">
               <span className="hidden sm:inline">Settings</span>
               <span className="sm:hidden">Set</span>
+            </TabsTrigger>
+            <TabsTrigger value="support" className="text-xs md:text-sm data-[state=active]:bg-[hsl(220,15%,20%)] data-[state=active]:text-white text-white/60 py-2">
+              <span className="hidden sm:inline">Support Settings</span>
+              <span className="sm:hidden">Support</span>
             </TabsTrigger>
           </TabsList>
 
