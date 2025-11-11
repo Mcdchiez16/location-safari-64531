@@ -59,19 +59,6 @@ const Send = () => {
   const [senderNumber, setSenderNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [senderVerified, setSenderVerified] = useState(false);
-  const [selectedCountryCode, setSelectedCountryCode] = useState("+260");
-
-  const countries = [
-    { name: "Zambia", code: "+260" },
-    { name: "Zimbabwe", code: "+263" },
-    { name: "South Africa", code: "+27" },
-    { name: "Kenya", code: "+254" },
-    { name: "Tanzania", code: "+255" },
-    { name: "Uganda", code: "+256" },
-    { name: "Malawi", code: "+265" },
-    { name: "Botswana", code: "+267" },
-    { name: "Mozambique", code: "+258" },
-  ];
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -338,8 +325,6 @@ const Send = () => {
     const {
       data: senderProfile
     } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
-    const fullSenderNumber = `${selectedCountryCode}${senderNumber}`;
-    
     const {
       error,
       data
@@ -355,7 +340,7 @@ const Send = () => {
       exchange_rate: exchangeRate,
       payout_method: payoutMethod,
       status: "pending",
-      sender_number: fullSenderNumber,
+      sender_number: senderNumber,
       transaction_id: transactionId
     }).select();
     if (error) {
@@ -560,31 +545,9 @@ const Send = () => {
                       <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
                         Your Phone Number *
                       </Label>
-                      <div className="flex gap-2">
-                        <Select value={selectedCountryCode} onValueChange={setSelectedCountryCode}>
-                          <SelectTrigger className="w-[140px] h-12">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {countries.map((country) => (
-                              <SelectItem key={country.code} value={country.code}>
-                                {country.code} {country.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Input 
-                          id="senderNumber" 
-                          type="text" 
-                          placeholder="77 123 4567" 
-                          value={senderNumber} 
-                          onChange={e => setSenderNumber(e.target.value)} 
-                          className="h-12 text-base flex-1" 
-                          required 
-                        />
-                      </div>
+                      <Input id="senderNumber" type="text" placeholder="e.g., +263 77 123 4567" value={senderNumber} onChange={e => setSenderNumber(e.target.value)} className="h-12 text-base" required />
                       <p className="text-xs text-muted-foreground mt-2">
-                        Select your country and enter the phone number you used to send the payment
+                        Enter the phone number you used to send the payment
                       </p>
                     </div>
 
