@@ -10,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import logo from "@/assets/logo.png";
-import QRCode from "react-qr-code";
 
 interface Profile {
   id: string;
@@ -70,6 +69,7 @@ const Settings = () => {
       }
 
       if (data) {
+        // Store the SVG QR code (it's already a complete SVG data URI)
         setMfaQrCode(data.totp.qr_code);
         setMfaSecret(data.totp.secret);
         setShowMfaDialog(true);
@@ -520,7 +520,13 @@ const Settings = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex justify-center p-4 bg-white rounded-lg border">
-              {mfaQrCode && <QRCode value={mfaQrCode} size={200} />}
+              {mfaQrCode && (
+                <img 
+                  src={mfaQrCode} 
+                  alt="2FA QR Code" 
+                  className="w-48 h-48"
+                />
+              )}
             </div>
             <div className="space-y-2">
               <p className="text-sm text-gray-600">Or enter this code manually:</p>
