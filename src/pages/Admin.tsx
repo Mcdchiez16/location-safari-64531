@@ -243,6 +243,16 @@ const Admin = () => {
       const threshold = referralThresholdSetting ? parseFloat(referralThresholdSetting.value) : 50;
       const usersAbove = usersData?.filter(u => (u.referral_earnings || 0) >= threshold) || [];
       setUsersAboveThreshold(usersAbove);
+
+      // Load support settings
+      const { data: supportData, error: supportError } = await supabase
+        .from("support_settings")
+        .select("*")
+        .maybeSingle();
+      
+      if (!supportError && supportData) {
+        setSupportSettings(supportData);
+      }
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load admin data");
@@ -477,6 +487,30 @@ const Admin = () => {
     } catch (error) {
       console.error("Error toggling referral program:", error);
       toast.error("Failed to update referral program status");
+    }
+  };
+
+  const updateSupportSettings = async () => {
+    if (!supportSettings?.email.trim()) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("support_settings")
+        .upsert({
+          id: supportSettings.id || undefined,
+          email: supportSettings.email,
+          phone: supportSettings.phone || null,
+          additional_info: supportSettings.additional_info || null,
+        });
+      
+      if (error) throw error;
+      toast.success("Support settings updated successfully");
+      loadData();
+    } catch (error) {
+      console.error("Error updating support settings:", error);
+      toast.error("Failed to update support settings");
     }
   };
 
@@ -1202,6 +1236,84 @@ const Admin = () => {
                      )}
                    </div>
                  </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="support">
+            <Card className="bg-[hsl(220,15%,16%)] border-white/10">
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-white text-base md:text-lg">Support Settings</CardTitle>
+                <CardDescription className="text-white/60 text-sm">
+                  Manage customer support contact information displayed on the Help & Support page
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
+                <div className="space-y-3 md:space-y-4">
+                  <div>
+                    <Label htmlFor="support_email" className="text-white text-sm md:text-base">Support Email *</Label>
+                    <Input
+                      id="support_email"
+                      type="email"
+                      placeholder="support@example.com"
+                      value={supportSettings?.email || ""}
+                      onChange={(e) => setSupportSettings(prev => prev ? {...prev, email: e.target.value} : {id: "", email: e.target.value, phone: "", additional_info: ""})}
+                      className="mt-2 h-10 md:h-11"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="support_phone" className="text-white text-sm md:text-base">Support Phone</Label>
+                    <Input
+                      id="support_phone"
+                      type="tel"
+                      placeholder="+260-XXX-XXXX"
+                      value={supportSettings?.phone || ""}
+                      onChange={(e) => setSupportSettings(prev => prev ? {...prev, phone: e.target.value} : {id: "", email: "", phone: e.target.value, additional_info: ""})}
+                      className="mt-2 h-10 md:h-11"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="support_hours" className="text-white text-sm md:text-base">Support Hours / Additional Info</Label>
+                    <Textarea
+                      id="support_hours"
+                      placeholder="Available Mon-Fri 9AM-5PM CAT"
+                      value={supportSettings?.additional_info || ""}
+                      onChange={(e) => setSupportSettings(prev => prev ? {...prev, additional_info: e.target.value} : {id: "", email: "", phone: "", additional_info: e.target.value})}
+                      className="mt-2 min-h-[80px] md:min-h-[100px]"
+                    />
+                    <p className="text-xs text-white/60 mt-1">
+                      This information will be displayed to users on the Help & Support page
+                    </p>
+                  </div>
+
+                  <Button 
+                    onClick={updateSupportSettings} 
+                    className="w-full md:w-auto h-10 md:h-11"
+                  >
+                    Save Support Settings
+                  </Button>
+                </div>
+
+                {/* Preview Section */}
+                <div className="mt-6 pt-6 border-t border-white/10">
+                  <h3 className="text-white font-semibold mb-4 text-sm md:text-base">Preview</h3>
+                  <div className="space-y-3 bg-white/5 p-4 rounded-lg border border-white/10">
+                    <div>
+                      <p className="text-white/60 text-xs md:text-sm">Email Support</p>
+                      <p className="text-white font-medium text-sm md:text-base">{supportSettings?.email || "Not set"}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-xs md:text-sm">Phone Support</p>
+                      <p className="text-white font-medium text-sm md:text-base">{supportSettings?.phone || "Not set"}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-xs md:text-sm">Support Hours</p>
+                      <p className="text-white font-medium text-sm md:text-base whitespace-pre-wrap">{supportSettings?.additional_info || "Not set"}</p>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
