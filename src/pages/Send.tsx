@@ -41,6 +41,7 @@ const Send = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [countryCode, setCountryCode] = useState("+260");
   const [lookupValue, setLookupValue] = useState("");
   const [receiverProfile, setReceiverProfile] = useState<ReceiverProfile | null>(null);
   const [autoLookupTimer, setAutoLookupTimer] = useState<NodeJS.Timeout | null>(null);
@@ -193,7 +194,7 @@ const Send = () => {
     }
   };
   const handleLookup = async (value?: string) => {
-    const searchValue = value || lookupValue;
+    const searchValue = value || getFullPhoneNumber();
     if (!searchValue) {
       toast.error("Please enter a phone number or payment link");
       return;
@@ -242,28 +243,28 @@ const Send = () => {
 
   // Handle lookup value change with auto-lookup for 9-digit numbers
   const handleLookupChange = (value: string) => {
-    setLookupValue(value);
-
     // Clear existing timer
     if (autoLookupTimer) {
       clearTimeout(autoLookupTimer);
     }
 
-    // Only allow numbers and + symbol
-    const cleaned = value.replace(/[^\d+]/g, '');
+    // Only allow numbers (no + or other symbols in the input itself)
+    const cleaned = value.replace(/\D/g, '');
     setLookupValue(cleaned);
 
-    // Extract just the digits (excluding + and country code)
-    const digitsOnly = cleaned.replace(/^\+\d{1,3}/, '').replace(/\D/g, '');
-
     // Auto-lookup when 9 digits are entered
-    if (digitsOnly.length === 9) {
+    if (cleaned.length === 9) {
       const timer = setTimeout(() => {
-        handleLookup(cleaned);
+        handleLookup();
       }, 500); // Small delay to avoid triggering too quickly
       setAutoLookupTimer(timer);
     }
   };
+
+  const getFullPhoneNumber = () => {
+    return countryCode + lookupValue;
+  };
+
   const calculateFee = (amount: number) => {
     return amount * transferFeePercentage / 100;
   };
@@ -402,13 +403,34 @@ const Send = () => {
                   Phone Number (9 digits)
                 </Label>
                 <div className="flex gap-3 mt-2">
-                  <Input id="lookup" type="text" placeholder="+260123456789" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="flex-1" />
+                  <Select value={countryCode} onValueChange={setCountryCode}>
+                    <SelectTrigger className="w-[140px] bg-background border-input">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-input z-50">
+                      <SelectItem value="+260" className="cursor-pointer hover:bg-accent">
+                        🇿🇲 Zambia +260
+                      </SelectItem>
+                      <SelectItem value="+263" className="cursor-pointer hover:bg-accent">
+                        🇿🇼 Zimbabwe +263
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input 
+                    id="lookup" 
+                    type="tel" 
+                    placeholder="123456789" 
+                    value={lookupValue} 
+                    onChange={e => handleLookupChange(e.target.value)} 
+                    className="flex-1"
+                    maxLength={9}
+                  />
                   <Button onClick={() => handleLookup()} disabled={loading} size="lg" className="min-w-[100px]">
                     {loading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : "Search"}
                   </Button>
                 </div>
                 {lookupValue && <p className="text-xs text-muted-foreground mt-2">
-                    {lookupValue.replace(/^\+\d{1,3}/, '').replace(/\D/g, '').length}/9 digits
+                    {lookupValue.length}/9 digits • Full number: {getFullPhoneNumber()}
                   </p>}
               </div>
             </div>
