@@ -404,22 +404,22 @@ const Send = () => {
                 </Label>
                 <div className="flex gap-3 mt-2">
                   <Select value={countryCode} onValueChange={setCountryCode}>
-                    <SelectTrigger className="w-[140px] bg-background border-input">
+                    <SelectTrigger className="w-[100px] bg-background border-input">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-background border-input z-50">
                       <SelectItem value="+260" className="cursor-pointer hover:bg-accent">
-                        🇿🇲 Zambia +260
+                        +260
                       </SelectItem>
                       <SelectItem value="+263" className="cursor-pointer hover:bg-accent">
-                        🇿🇼 Zimbabwe +263
+                        +263
                       </SelectItem>
                     </SelectContent>
                   </Select>
                   <Input 
                     id="lookup" 
                     type="tel" 
-                    placeholder="123456789" 
+                    placeholder="" 
                     value={lookupValue} 
                     onChange={e => handleLookupChange(e.target.value)} 
                     className="flex-1"
