@@ -26,8 +26,7 @@ const transactionSchema = z.object({
   transactionId: z.string()
     .trim()
     .min(1, { message: "Transaction ID is required" })
-    .regex(/^[a-zA-Z0-9\-_]+$/, { message: "Transaction ID must be alphanumeric" })
-    .max(50, { message: "Transaction ID too long" })
+    .max(100, { message: "Transaction ID too long" })
 });
 
 interface ReceiverProfile {
