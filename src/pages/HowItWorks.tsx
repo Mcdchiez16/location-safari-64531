@@ -14,7 +14,7 @@ const HowItWorks = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">TuraPay</h1>
+          <h1 className="text-xl font-bold text-primary">Tusapay</h1>
         </div>
       </header>
 
@@ -128,7 +128,7 @@ const HowItWorks = () => {
         <Card className="p-8 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
           <h2 className="text-2xl font-bold mb-4">Ready to Send Money?</h2>
           <p className="text-muted-foreground mb-6 leading-relaxed">
-            Join thousands of users who trust TuraPay for their cross-border transfers. Fast, secure, and reliable.
+            Join thousands of users who trust Tusapay for their cross-border transfers. Fast, secure, and reliable.
           </p>
           <Button onClick={() => navigate("/auth")} size="lg" className="gap-2">
             Create Free Account

@@ -650,7 +650,7 @@ const Admin = () => {
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center space-x-2 md:space-x-3 min-w-0">
               <div className="min-w-0">
-                <h1 className="text-lg md:text-2xl font-bold text-white truncate">TuraPay Admin</h1>
+                <h1 className="text-lg md:text-2xl font-bold text-white truncate">Tusapay Admin</h1>
                 <p className="text-xs md:text-sm text-white/60 hidden sm:block">Dashboard & Management</p>
               </div>
             </div>

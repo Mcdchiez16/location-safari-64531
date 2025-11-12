@@ -14,7 +14,7 @@ const TermsOfService = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">TuraPay</h1>
+          <h1 className="text-xl font-bold text-primary">Tusapay</h1>
         </div>
       </header>
 
@@ -25,7 +25,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Acceptance of Terms</h2>
           <p className="text-muted-foreground leading-relaxed">
-            By accessing and using TuraPay's services, you accept and agree to be bound by these Terms of Service. 
+            By accessing and using Tusapay's services, you accept and agree to be bound by these Terms of Service. 
             If you do not agree to these terms, please do not use our services.
           </p>
         </Card>
@@ -33,7 +33,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Eligibility</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            To use TuraPay, you must:
+            To use Tusapay, you must:
           </p>
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
             <li>Be at least 18 years old</li>
@@ -62,7 +62,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Service Description</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            TuraPay provides money transfer services between Zimbabwe and Zambia. Our services include:
+            Tusapay provides money transfer services between Zimbabwe and Zambia. Our services include:
           </p>
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
             <li>Cross-border money transfers</li>
@@ -101,7 +101,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Prohibited Activities</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            You may not use TuraPay to:
+            You may not use Tusapay to:
           </p>
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
             <li>Engage in fraudulent or illegal activities</li>
@@ -115,7 +115,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Limitation of Liability</h2>
           <p className="text-muted-foreground leading-relaxed">
-            TuraPay shall not be liable for any indirect, incidental, special, consequential, or punitive damages 
+            Tusapay shall not be liable for any indirect, incidental, special, consequential, or punitive damages 
             resulting from your use of our services. Our total liability shall not exceed the amount of fees paid 
             by you in the transaction giving rise to the claim.
           </p>
@@ -144,7 +144,7 @@ const TermsOfService = () => {
             For questions about these Terms of Service, please contact:
           </p>
           <p className="text-muted-foreground mt-4">
-            Email: legal@turapay.com<br />
+            Email: legal@tusapay.com<br />
             Phone: +263 123 4567
           </p>
         </Card>

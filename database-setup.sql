@@ -1,5 +1,5 @@
 -- ========================================
--- TuraPay Cross-Border Transfer System
+-- Tusapay Cross-Border Transfer System
 -- Database Setup Script
 -- ========================================
 -- Run this SQL in your Supabase SQL Editor
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS public.settings (
 INSERT INTO public.settings (key, value, description) VALUES
     ('commission_percentage', '5', 'Commission percentage on transactions'),
     ('transfer_fee', '2.99', 'Flat transfer fee in USD'),
-    ('admin_contact_email', 'admin@turapay.com', 'Admin contact email'),
+    ('admin_contact_email', 'admin@tusapay.com', 'Admin contact email'),
     ('admin_contact_phone', '+260000000000', 'Admin contact phone')
 ON CONFLICT (key) DO NOTHING;
 

@@ -35,7 +35,7 @@ const ContactUs = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">TuraPay</h1>
+          <h1 className="text-xl font-bold text-primary">Tusapay</h1>
         </div>
       </header>
 
@@ -106,8 +106,8 @@ const ContactUs = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Email Us</h3>
-                  <p className="text-sm text-muted-foreground">support@turapay.com</p>
-                  <p className="text-sm text-muted-foreground">info@turapay.com</p>
+                  <p className="text-sm text-muted-foreground">support@tusapay.com</p>
+                  <p className="text-sm text-muted-foreground">info@tusapay.com</p>
                 </div>
               </div>
 

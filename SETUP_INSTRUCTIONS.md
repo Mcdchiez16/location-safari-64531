@@ -1,4 +1,4 @@
-# TuraPay Cross-Border Transfer System - Setup Instructions
+# Tusapay Cross-Border Transfer System - Setup Instructions
 
 ## 🚀 Quick Start
 

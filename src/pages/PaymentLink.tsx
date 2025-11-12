@@ -66,8 +66,8 @@ const PaymentLink = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'TuraPay Payment Link',
-          text: `Send me money using TuraPay`,
+          title: 'Tusapay Payment Link',
+          text: `Send me money using Tusapay`,
           url: paymentUrl,
         });
         toast.success("Shared successfully!");
@@ -146,7 +146,7 @@ const PaymentLink = () => {
               
               <h3 className="text-xl font-bold mb-2 text-foreground">Scan & Pay</h3>
               <p className="text-center text-sm text-muted-foreground mb-8 max-w-md">
-                Anyone can scan this code with their phone camera to send you money instantly through TuraPay
+                Anyone can scan this code with their phone camera to send you money instantly through Tusapay
               </p>
               
               {/* Modern Action Buttons */}

@@ -14,7 +14,7 @@ const PrivacyPolicy = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">TuraPay</h1>
+          <h1 className="text-xl font-bold text-primary">Tusapay</h1>
         </div>
       </header>
 
@@ -25,11 +25,11 @@ const PrivacyPolicy = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Introduction</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            At TuraPay, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, 
+            At Tusapay, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, 
             and safeguard your information when you use our money transfer services.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            By using TuraPay, you agree to the collection and use of information in accordance with this policy.
+            By using Tusapay, you agree to the collection and use of information in accordance with this policy.
           </p>
         </Card>
 
@@ -115,7 +115,7 @@ const PrivacyPolicy = () => {
             If you have questions about this Privacy Policy or how we handle your information, please contact us at:
           </p>
           <p className="text-muted-foreground mt-4">
-            Email: privacy@turapay.com<br />
+            Email: privacy@tusapay.com<br />
             Phone: +263 123 4567
           </p>
         </Card>
