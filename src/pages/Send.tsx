@@ -444,7 +444,7 @@ const Send = () => {
                       {receiverProfile.full_name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
                         <h3 className="text-base sm:text-lg font-bold text-foreground truncate">{receiverProfile.full_name}</h3>
                         <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                         {receiverProfile.verified && <div className="flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full">
@@ -452,9 +452,15 @@ const Send = () => {
                             <span className="text-xs font-medium">Verified</span>
                           </div>}
                       </div>
-                      <div className="inline-flex items-center gap-2 bg-background/60 px-3 py-1.5 rounded-lg border border-border">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-mono font-medium text-foreground">{receiverProfile.phone_number}</span>
+                      <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 bg-background/80 px-4 py-2 rounded-lg border border-border/60">
+                          <User className="h-5 w-5 text-primary" />
+                          <span className="text-base sm:text-lg font-mono font-semibold text-foreground">{receiverProfile.phone_number}</span>
+                        </div>
+                        <div className="inline-flex items-center gap-2 bg-accent/10 px-3 py-1.5 rounded-lg border border-accent/20">
+                          <span className="text-xs sm:text-sm text-muted-foreground">Max transfer limit:</span>
+                          <span className="text-sm sm:text-base font-bold text-accent">${maxTransferLimit}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
