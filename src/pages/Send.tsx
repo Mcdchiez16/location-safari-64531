@@ -277,6 +277,12 @@ const Send = () => {
       return;
     }
     
+    // Check if amount exceeds maximum transfer limit
+    if (numAmount > maxTransferLimit) {
+      toast.error(`Maximum transfer amount is $${maxTransferLimit} USD. Please enter a lower amount.`);
+      return;
+    }
+    
     // Check if unverified user is trying to send more than allowed limit
     if (!senderVerified && numAmount > unverifiedLimit) {
       toast.error(`Unverified users can only send up to $${unverifiedLimit} USD. Please complete verification to send larger amounts.`);
