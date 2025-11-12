@@ -423,7 +423,7 @@ const Send = () => {
                     placeholder="" 
                     value={lookupValue} 
                     onChange={e => handleLookupChange(e.target.value)} 
-                    className="flex-1"
+                    className="flex-1 h-12 md:h-10 text-lg md:text-sm"
                     maxLength={9}
                   />
                   <Button onClick={() => handleLookup()} disabled={loading} size="lg" className="min-w-[100px]">
