@@ -59,7 +59,7 @@ const Index = () => {
             {/* Logo */}
             <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => navigate("/")}>
               <img src={logo} alt="Tangila Pay Logo" className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" />
-              <span className="text-xl sm:text-2xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-bold font-mono text-center">​Tangila Pay</span>
+              <span className="text-xl sm:text-2xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-bold font-mono text-center">TiclaPay</span>
             </div>
 
             {/* Right Side Actions */}
