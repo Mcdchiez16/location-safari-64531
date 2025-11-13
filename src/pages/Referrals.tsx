@@ -27,6 +27,7 @@ const Referrals = () => {
   const [referralCount, setReferralCount] = useState(0);
   const [referralTransactions, setReferralTransactions] = useState<ReferralTransaction[]>([]);
   const [referralPercentage, setReferralPercentage] = useState(5);
+  const [referralProgramEnabled, setReferralProgramEnabled] = useState(true);
 
   useEffect(() => {
     checkAuthAndLoadData();
@@ -46,7 +47,7 @@ const Referrals = () => {
   const loadReferralData = async (userId: string) => {
     try {
       // Load all data in parallel for faster loading
-      const [profileResult, countResult, transactionsResult, settingsResult] = await Promise.all([
+      const [profileResult, countResult, transactionsResult, settingsResult, programEnabledResult] = await Promise.all([
         supabase
           .from("profiles")
           .select("referral_code, referral_earnings")
@@ -75,6 +76,11 @@ const Referrals = () => {
           .from("settings")
           .select("value")
           .eq("key", "referral_percentage")
+          .maybeSingle(),
+        supabase
+          .from("settings")
+          .select("value")
+          .eq("key", "referral_program_enabled")
           .maybeSingle()
       ]);
 
@@ -88,6 +94,10 @@ const Referrals = () => {
 
       if (settingsResult.data) {
         setReferralPercentage(Number(settingsResult.data.value));
+      }
+
+      if (programEnabledResult.data) {
+        setReferralProgramEnabled(programEnabledResult.data.value === 'true');
       }
     } catch (error) {
       console.error("Error loading referral data:", error);
@@ -131,6 +141,22 @@ const Referrals = () => {
             Earn {referralPercentage}% when your friends receive money!
           </p>
         </div>
+
+        {!referralProgramEnabled && (
+          <Card className="bg-yellow-500/10 border-yellow-500/30 mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <Gift className="h-8 w-8 text-yellow-500" />
+                <div>
+                  <h3 className="text-lg font-semibold text-yellow-500">Referral Program Temporarily Unavailable</h3>
+                  <p className="text-sm text-yellow-500/80 mt-1">
+                    The referral program is currently disabled. You can still view your existing referral data, but new referrals won't earn rewards at this time.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
