@@ -52,13 +52,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Validate card details for new payments
-    if (!referenceId && (!cardNumber || !cardExpiry || !cardCVV || !cardholderName)) {
-      return new Response(
-        JSON.stringify({ error: 'Card details are required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Card details are not collected here for Lipila card collections.
+    // The API returns a cardRedirectionUrl where the user enters card details.
 
     const lipilaApiKey = Deno.env.get('LIPILA_API_KEY');
     if (!lipilaApiKey) {
@@ -95,27 +90,58 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create a new collection request
-    const generatedRefId = crypto.randomUUID();
+    // Create a new card collection request (Lipila Card Collections)
+    const generatedRefId = referenceId ?? crypto.randomUUID();
     console.log('Creating collection for user:', user.id, 'amount:', amount, 'reference:', generatedRefId);
 
-    // Create collection via Lipila API
-    const collectionResponse = await fetch('https://api.lipila.dev/api/v1/collections', {
+    // Fetch basic customer info from profile
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('full_name, phone_number, country')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const fullName = (profile?.full_name || (user.user_metadata as any)?.full_name || 'User').toString();
+    const [firstName, ...restName] = fullName.trim().split(' ');
+    const lastName = restName.join(' ') || 'User';
+    const customerPhone = profile?.phone_number || '';
+
+    if (!user.email) {
+      return new Response(
+        JSON.stringify({ error: 'Email is required for card payments' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create collection via Lipila API (redirect-based card collection)
+    const collectionResponse = await fetch('https://api.lipila.dev/api/v1/collections/card', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'accept': 'application/json',
         'x-api-key': lipilaApiKey,
+        // Optionally provide a callback URL if you need webhooks
+        // 'callbackUrl': 'https://yourapp.com/api/lipila/callback'
       },
       body: JSON.stringify({
-        amount,
-        currency,
-        referenceId: generatedRefId,
-        paymentType: 'Card',
-        cardNumber,
-        cardExpiry,
-        cardCVV,
-        cardholderName,
+        customerInfo: {
+          firstName,
+          lastName,
+          phoneNumber: customerPhone,
+          city: '',
+          country: profile?.country || 'ZM',
+          address: '',
+          zip: '',
+          email: user.email,
+        },
+        collectionRequest: {
+          referenceId: generatedRefId,
+          amount,
+          narration: 'Card payment',
+          accountNumber: user.email, // Per docs example this may be email
+          currency,
+          // backUrl and redirectUrl are optional
+        },
       }),
     });
 
