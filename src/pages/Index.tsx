@@ -331,7 +331,7 @@ const Index = () => {
             Ready to Get Started?
           </h2>
           <p className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Join thousands of people sending money across borders with Tusapay. Fast, secure, and reliable.
+            Join thousands of people sending money across borders with Tangila pay. Fast, secure, and reliable.
           </p>
           <Button size="lg" onClick={() => navigate("/auth")} className="h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-bold bg-background text-primary hover:bg-background/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
             Create Free Account
@@ -346,7 +346,7 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl font-bold text-primary">Tusapay</span>
+                <span className="text-2xl font-bold text-primary font-mono">​Tangila Pay</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Fast and secure money transfers from Zimbabwe to Zambia. Your trusted cross-border payment partner.
@@ -382,9 +382,7 @@ const Index = () => {
           </div>
           
           <div className="border-t pt-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              © 2024 Tusapay. All rights reserved. Secure cross-border payments made easy.
-            </p>
+            <p className="text-sm text-muted-foreground">© 2024 Tangila Pay. All rights reserved. Secure cross-border payments made easy.</p>
           </div>
         </div>
       </footer>
