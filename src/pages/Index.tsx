@@ -58,7 +58,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logo} alt="Tusapay Logo" className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" />
+              <img src={logo} alt="Tangila Pay Logo" className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" />
               <span className="text-xl sm:text-2xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-bold font-mono text-center">​Tangila Pay</span>
             </div>
 
@@ -220,7 +220,7 @@ const Index = () => {
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Why Choose Tusapay?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Why Choose Tangila Pay?</h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Experience the future of cross-border payments
             </p>

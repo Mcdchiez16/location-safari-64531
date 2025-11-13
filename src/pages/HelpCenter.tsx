@@ -52,7 +52,7 @@ const HelpCenter = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">Tusapay</h1>
+          <h1 className="text-xl font-bold text-primary">Tangila Pay</h1>
         </div>
       </header>
 
@@ -103,7 +103,7 @@ const HelpCenter = () => {
             <Button variant="outline" className="gap-2 h-auto py-4 flex-col">
               <Mail className="h-6 w-6 text-primary" />
               <span className="font-semibold">Email Us</span>
-              <span className="text-xs text-muted-foreground">support@tusapay.com</span>
+              <span className="text-xs text-muted-foreground">support@tangilapay.com</span>
             </Button>
             <Button variant="outline" className="gap-2 h-auto py-4 flex-col">
               <Phone className="h-6 w-6 text-primary" />

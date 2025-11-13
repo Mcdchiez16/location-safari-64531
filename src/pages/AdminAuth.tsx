@@ -78,7 +78,7 @@ const AdminAuth = () => {
             <div className="bg-primary p-3 rounded-lg">
               <Shield className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-primary">Tusapay Admin</span>
+            <span className="text-2xl font-bold text-primary">Tangila Pay Admin</span>
           </div>
           <CardTitle className="text-2xl text-center">Admin Login</CardTitle>
           <CardDescription className="text-center">

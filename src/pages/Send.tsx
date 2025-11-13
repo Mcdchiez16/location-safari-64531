@@ -52,7 +52,7 @@ const Send = () => {
   const [senderName, setSenderName] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
   const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
-  const [paymentRecipientName, setPaymentRecipientName] = useState("Tusapay");
+  const [paymentRecipientName, setPaymentRecipientName] = useState("Tangila Pay");
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
   const [unverifiedLimit, setUnverifiedLimit] = useState(20);
   const [maxTransferLimit, setMaxTransferLimit] = useState(10000);
@@ -368,10 +368,10 @@ const Send = () => {
             <div className="flex items-center space-x-2">
               <img 
                 src={logo} 
-                alt="Tusapay Logo" 
+                alt="Tangila Pay Logo" 
                 className="w-8 h-8 rounded-lg object-cover shadow-lg" 
               />
-              <span className="text-xl font-semibold text-foreground">Tusapay</span>
+              <span className="text-xl font-semibold text-foreground">Tangila Pay</span>
             </div>
             <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">
               <ArrowLeft className="h-4 w-4" />

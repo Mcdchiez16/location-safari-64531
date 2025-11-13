@@ -351,7 +351,7 @@ const Auth = () => {
                 </div>
               </div>
               <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-                Tusapay
+                Tangila Pay
               </span>
             </Link>
             
@@ -568,7 +568,7 @@ const Auth = () => {
                   </div>
                   <div className="relative flex justify-center text-xs">
                     <span className="bg-card px-3 py-1 text-muted-foreground text-[10px] sm:text-xs rounded-full">
-                      {isLogin ? "New to Tusapay?" : "Already have an account?"}
+                      {isLogin ? "New to Tangila Pay?" : "Already have an account?"}
                     </span>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-# Tusapay Cross-Border Transfer System - Setup Instructions
+# Tangila Pay Cross-Border Transfer System - Setup Instructions
 
 ## 🚀 Quick Start
 

@@ -14,12 +14,12 @@ const AboutUs = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">Tusapay</h1>
+          <h1 className="text-xl font-bold text-primary">Tangila Pay</h1>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">About Tusapay</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">About Tangila Pay</h1>
         <p className="text-lg text-muted-foreground mb-12 leading-relaxed">
           Making cross-border money transfers simple, fast, and secure between Zimbabwe and Zambia.
         </p>
@@ -59,7 +59,7 @@ const AboutUs = () => {
         <Card className="p-8 mb-8">
           <h2 className="text-2xl font-bold mb-4">Who We Are</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Tusapay is a leading fintech company specializing in cross-border money transfers between Zimbabwe and Zambia.
+            Tangila Pay is a leading fintech company specializing in cross-border money transfers between Zimbabwe and Zambia.
             Founded with the mission to make international money transfers accessible to everyone, we combine cutting-edge 
             technology with local expertise to provide seamless financial services.
           </p>
