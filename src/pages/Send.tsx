@@ -63,6 +63,12 @@ const Send = () => {
   const [senderVerified, setSenderVerified] = useState(false);
   const [processingCardPayment, setProcessingCardPayment] = useState(false);
   const [cardPaymentReference, setCardPaymentReference] = useState<string | null>(null);
+  
+  // Card details state
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCVV, setCardCVV] = useState("");
+  const [cardholderName, setCardholderName] = useState("");
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -275,28 +281,53 @@ const Send = () => {
   };
 
   const handleCardPayment = async () => {
-    if (!userId || !senderNumber) {
-      toast.error("Please provide your phone number");
+    // Validate card details
+    if (!cardNumber.trim() || !cardExpiry.trim() || !cardCVV.trim() || !cardholderName.trim()) {
+      toast.error("Please fill in all card details");
+      return;
+    }
+
+    // Basic card number validation (13-19 digits)
+    const cleanCardNumber = cardNumber.replace(/\s/g, '');
+    if (!/^\d{13,19}$/.test(cleanCardNumber)) {
+      toast.error("Invalid card number");
+      return;
+    }
+
+    // Expiry validation (MM/YY format)
+    if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+      toast.error("Invalid expiry date. Use MM/YY format");
+      return;
+    }
+
+    // CVV validation (3-4 digits)
+    if (!/^\d{3,4}$/.test(cardCVV)) {
+      toast.error("Invalid CVV");
       return;
     }
 
     setProcessingCardPayment(true);
-    const totalAmount = parseFloat(amount) + calculateFee(parseFloat(amount));
+    setCardPaymentReference("pending");
 
     try {
+      const totalAmount = parseFloat(amount) + calculateFee(parseFloat(amount));
+      
       const { data, error } = await supabase.functions.invoke('lipila-deposit', {
         body: {
           amount: totalAmount,
           currency: 'USD',
-          accountNumber: senderNumber,
+          cardNumber: cleanCardNumber,
+          cardExpiry,
+          cardCVV,
+          cardholderName,
         },
       });
 
       if (error) throw error;
 
-      if (data.success) {
+      if (data.referenceId) {
         setCardPaymentReference(data.referenceId);
-        toast.success("Payment request created. Please complete the payment on your device.");
+        toast.info("Processing payment...");
         
         // Poll for status
         setTimeout(() => checkCardPaymentStatus(data.referenceId, totalAmount), 5000);
@@ -314,16 +345,15 @@ const Send = () => {
         body: {
           referenceId: refId,
           amount: totalAmount,
-          accountNumber: senderNumber,
         },
       });
 
       if (error) throw error;
 
       if (data.status === 'Successful') {
-        toast.success("Payment successful! Processing your transfer...");
-        // Create transaction record
-        await createTransactionAfterPayment(refId);
+        toast.success("Payment successful! Sending money to receiver...");
+        // Create transaction and initiate disbursement
+        await createTransactionAfterPayment(refId, totalAmount);
       } else if (data.status === 'Pending') {
         setTimeout(() => checkCardPaymentStatus(refId, totalAmount), 5000);
       } else if (data.status === 'Failed') {
@@ -337,7 +367,7 @@ const Send = () => {
     }
   };
 
-  const createTransactionAfterPayment = async (paymentRef: string) => {
+  const createTransactionAfterPayment = async (paymentRef: string, totalAmount: number) => {
     try {
       const { data: insertData, error: insertError } = await supabase
         .from("transactions")
@@ -353,17 +383,34 @@ const Send = () => {
           total_amount: parseFloat(amount) + calculateFee(parseFloat(amount)),
           payout_method: payoutMethod,
           sender_name: senderName,
-          sender_number: senderNumber,
+          sender_number: cardholderName, // Use cardholder name for card payments
           transaction_id: paymentRef,
           payment_reference: paymentRef,
-          status: "pending",
+          status: "processing",
         })
         .select()
         .single();
 
       if (insertError) throw insertError;
 
-      toast.success("Transfer submitted successfully!");
+      // Initiate disbursement to receiver
+      const amountInZMW = parseFloat(amount) * exchangeRate;
+      const { data: disbursementData, error: disbursementError } = await supabase.functions.invoke('lipila-disbursement', {
+        body: {
+          amount: amountInZMW,
+          currency: 'ZMW',
+          accountNumber: receiverProfile!.phone_number,
+          transactionId: insertData.id,
+        },
+      });
+
+      if (disbursementError) {
+        console.error('Disbursement error:', disbursementError);
+        toast.warning("Payment received but disbursement failed. Our team will process manually.");
+      } else {
+        toast.success("Transfer completed! Money sent to receiver.");
+      }
+
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -714,37 +761,101 @@ const Send = () => {
                         <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
                       </div>
                     ) : (
-                      <div className="bg-card rounded-lg p-3 sm:p-4 border border-border space-y-3">
+                      <div className="bg-card rounded-lg p-3 sm:p-4 border border-border space-y-4">
                         <div className="flex items-center gap-2">
                           <CreditCard className="h-5 w-5 text-primary" />
                           <p className="text-sm font-semibold text-primary">Secure Card Payment via Lipila</p>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Click the button below to initiate a secure card payment. You'll receive a payment prompt on your device.
+                          Enter your card details below. Your payment will be processed securely.
                         </p>
+                        
+                        {/* Cardholder Name */}
                         <div>
-                          <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
-                            Your Phone Number *
+                          <Label htmlFor="cardholderName" className="text-sm font-medium text-foreground mb-2 block">
+                            Cardholder Name *
                           </Label>
                           <Input 
-                            id="senderNumber" 
+                            id="cardholderName" 
                             type="text" 
-                            placeholder="e.g., +260 XXX XXX XXX" 
-                            value={senderNumber} 
-                            onChange={e => setSenderNumber(e.target.value)} 
+                            placeholder="John Doe" 
+                            value={cardholderName} 
+                            onChange={e => setCardholderName(e.target.value)} 
                             className="h-12 text-base" 
                             required 
                             disabled={processingCardPayment || cardPaymentReference !== null}
                           />
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Enter your phone number to receive the payment prompt
-                          </p>
                         </div>
+
+                        {/* Card Number */}
+                        <div>
+                          <Label htmlFor="cardNumber" className="text-sm font-medium text-foreground mb-2 block">
+                            Card Number *
+                          </Label>
+                          <Input 
+                            id="cardNumber" 
+                            type="text" 
+                            placeholder="1234 5678 9012 3456" 
+                            value={cardNumber} 
+                            onChange={e => {
+                              const value = e.target.value.replace(/\s/g, '');
+                              const formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+                              setCardNumber(formatted);
+                            }}
+                            maxLength={19}
+                            className="h-12 text-base" 
+                            required 
+                            disabled={processingCardPayment || cardPaymentReference !== null}
+                          />
+                        </div>
+
+                        {/* Expiry and CVV */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="cardExpiry" className="text-sm font-medium text-foreground mb-2 block">
+                              Expiry Date *
+                            </Label>
+                            <Input 
+                              id="cardExpiry" 
+                              type="text" 
+                              placeholder="MM/YY" 
+                              value={cardExpiry} 
+                              onChange={e => {
+                                let value = e.target.value.replace(/\D/g, '');
+                                if (value.length >= 2) {
+                                  value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                                }
+                                setCardExpiry(value);
+                              }}
+                              maxLength={5}
+                              className="h-12 text-base" 
+                              required 
+                              disabled={processingCardPayment || cardPaymentReference !== null}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="cardCVV" className="text-sm font-medium text-foreground mb-2 block">
+                              CVV *
+                            </Label>
+                            <Input 
+                              id="cardCVV" 
+                              type="text" 
+                              placeholder="123" 
+                              value={cardCVV} 
+                              onChange={e => setCardCVV(e.target.value.replace(/\D/g, ''))}
+                              maxLength={4}
+                              className="h-12 text-base" 
+                              required 
+                              disabled={processingCardPayment || cardPaymentReference !== null}
+                            />
+                          </div>
+                        </div>
+
                         {!cardPaymentReference ? (
                           <Button 
                             onClick={handleCardPayment} 
                             className="w-full"
-                            disabled={processingCardPayment || !senderNumber}
+                            disabled={processingCardPayment || !cardNumber || !cardExpiry || !cardCVV || !cardholderName}
                           >
                             {processingCardPayment ? "Processing..." : "Pay with Card"}
                           </Button>

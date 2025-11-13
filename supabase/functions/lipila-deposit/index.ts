@@ -8,8 +8,12 @@ const corsHeaders = {
 interface DepositRequest {
   amount: number;
   currency?: string;
-  accountNumber: string;
+  accountNumber?: string;
   referenceId?: string;
+  cardNumber?: string;
+  cardExpiry?: string;
+  cardCVV?: string;
+  cardholderName?: string;
 }
 
 Deno.serve(async (req) => {
@@ -39,11 +43,19 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { amount, currency = 'ZMW', accountNumber, referenceId } = await req.json() as DepositRequest;
+    const { amount, currency = 'USD', accountNumber, referenceId, cardNumber, cardExpiry, cardCVV, cardholderName } = await req.json() as DepositRequest;
 
     if (!amount || amount <= 0) {
       return new Response(
         JSON.stringify({ error: 'Invalid amount' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate card details for new payments
+    if (!referenceId && (!cardNumber || !cardExpiry || !cardCVV || !cardholderName)) {
+      return new Response(
+        JSON.stringify({ error: 'Card details are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -74,26 +86,8 @@ Deno.serve(async (req) => {
       const statusData = await statusResponse.json();
       console.log('Status check response:', statusData);
 
-      // If payment is successful, update user balance
-      if (statusData.status === 'Successful') {
-        const { data: profile } = await supabaseClient
-          .from('profiles')
-          .select('balance')
-          .eq('id', user.id)
-          .single();
-
-        if (profile) {
-          const newBalance = (profile.balance || 0) + amount;
-          const { error: updateError } = await supabaseClient
-            .from('profiles')
-            .update({ balance: newBalance })
-            .eq('id', user.id);
-
-          if (updateError) {
-            console.error('Error updating balance:', updateError);
-          }
-        }
-      }
+      // Note: For Send flow, balance updates are not needed as funds go directly to receiver via disbursement
+      // Balance updates only apply when using this function for direct deposits
 
       return new Response(
         JSON.stringify(statusData),
@@ -116,9 +110,12 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         amount,
         currency,
-        accountNumber,
         referenceId: generatedRefId,
         paymentType: 'Card',
+        cardNumber,
+        cardExpiry,
+        cardCVV,
+        cardholderName,
       }),
     });
 
