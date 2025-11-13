@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield } from "lucide-react";
+import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield, CreditCard, Smartphone } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { z } from "zod";
 import logo from "@/assets/logo.png";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Validation schemas
 const transactionSchema = z.object({
@@ -51,6 +52,7 @@ const Send = () => {
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false);
   const [senderName, setSenderName] = useState("");
   const [payoutMethod, setPayoutMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"mobile" | "card" | "">("");
   const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
   const [paymentRecipientName, setPaymentRecipientName] = useState("Tangila Pay");
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
@@ -59,6 +61,8 @@ const Send = () => {
   const [senderNumber, setSenderNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [senderVerified, setSenderVerified] = useState(false);
+  const [processingCardPayment, setProcessingCardPayment] = useState(false);
+  const [cardPaymentReference, setCardPaymentReference] = useState<string | null>(null);
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -269,6 +273,108 @@ const Send = () => {
   const calculateFee = (amount: number) => {
     return amount * transferFeePercentage / 100;
   };
+
+  const handleCardPayment = async () => {
+    if (!userId || !senderNumber) {
+      toast.error("Please provide your phone number");
+      return;
+    }
+
+    setProcessingCardPayment(true);
+    const totalAmount = parseFloat(amount) + calculateFee(parseFloat(amount));
+
+    try {
+      const { data, error } = await supabase.functions.invoke('lipila-deposit', {
+        body: {
+          amount: totalAmount,
+          currency: 'USD',
+          accountNumber: senderNumber,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setCardPaymentReference(data.referenceId);
+        toast.success("Payment request created. Please complete the payment on your device.");
+        
+        // Poll for status
+        setTimeout(() => checkCardPaymentStatus(data.referenceId, totalAmount), 5000);
+      }
+    } catch (error) {
+      console.error('Card payment error:', error);
+      toast.error(error.message || "Failed to process card payment");
+      setProcessingCardPayment(false);
+    }
+  };
+
+  const checkCardPaymentStatus = async (refId: string, totalAmount: number) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('lipila-deposit', {
+        body: {
+          referenceId: refId,
+          amount: totalAmount,
+          accountNumber: senderNumber,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.status === 'Successful') {
+        toast.success("Payment successful! Processing your transfer...");
+        // Create transaction record
+        await createTransactionAfterPayment(refId);
+      } else if (data.status === 'Pending') {
+        setTimeout(() => checkCardPaymentStatus(refId, totalAmount), 5000);
+      } else if (data.status === 'Failed') {
+        toast.error(data.message || "Payment failed");
+        setProcessingCardPayment(false);
+        setCardPaymentReference(null);
+      }
+    } catch (error) {
+      console.error('Status check error:', error);
+      setTimeout(() => checkCardPaymentStatus(refId, totalAmount), 5000);
+    }
+  };
+
+  const createTransactionAfterPayment = async (paymentRef: string) => {
+    try {
+      const { data: insertData, error: insertError } = await supabase
+        .from("transactions")
+        .insert({
+          sender_id: userId,
+          receiver_name: receiverProfile!.full_name,
+          receiver_phone: receiverProfile!.phone_number,
+          receiver_country: "Zambia",
+          amount: parseFloat(amount),
+          currency: "USD",
+          exchange_rate: exchangeRate,
+          fee: calculateFee(parseFloat(amount)),
+          total_amount: parseFloat(amount) + calculateFee(parseFloat(amount)),
+          payout_method: payoutMethod,
+          sender_name: senderName,
+          sender_number: senderNumber,
+          transaction_id: paymentRef,
+          payment_reference: paymentRef,
+          status: "pending",
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      toast.success("Transfer submitted successfully!");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+    } catch (error) {
+      console.error('Transaction creation error:', error);
+      toast.error("Payment successful but failed to create transaction record");
+    } finally {
+      setProcessingCardPayment(false);
+      setCardPaymentReference(null);
+    }
+  };
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
@@ -293,6 +399,12 @@ const Send = () => {
       toast.error("Please select a payout method");
       return;
     }
+
+    if (!paymentMethod) {
+      toast.error("Please select a payment method");
+      return;
+    }
+    
     setShowPaymentInstructions(true);
   };
   const handleConfirmPayment = async () => {
@@ -508,6 +620,36 @@ const Send = () => {
                   </Select>
                 </div>
 
+                <div className="mb-6">
+                  <Label className="text-sm font-medium text-foreground block mb-3">
+                    How would you like to pay?
+                  </Label>
+                  <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as "mobile" | "card")} required>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent/50 cursor-pointer transition-colors">
+                        <RadioGroupItem value="mobile" id="mobile" />
+                        <Label htmlFor="mobile" className="flex items-center gap-3 cursor-pointer flex-1">
+                          <Smartphone className="h-5 w-5 text-primary" />
+                          <div>
+                            <p className="font-medium">Mobile Money</p>
+                            <p className="text-xs text-muted-foreground">Pay via EcoCash</p>
+                          </div>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent/50 cursor-pointer transition-colors">
+                        <RadioGroupItem value="card" id="card" />
+                        <Label htmlFor="card" className="flex items-center gap-3 cursor-pointer flex-1">
+                          <CreditCard className="h-5 w-5 text-primary" />
+                          <div>
+                            <p className="font-medium">Card Payment</p>
+                            <p className="text-xs text-muted-foreground">Mastercard, Visa via Lipila</p>
+                          </div>
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
+
                 {amount && parseFloat(amount) > 0 && <div className="bg-primary/10 rounded-xl p-4 sm:p-6 border border-primary/20">
                     <div className="space-y-3">
                       
@@ -534,7 +676,7 @@ const Send = () => {
                     </div>
                   </div>}
 
-                <Button type="submit" className="w-full mt-6 sm:mt-8 h-12 sm:h-14 text-base sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg" disabled={loading || !amount || parseFloat(amount) <= 0 || !payoutMethod}>
+                <Button type="submit" className="w-full mt-6 sm:mt-8 h-12 sm:h-14 text-base sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg" disabled={loading || !amount || parseFloat(amount) <= 0 || !payoutMethod || !paymentMethod}>
                   Continue to Payment
                 </Button>
               </div>
@@ -550,78 +692,143 @@ const Send = () => {
               </div>
               
               <div className="p-4 sm:p-8 space-y-6">
-                {/* Step 1 */}
+                {/* Step 1 - Different for mobile vs card */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">1</div>
-                    <h3 className="font-semibold text-foreground text-base sm:text-lg">Send Money</h3>
+                    <h3 className="font-semibold text-foreground text-base sm:text-lg">
+                      {paymentMethod === "mobile" ? "Send Money" : "Pay with Card"}
+                    </h3>
                   </div>
                   <div className="ml-11 bg-secondary/10 rounded-xl p-4 sm:p-6 border-2 border-secondary/30">
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Send this amount:</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">
+                      {paymentMethod === "mobile" ? "Send this amount:" : "Amount to pay:"}
+                    </p>
                     <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}</p>
-                    <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
-                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
-                      <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
-                      <p className="text-xs sm:text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
+                    
+                    {paymentMethod === "mobile" ? (
+                      <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
+                        <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
+                        <p className="text-xs sm:text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
+                      </div>
+                    ) : (
+                      <div className="bg-card rounded-lg p-3 sm:p-4 border border-border space-y-3">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-5 w-5 text-primary" />
+                          <p className="text-sm font-semibold text-primary">Secure Card Payment via Lipila</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Click the button below to initiate a secure card payment. You'll receive a payment prompt on your device.
+                        </p>
+                        <div>
+                          <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
+                            Your Phone Number *
+                          </Label>
+                          <Input 
+                            id="senderNumber" 
+                            type="text" 
+                            placeholder="e.g., +260 XXX XXX XXX" 
+                            value={senderNumber} 
+                            onChange={e => setSenderNumber(e.target.value)} 
+                            className="h-12 text-base" 
+                            required 
+                            disabled={processingCardPayment || cardPaymentReference !== null}
+                          />
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Enter your phone number to receive the payment prompt
+                          </p>
+                        </div>
+                        {!cardPaymentReference ? (
+                          <Button 
+                            onClick={handleCardPayment} 
+                            className="w-full"
+                            disabled={processingCardPayment || !senderNumber}
+                          >
+                            {processingCardPayment ? "Processing..." : "Pay with Card"}
+                          </Button>
+                        ) : (
+                          <div className="text-center text-sm">
+                            <p className="font-medium text-primary">Payment initiated</p>
+                            <p className="text-muted-foreground mt-1">Ref: {cardPaymentReference.slice(0, 8)}...</p>
+                            <p className="text-muted-foreground">Waiting for payment completion...</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Step 2 - Only for mobile money */}
+                {paymentMethod === "mobile" && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
+                      <h3 className="font-semibold text-foreground text-base sm:text-lg">Enter Payment Details</h3>
+                    </div>
+                    <div className="ml-11 space-y-4">
+                      <div>
+                        <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
+                          Your Phone Number *
+                        </Label>
+                        <Input id="senderNumber" type="text" placeholder="e.g., +263 77 123 4567" value={senderNumber} onChange={e => setSenderNumber(e.target.value)} className="h-12 text-base" required />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Enter the phone number you used to send the payment
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="transactionId" className="text-sm font-medium text-foreground mb-2 block">
+                          Transaction ID *
+                        </Label>
+                        <Input id="transactionId" type="text" placeholder="e.g., CO250822.1552.F38050 or F38050" value={transactionId} onChange={e => setTransactionId(e.target.value)} className="h-12 text-base" required />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Enter the transaction ID from your payment confirmation
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Step 2 */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
-                    <h3 className="font-semibold text-foreground text-base sm:text-lg">Enter Payment Details</h3>
-                  </div>
-                  <div className="ml-11 space-y-4">
-                    <div>
-                      <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
-                        Your Phone Number *
-                      </Label>
-                      <Input id="senderNumber" type="text" placeholder="e.g., +263 77 123 4567" value={senderNumber} onChange={e => setSenderNumber(e.target.value)} className="h-12 text-base" required />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Enter the phone number you used to send the payment
-                      </p>
+                {/* Step 3 - Only for mobile money */}
+                {paymentMethod === "mobile" && (
+                  <>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
+                        <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm & Submit</h3>
+                      </div>
+                      <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
+                        <p className="text-xs sm:text-sm font-medium text-foreground mb-2">✅ Ready to submit:</p>
+                        <ul className="text-xs sm:text-sm text-muted-foreground space-y-1 ml-4 list-disc">
+                          <li>Your transaction will be reviewed by our admin team</li>
+                          <li>You'll be notified once the payment is confirmed</li>
+                          <li>The recipient will receive their funds shortly after</li>
+                        </ul>
+                      </div>
                     </div>
 
-                    <div>
-                      <Label htmlFor="transactionId" className="text-sm font-medium text-foreground mb-2 block">
-                        Transaction ID *
-                      </Label>
-                      <Input id="transactionId" type="text" placeholder="e.g., CO250822.1552.F38050 or F38050" value={transactionId} onChange={e => setTransactionId(e.target.value)} className="h-12 text-base" required />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Enter the transaction ID from your payment confirmation
-                      </p>
+                    <div className="space-y-3 pt-4">
+                      <Button onClick={handleConfirmPayment} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={loading || !senderNumber.trim() || !transactionId.trim()}>
+                        {loading ? "Processing..." : "Submit Transaction"}
+                      </Button>
+
+                      <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
+                        Go Back
+                      </Button>
                     </div>
-                  </div>
-                </div>
+                  </>
+                )}
 
-                {/* Step 3 */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
-                    <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm & Submit</h3>
+                {/* For card payment, just show a back button */}
+                {paymentMethod === "card" && !processingCardPayment && !cardPaymentReference && (
+                  <div className="pt-4">
+                    <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
+                      Go Back
+                    </Button>
                   </div>
-                  <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
-                    <p className="text-xs sm:text-sm font-medium text-foreground mb-2">✅ Ready to submit:</p>
-                    <ul className="text-xs sm:text-sm text-muted-foreground space-y-1 ml-4 list-disc">
-                      <li>Your transaction will be reviewed by our admin team</li>
-                      <li>You'll be notified once the payment is confirmed</li>
-                      <li>The recipient will receive their funds shortly after</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="space-y-3 pt-4">
-                  <Button onClick={handleConfirmPayment} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={loading || !senderNumber.trim() || !transactionId.trim()}>
-                    {loading ? "Processing..." : "Submit Transaction"}
-                  </Button>
-
-                  <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
-                    Go Back
-                  </Button>
-                </div>
+                )}
               </div>
             </Card>
           </div>}
