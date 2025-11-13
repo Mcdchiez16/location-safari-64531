@@ -59,9 +59,7 @@ const Index = () => {
             {/* Logo */}
             <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => navigate("/")}>
               <img src={logo} alt="Tusapay Logo" className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" />
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Tusapay
-              </span>
+              <span className="text-xl sm:text-2xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-bold font-mono text-center">​Tangila Pay</span>
             </div>
 
             {/* Right Side Actions */}
@@ -319,8 +317,8 @@ const Index = () => {
                       <ArrowRight className="h-8 w-8 text-primary" />
                      </div>
                   </div>}
-              </div>
-            })}
+              </div>;
+          })}
           </div>
         </div>
       </section>
