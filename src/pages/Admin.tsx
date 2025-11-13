@@ -106,6 +106,7 @@ const Admin = () => {
   const [referralEnabled, setReferralEnabled] = useState(true);
   const [referralPayoutThreshold, setReferralPayoutThreshold] = useState("");
   const [usersAboveThreshold, setUsersAboveThreshold] = useState<UserProfile[]>([]);
+  const [cardPaymentsEnabled, setCardPaymentsEnabled] = useState(true);
   useEffect(() => {
     checkAdminAndLoadData();
   }, []);
@@ -237,6 +238,12 @@ const Admin = () => {
       const referralThresholdSetting = settingsData?.find(s => s.key === "referral_payout_threshold");
       if (referralThresholdSetting) {
         setReferralPayoutThreshold(referralThresholdSetting.value);
+      }
+
+      // Get card payments enabled setting
+      const cardPaymentsSetting = settingsData?.find(s => s.key === "card_payments_enabled");
+      if (cardPaymentsSetting) {
+        setCardPaymentsEnabled(cardPaymentsSetting.value === "true");
       }
 
       // Get users with earnings above threshold
@@ -479,7 +486,7 @@ const Admin = () => {
       const newValue = !referralEnabled;
       const { error } = await supabase.from("settings").update({
         value: newValue.toString()
-      }).eq("key", "referral_enabled");
+      }).eq("key", "referral_program_enabled");
       if (error) throw error;
       setReferralEnabled(newValue);
       toast.success(`Referral program ${newValue ? "enabled" : "disabled"}`);
@@ -487,6 +494,22 @@ const Admin = () => {
     } catch (error) {
       console.error("Error toggling referral program:", error);
       toast.error("Failed to update referral program status");
+    }
+  };
+
+  const toggleCardPayments = async () => {
+    try {
+      const newValue = !cardPaymentsEnabled;
+      const { error } = await supabase.from("settings").update({
+        value: newValue.toString()
+      }).eq("key", "card_payments_enabled");
+      if (error) throw error;
+      setCardPaymentsEnabled(newValue);
+      toast.success(`Card payments ${newValue ? "enabled" : "disabled"}`);
+      loadData();
+    } catch (error) {
+      console.error("Error toggling card payments:", error);
+      toast.error("Failed to update card payments status");
     }
   };
 
@@ -1315,9 +1338,32 @@ const Admin = () => {
                     <div>
                       <p className="text-white/60 text-xs md:text-sm">Support Hours</p>
                       <p className="text-white font-medium text-sm md:text-base whitespace-pre-wrap">{supportSettings?.additional_info || "Not set"}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+
+                  <div className="pt-4 border-t border-white/10">
+                    <h3 className="text-base md:text-lg font-semibold text-white mb-4">Payment Methods</h3>
+                    
+                    <div>
+                      <Label htmlFor="card_payments_enabled" className="text-sm md:text-base text-white">Card Payments (Lipila)</Label>
+                      <div className="flex items-center gap-3 mt-2">
+                        <Button 
+                          onClick={toggleCardPayments}
+                          variant={cardPaymentsEnabled ? "default" : "outline"}
+                          className="min-w-[120px] text-sm md:text-base h-9 md:h-10"
+                        >
+                          {cardPaymentsEnabled ? "Enabled" : "Disabled"}
+                        </Button>
+                        <span className="text-xs text-white/60">
+                          {cardPaymentsEnabled ? "Card payment option is visible to users" : "Card payment option is hidden"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-white/60 mt-2">
+                        Control whether users can see and use the card payment option (Mastercard/Visa via Lipila) on the Send page
+                      </p>
+                    </div>
+                  </div>
               </CardContent>
             </Card>
           </TabsContent>

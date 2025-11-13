@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield, CreditCard, Smartphone } from "lucide-react";
+import { ArrowLeft, Send as SendIcon, Search, User, CheckCircle2, Shield, CreditCard, Smartphone, BadgeCheck } from "lucide-react";
+import { detectCardType, formatCardNumber, formatCardExpiry } from "@/lib/cardUtils";
 import Navbar from "@/components/Navbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { z } from "zod";
@@ -69,6 +70,8 @@ const Send = () => {
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCVV, setCardCVV] = useState("");
   const [cardholderName, setCardholderName] = useState("");
+  const [cardType, setCardType] = useState<'visa' | 'mastercard' | 'unknown'>('unknown');
+  const [cardPaymentsEnabled, setCardPaymentsEnabled] = useState(true);
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -97,6 +100,7 @@ const Send = () => {
     fetchTransferFee();
     fetchUnverifiedLimit();
     fetchMaxTransferLimit();
+    fetchCardPaymentsEnabled();
 
     // Fetch exchange rate
     fetchExchangeRate();
@@ -179,6 +183,17 @@ const Send = () => {
       }
     } catch (error) {
       console.error('Error fetching max transfer limit:', error);
+    }
+  };
+
+  const fetchCardPaymentsEnabled = async () => {
+    try {
+      const { data, error } = await supabase.from("settings").select("value").eq("key", "card_payments_enabled").maybeSingle();
+      if (!error && data) {
+        setCardPaymentsEnabled(data.value === 'true');
+      }
+    } catch (error) {
+      console.error('Error fetching card payments setting:', error);
     }
   };
   const fetchExchangeRate = async () => {
@@ -683,16 +698,18 @@ const Send = () => {
                           </div>
                         </Label>
                       </div>
-                      <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent/50 cursor-pointer transition-colors">
-                        <RadioGroupItem value="card" id="card" />
-                        <Label htmlFor="card" className="flex items-center gap-3 cursor-pointer flex-1">
-                          <CreditCard className="h-5 w-5 text-primary" />
-                          <div>
-                            <p className="font-medium">Card Payment</p>
-                            <p className="text-xs text-muted-foreground">Mastercard, Visa via Lipila</p>
-                          </div>
-                        </Label>
-                      </div>
+                      {cardPaymentsEnabled && (
+                        <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent/50 cursor-pointer transition-colors">
+                          <RadioGroupItem value="card" id="card" />
+                          <Label htmlFor="card" className="flex items-center gap-3 cursor-pointer flex-1">
+                            <CreditCard className="h-5 w-5 text-primary" />
+                            <div>
+                              <p className="font-medium">Card Payment</p>
+                              <p className="text-xs text-muted-foreground">Mastercard, Visa via Lipila</p>
+                            </div>
+                          </Label>
+                        </div>
+                      )}
                     </div>
                   </RadioGroup>
                 </div>
@@ -792,21 +809,39 @@ const Send = () => {
                           <Label htmlFor="cardNumber" className="text-sm font-medium text-foreground mb-2 block">
                             Card Number *
                           </Label>
-                          <Input 
-                            id="cardNumber" 
-                            type="text" 
-                            placeholder="1234 5678 9012 3456" 
-                            value={cardNumber} 
-                            onChange={e => {
-                              const value = e.target.value.replace(/\s/g, '');
-                              const formatted = value.match(/.{1,4}/g)?.join(' ') || value;
-                              setCardNumber(formatted);
-                            }}
-                            maxLength={19}
-                            className="h-12 text-base" 
-                            required 
-                            disabled={processingCardPayment || cardPaymentReference !== null}
-                          />
+                          <div className="relative">
+                            <Input 
+                              id="cardNumber" 
+                              type="text" 
+                              placeholder="1234 5678 9012 3456" 
+                              value={cardNumber} 
+                              onChange={e => {
+                                const formatted = formatCardNumber(e.target.value);
+                                setCardNumber(formatted);
+                                setCardType(detectCardType(formatted));
+                              }}
+                              maxLength={19}
+                              className="h-12 text-base pr-12" 
+                              required 
+                              disabled={processingCardPayment || cardPaymentReference !== null}
+                            />
+                            {cardType !== 'unknown' && (
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                {cardType === 'visa' && (
+                                  <div className="flex items-center gap-1 text-xs font-semibold text-primary">
+                                    <BadgeCheck className="h-4 w-4" />
+                                    <span>Visa</span>
+                                  </div>
+                                )}
+                                {cardType === 'mastercard' && (
+                                  <div className="flex items-center gap-1 text-xs font-semibold text-primary">
+                                    <BadgeCheck className="h-4 w-4" />
+                                    <span>Mastercard</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         {/* Expiry and CVV */}
@@ -821,11 +856,8 @@ const Send = () => {
                               placeholder="MM/YY" 
                               value={cardExpiry} 
                               onChange={e => {
-                                let value = e.target.value.replace(/\D/g, '');
-                                if (value.length >= 2) {
-                                  value = value.slice(0, 2) + '/' + value.slice(2, 4);
-                                }
-                                setCardExpiry(value);
+                                const formatted = formatCardExpiry(e.target.value);
+                                setCardExpiry(formatted);
                               }}
                               maxLength={5}
                               className="h-12 text-base" 
