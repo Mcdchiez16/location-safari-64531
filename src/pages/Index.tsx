@@ -206,7 +206,7 @@ const Index = () => {
                 <div className="text-sm text-muted-foreground">Success Rate</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl sm:text-5xl font-bold text-primary"><30min</div>
+                <div className="text-4xl sm:text-5xl font-bold text-primary">{"<30min"}</div>
                 <div className="text-sm text-muted-foreground">Avg. Transfer Time</div>
               </div>
             </div>
