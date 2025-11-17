@@ -71,9 +71,7 @@ const Index = () => {
                   </span>
                 </div>}
 
-              <Button onClick={() => navigate("/auth")} className="px-3 sm:px-5 h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap">
-                Start
-              </Button>
+              <Button onClick={() => navigate("/auth")} className="px-3 sm:px-5 h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap">​Get Started </Button>
             </div>
           </div>
         </div>
