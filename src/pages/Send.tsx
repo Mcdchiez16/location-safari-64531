@@ -16,21 +16,26 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Validation schemas
 const transactionSchema = z.object({
-  amount: z.number()
-    .positive({ message: "Amount must be greater than 0" })
-    .max(1000000, { message: "Amount cannot exceed $1,000,000" })
-    .refine((val) => Number.isFinite(val), { message: "Invalid amount" }),
-  senderNumber: z.string()
-    .trim()
-    .min(1, { message: "Sender number is required" })
-    .regex(/^\+?[\d\s\-()]+$/, { message: "Invalid phone number format" })
-    .max(20, { message: "Phone number too long" }),
-  transactionId: z.string()
-    .trim()
-    .min(1, { message: "Transaction ID is required" })
-    .max(100, { message: "Transaction ID too long" })
+  amount: z.number().positive({
+    message: "Amount must be greater than 0"
+  }).max(1000000, {
+    message: "Amount cannot exceed $1,000,000"
+  }).refine(val => Number.isFinite(val), {
+    message: "Invalid amount"
+  }),
+  senderNumber: z.string().trim().min(1, {
+    message: "Sender number is required"
+  }).regex(/^\+?[\d\s\-()]+$/, {
+    message: "Invalid phone number format"
+  }).max(20, {
+    message: "Phone number too long"
+  }),
+  transactionId: z.string().trim().min(1, {
+    message: "Transaction ID is required"
+  }).max(100, {
+    message: "Transaction ID too long"
+  })
 });
-
 interface ReceiverProfile {
   id: string;
   full_name: string;
@@ -64,7 +69,7 @@ const Send = () => {
   const [senderVerified, setSenderVerified] = useState(false);
   const [processingCardPayment, setProcessingCardPayment] = useState(false);
   const [cardPaymentReference, setCardPaymentReference] = useState<string | null>(null);
-  
+
   // Card details state
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
@@ -109,12 +114,10 @@ const Send = () => {
   }, [navigate, searchParams]);
   const fetchSenderProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("verified")
-        .eq("id", userId)
-        .single();
-      
+      const {
+        data,
+        error
+      } = await supabase.from("profiles").select("verified").eq("id", userId).single();
       if (!error && data) {
         setSenderVerified(data.verified || false);
       }
@@ -122,7 +125,6 @@ const Send = () => {
       console.error('Error fetching sender profile:', error);
     }
   };
-
   const fetchPaymentNumber = async () => {
     try {
       const {
@@ -164,7 +166,10 @@ const Send = () => {
   };
   const fetchUnverifiedLimit = async () => {
     try {
-      const { data, error } = await supabase.from("settings").select("value").eq("key", "unverified_send_limit").maybeSingle();
+      const {
+        data,
+        error
+      } = await supabase.from("settings").select("value").eq("key", "unverified_send_limit").maybeSingle();
       if (!error && data) {
         const v = parseFloat(data.value);
         if (!isNaN(v) && v >= 0) setUnverifiedLimit(v);
@@ -173,10 +178,12 @@ const Send = () => {
       console.error('Error fetching unverified send limit:', error);
     }
   };
-
   const fetchMaxTransferLimit = async () => {
     try {
-      const { data, error } = await supabase.from("settings").select("value").eq("key", "max_transfer_limit").maybeSingle();
+      const {
+        data,
+        error
+      } = await supabase.from("settings").select("value").eq("key", "max_transfer_limit").maybeSingle();
       if (!error && data) {
         const limit = parseFloat(data.value);
         if (!isNaN(limit) && limit > 0) setMaxTransferLimit(limit);
@@ -185,10 +192,12 @@ const Send = () => {
       console.error('Error fetching max transfer limit:', error);
     }
   };
-
   const fetchCardPaymentsEnabled = async () => {
     try {
-      const { data, error } = await supabase.from("settings").select("value").eq("key", "card_payments_enabled").maybeSingle();
+      const {
+        data,
+        error
+      } = await supabase.from("settings").select("value").eq("key", "card_payments_enabled").maybeSingle();
       if (!error && data) {
         setCardPaymentsEnabled(data.value === 'true');
       }
@@ -228,8 +237,11 @@ const Send = () => {
     try {
       // If it's a payment link ID (no digits or mostly letters), use backend RPC to bypass RLS safely
       if (!/\d{3,}/.test(searchValue)) {
-        const { data, error } = await supabase.rpc('find_profile_by_payment_link', {
-          _link: searchValue.trim(),
+        const {
+          data,
+          error
+        } = await supabase.rpc('find_profile_by_payment_link', {
+          _link: searchValue.trim()
         });
         if (error) throw error;
         const profile = Array.isArray(data) ? data[0] : data;
@@ -245,8 +257,11 @@ const Send = () => {
       }
 
       // Phone lookup via RPC (handles normalization and RLS)
-      const { data, error } = await supabase.rpc('find_profile_by_phone', {
-        _phone: searchValue,
+      const {
+        data,
+        error
+      } = await supabase.rpc('find_profile_by_phone', {
+        _phone: searchValue
       });
       if (error) throw error;
       const profile = Array.isArray(data) ? data[0] : data;
@@ -286,15 +301,12 @@ const Send = () => {
       setAutoLookupTimer(timer);
     }
   };
-
   const getFullPhoneNumber = () => {
     return countryCode + lookupValue;
   };
-
   const calculateFee = (amount: number) => {
     return amount * transferFeePercentage / 100;
   };
-
   const handleCardPayment = async () => {
     // Validate card details
     if (!cardNumber.trim() || !cardExpiry.trim() || !cardCVV.trim() || !cardholderName.trim()) {
@@ -320,30 +332,28 @@ const Send = () => {
       toast.error("Invalid CVV");
       return;
     }
-
     setProcessingCardPayment(true);
     setCardPaymentReference("pending");
-
     try {
       const totalAmount = parseFloat(amount) + calculateFee(parseFloat(amount));
-      
-      const { data, error } = await supabase.functions.invoke('lipila-deposit', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('lipila-deposit', {
         body: {
           amount: totalAmount,
           currency: 'USD',
           cardNumber: cleanCardNumber,
           cardExpiry,
           cardCVV,
-          cardholderName,
-        },
+          cardholderName
+        }
       });
-
       if (error) throw error;
-
       if (data.referenceId) {
         setCardPaymentReference(data.referenceId);
         toast.info("Processing payment...");
-        
+
         // Poll for status
         setTimeout(() => checkCardPaymentStatus(data.referenceId, totalAmount), 5000);
       }
@@ -353,18 +363,18 @@ const Send = () => {
       setProcessingCardPayment(false);
     }
   };
-
   const checkCardPaymentStatus = async (refId: string, totalAmount: number) => {
     try {
-      const { data, error } = await supabase.functions.invoke('lipila-deposit', {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('lipila-deposit', {
         body: {
           referenceId: refId,
-          amount: totalAmount,
-        },
+          amount: totalAmount
+        }
       });
-
       if (error) throw error;
-
       if (data.status === 'Successful') {
         toast.success("Payment successful! Sending money to receiver...");
         // Create transaction and initiate disbursement
@@ -381,51 +391,50 @@ const Send = () => {
       setTimeout(() => checkCardPaymentStatus(refId, totalAmount), 5000);
     }
   };
-
   const createTransactionAfterPayment = async (paymentRef: string, totalAmount: number) => {
     try {
-      const { data: insertData, error: insertError } = await supabase
-        .from("transactions")
-        .insert({
-          sender_id: userId,
-          receiver_name: receiverProfile!.full_name,
-          receiver_phone: receiverProfile!.phone_number,
-          receiver_country: "Zambia",
-          amount: parseFloat(amount),
-          currency: "USD",
-          exchange_rate: exchangeRate,
-          fee: calculateFee(parseFloat(amount)),
-          total_amount: parseFloat(amount) + calculateFee(parseFloat(amount)),
-          payout_method: payoutMethod,
-          sender_name: senderName,
-          sender_number: cardholderName, // Use cardholder name for card payments
-          transaction_id: paymentRef,
-          payment_reference: paymentRef,
-          status: "processing",
-        })
-        .select()
-        .single();
-
+      const {
+        data: insertData,
+        error: insertError
+      } = await supabase.from("transactions").insert({
+        sender_id: userId,
+        receiver_name: receiverProfile!.full_name,
+        receiver_phone: receiverProfile!.phone_number,
+        receiver_country: "Zambia",
+        amount: parseFloat(amount),
+        currency: "USD",
+        exchange_rate: exchangeRate,
+        fee: calculateFee(parseFloat(amount)),
+        total_amount: parseFloat(amount) + calculateFee(parseFloat(amount)),
+        payout_method: payoutMethod,
+        sender_name: senderName,
+        sender_number: cardholderName,
+        // Use cardholder name for card payments
+        transaction_id: paymentRef,
+        payment_reference: paymentRef,
+        status: "processing"
+      }).select().single();
       if (insertError) throw insertError;
 
       // Initiate disbursement to receiver
       const amountInZMW = parseFloat(amount) * exchangeRate;
-      const { data: disbursementData, error: disbursementError } = await supabase.functions.invoke('lipila-disbursement', {
+      const {
+        data: disbursementData,
+        error: disbursementError
+      } = await supabase.functions.invoke('lipila-disbursement', {
         body: {
           amount: amountInZMW,
           currency: 'ZMW',
           accountNumber: receiverProfile!.phone_number,
-          transactionId: insertData.id,
-        },
+          transactionId: insertData.id
+        }
       });
-
       if (disbursementError) {
         console.error('Disbursement error:', disbursementError);
         toast.warning("Payment received but disbursement failed. Our team will process manually.");
       } else {
         toast.success("Transfer completed! Money sent to receiver.");
       }
-
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -444,29 +453,26 @@ const Send = () => {
       toast.error("Please enter a valid amount");
       return;
     }
-    
+
     // Check if amount exceeds maximum transfer limit
     if (numAmount > maxTransferLimit) {
       toast.error(`Maximum transfer amount is $${maxTransferLimit} USD. Please enter a lower amount.`);
       return;
     }
-    
+
     // Check if unverified user is trying to send more than allowed limit
     if (!senderVerified && numAmount > unverifiedLimit) {
       toast.error(`Unverified users can only send up to $${unverifiedLimit} USD. Please complete verification to send larger amounts.`);
       return;
     }
-    
     if (!payoutMethod) {
       toast.error("Please select a payout method");
       return;
     }
-
     if (!paymentMethod) {
       toast.error("Please select a payment method");
       return;
     }
-    
     setShowPaymentInstructions(true);
   };
   const handleConfirmPayment = async () => {
@@ -493,12 +499,10 @@ const Send = () => {
       toast.error(`Transfer amount cannot exceed $${maxTransferLimit.toLocaleString()} USD. Please contact support for larger transfers.`);
       return;
     }
-
     if (!userId || !receiverProfile) {
       toast.error("Please select a receiver first");
       return;
     }
-    
     setLoading(true);
     const transferFee = calculateFee(parseFloat(amount));
 
@@ -540,12 +544,8 @@ const Send = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <img 
-                src={logo} 
-                alt="Tangila Pay Logo" 
-                className="w-8 h-8 rounded-lg object-cover shadow-lg" 
-              />
-              <span className="text-xl font-semibold text-foreground">Tangila Pay</span>
+              <img src={logo} alt="Tangila Pay Logo" className="w-8 h-8 rounded-lg object-cover shadow-lg" />
+              <span className="font-mono text-blue-500 text-lg font-bold">Ticla-Pay</span>
             </div>
             <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">
               <ArrowLeft className="h-4 w-4" />
@@ -597,15 +597,7 @@ const Send = () => {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input 
-                    id="lookup" 
-                    type="tel" 
-                    placeholder="" 
-                    value={lookupValue} 
-                    onChange={e => handleLookupChange(e.target.value)} 
-                    className="flex-1 h-12 md:h-10 text-lg md:text-sm"
-                    maxLength={9}
-                  />
+                  <Input id="lookup" type="tel" placeholder="" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="flex-1 h-12 md:h-10 text-lg md:text-sm" maxLength={9} />
                   <Button onClick={() => handleLookup()} disabled={loading} size="lg" className="min-w-[100px]">
                     {loading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : "Search"}
                   </Button>
@@ -686,7 +678,7 @@ const Send = () => {
                   <Label className="text-sm font-medium text-foreground block mb-3">
                     How would you like to pay?
                   </Label>
-                  <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as "mobile" | "card")} required>
+                  <RadioGroup value={paymentMethod} onValueChange={value => setPaymentMethod(value as "mobile" | "card")} required>
                     <div className="space-y-3">
                       <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent/50 cursor-pointer transition-colors">
                         <RadioGroupItem value="mobile" id="mobile" />
@@ -698,8 +690,7 @@ const Send = () => {
                           </div>
                         </Label>
                       </div>
-                      {cardPaymentsEnabled && (
-                        <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent/50 cursor-pointer transition-colors">
+                      {cardPaymentsEnabled && <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-accent/50 cursor-pointer transition-colors">
                           <RadioGroupItem value="card" id="card" />
                           <Label htmlFor="card" className="flex items-center gap-3 cursor-pointer flex-1">
                             <CreditCard className="h-5 w-5 text-primary" />
@@ -708,8 +699,7 @@ const Send = () => {
                               <p className="text-xs text-muted-foreground">Mastercard, Visa via Lipila</p>
                             </div>
                           </Label>
-                        </div>
-                      )}
+                        </div>}
                     </div>
                   </RadioGroup>
                 </div>
@@ -770,15 +760,12 @@ const Send = () => {
                     </p>
                     <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}</p>
                     
-                    {paymentMethod === "mobile" ? (
-                      <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
+                    {paymentMethod === "mobile" ? <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
                         <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
                         <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
                         <p className="text-xs sm:text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
                         <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
-                      </div>
-                    ) : (
-                      <div className="bg-card rounded-lg p-3 sm:p-4 border border-border space-y-4">
+                      </div> : <div className="bg-card rounded-lg p-3 sm:p-4 border border-border space-y-4">
                         <div className="flex items-center gap-2">
                           <CreditCard className="h-5 w-5 text-primary" />
                           <p className="text-sm font-semibold text-primary">Secure Card Payment via Lipila</p>
@@ -792,16 +779,7 @@ const Send = () => {
                           <Label htmlFor="cardholderName" className="text-sm font-medium text-foreground mb-2 block">
                             Cardholder Name *
                           </Label>
-                          <Input 
-                            id="cardholderName" 
-                            type="text" 
-                            placeholder="John Doe" 
-                            value={cardholderName} 
-                            onChange={e => setCardholderName(e.target.value)} 
-                            className="h-12 text-base" 
-                            required 
-                            disabled={processingCardPayment || cardPaymentReference !== null}
-                          />
+                          <Input id="cardholderName" type="text" placeholder="John Doe" value={cardholderName} onChange={e => setCardholderName(e.target.value)} className="h-12 text-base" required disabled={processingCardPayment || cardPaymentReference !== null} />
                         </div>
 
                         {/* Card Number */}
@@ -810,37 +788,21 @@ const Send = () => {
                             Card Number *
                           </Label>
                           <div className="relative">
-                            <Input 
-                              id="cardNumber" 
-                              type="text" 
-                              placeholder="1234 5678 9012 3456" 
-                              value={cardNumber} 
-                              onChange={e => {
-                                const formatted = formatCardNumber(e.target.value);
-                                setCardNumber(formatted);
-                                setCardType(detectCardType(formatted));
-                              }}
-                              maxLength={19}
-                              className="h-12 text-base pr-12" 
-                              required 
-                              disabled={processingCardPayment || cardPaymentReference !== null}
-                            />
-                            {cardType !== 'unknown' && (
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                {cardType === 'visa' && (
-                                  <div className="flex items-center gap-1 text-xs font-semibold text-primary">
+                            <Input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" value={cardNumber} onChange={e => {
+                        const formatted = formatCardNumber(e.target.value);
+                        setCardNumber(formatted);
+                        setCardType(detectCardType(formatted));
+                      }} maxLength={19} className="h-12 text-base pr-12" required disabled={processingCardPayment || cardPaymentReference !== null} />
+                            {cardType !== 'unknown' && <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                {cardType === 'visa' && <div className="flex items-center gap-1 text-xs font-semibold text-primary">
                                     <BadgeCheck className="h-4 w-4" />
                                     <span>Visa</span>
-                                  </div>
-                                )}
-                                {cardType === 'mastercard' && (
-                                  <div className="flex items-center gap-1 text-xs font-semibold text-primary">
+                                  </div>}
+                                {cardType === 'mastercard' && <div className="flex items-center gap-1 text-xs font-semibold text-primary">
                                     <BadgeCheck className="h-4 w-4" />
                                     <span>Mastercard</span>
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                                  </div>}
+                              </div>}
                           </div>
                         </div>
 
@@ -850,62 +812,32 @@ const Send = () => {
                             <Label htmlFor="cardExpiry" className="text-sm font-medium text-foreground mb-2 block">
                               Expiry Date *
                             </Label>
-                            <Input 
-                              id="cardExpiry" 
-                              type="text" 
-                              placeholder="MM/YY" 
-                              value={cardExpiry} 
-                              onChange={e => {
-                                const formatted = formatCardExpiry(e.target.value);
-                                setCardExpiry(formatted);
-                              }}
-                              maxLength={5}
-                              className="h-12 text-base" 
-                              required 
-                              disabled={processingCardPayment || cardPaymentReference !== null}
-                            />
+                            <Input id="cardExpiry" type="text" placeholder="MM/YY" value={cardExpiry} onChange={e => {
+                        const formatted = formatCardExpiry(e.target.value);
+                        setCardExpiry(formatted);
+                      }} maxLength={5} className="h-12 text-base" required disabled={processingCardPayment || cardPaymentReference !== null} />
                           </div>
                           <div>
                             <Label htmlFor="cardCVV" className="text-sm font-medium text-foreground mb-2 block">
                               CVV *
                             </Label>
-                            <Input 
-                              id="cardCVV" 
-                              type="text" 
-                              placeholder="123" 
-                              value={cardCVV} 
-                              onChange={e => setCardCVV(e.target.value.replace(/\D/g, ''))}
-                              maxLength={4}
-                              className="h-12 text-base" 
-                              required 
-                              disabled={processingCardPayment || cardPaymentReference !== null}
-                            />
+                            <Input id="cardCVV" type="text" placeholder="123" value={cardCVV} onChange={e => setCardCVV(e.target.value.replace(/\D/g, ''))} maxLength={4} className="h-12 text-base" required disabled={processingCardPayment || cardPaymentReference !== null} />
                           </div>
                         </div>
 
-                        {!cardPaymentReference ? (
-                          <Button 
-                            onClick={handleCardPayment} 
-                            className="w-full"
-                            disabled={processingCardPayment || !cardNumber || !cardExpiry || !cardCVV || !cardholderName}
-                          >
+                        {!cardPaymentReference ? <Button onClick={handleCardPayment} className="w-full" disabled={processingCardPayment || !cardNumber || !cardExpiry || !cardCVV || !cardholderName}>
                             {processingCardPayment ? "Processing..." : "Pay with Card"}
-                          </Button>
-                        ) : (
-                          <div className="text-center text-sm">
+                          </Button> : <div className="text-center text-sm">
                             <p className="font-medium text-primary">Payment initiated</p>
                             <p className="text-muted-foreground mt-1">Ref: {cardPaymentReference.slice(0, 8)}...</p>
                             <p className="text-muted-foreground">Waiting for payment completion...</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          </div>}
+                      </div>}
                   </div>
                 </div>
 
                 {/* Step 2 - Only for mobile money */}
-                {paymentMethod === "mobile" && (
-                  <div className="space-y-3">
+                {paymentMethod === "mobile" && <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
                       <h3 className="font-semibold text-foreground text-base sm:text-lg">Enter Payment Details</h3>
@@ -931,12 +863,10 @@ const Send = () => {
                         </p>
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
 
                 {/* Step 3 - Only for mobile money */}
-                {paymentMethod === "mobile" && (
-                  <>
+                {paymentMethod === "mobile" && <>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
@@ -961,17 +891,14 @@ const Send = () => {
                         Go Back
                       </Button>
                     </div>
-                  </>
-                )}
+                  </>}
 
                 {/* For card payment, just show a back button */}
-                {paymentMethod === "card" && !processingCardPayment && !cardPaymentReference && (
-                  <div className="pt-4">
+                {paymentMethod === "card" && !processingCardPayment && !cardPaymentReference && <div className="pt-4">
                     <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
                       Go Back
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </div>
             </Card>
           </div>}
