@@ -654,7 +654,7 @@ const Send = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-3">
-                        
+                        <h3 className="text-lg sm:text-xl font-bold text-foreground">{receiverProfile.full_name}</h3>
                         <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                         {receiverProfile.verified && <div className="flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full">
                             <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
