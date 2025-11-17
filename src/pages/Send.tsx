@@ -57,7 +57,7 @@ const Send = () => {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false);
   const [senderName, setSenderName] = useState("");
-  const [payoutMethod, setPayoutMethod] = useState("");
+  const [payoutMethod, setPayoutMethod] = useState("Mobile Money"); // Default to Mobile Money for Zambia
   const [paymentMethod, setPaymentMethod] = useState<"mobile" | "card" | "">("");
   const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
   const [paymentRecipientName, setPaymentRecipientName] = useState("Ticlapay");
@@ -77,6 +77,9 @@ const Send = () => {
   const [cardholderName, setCardholderName] = useState("");
   const [cardType, setCardType] = useState<'visa' | 'mastercard' | 'unknown'>('unknown');
   const [cardPaymentsEnabled, setCardPaymentsEnabled] = useState(true);
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [transactionIdForProof, setTransactionIdForProof] = useState<string | null>(null);
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -446,6 +449,48 @@ const Send = () => {
       setCardPaymentReference(null);
     }
   };
+  
+  const handleUploadProof = async () => {
+    if (!paymentProof || !transactionIdForProof) {
+      toast.error("Please select a screenshot to upload");
+      return;
+    }
+
+    setUploadingProof(true);
+    try {
+      // Upload to Supabase storage
+      const fileExt = paymentProof.name.split('.').pop();
+      const fileName = `${transactionIdForProof}-${Date.now()}.${fileExt}`;
+      const filePath = `payment-proofs/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('payment-proofs')
+        .upload(filePath, paymentProof);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('payment-proofs')
+        .getPublicUrl(filePath);
+
+      // Update transaction with payment proof URL
+      const { error: updateError } = await supabase
+        .from('transactions')
+        .update({ payment_proof_url: publicUrl })
+        .eq('id', transactionIdForProof);
+
+      if (updateError) throw updateError;
+
+      toast.success("Payment proof uploaded successfully!");
+      navigate("/transactions");
+    } catch (error) {
+      console.error('Error uploading proof:', error);
+      toast.error("Failed to upload payment proof. Please try again.");
+    } finally {
+      setUploadingProof(false);
+    }
+  };
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
@@ -532,8 +577,10 @@ const Send = () => {
       toast.error("Failed to create transaction");
       console.error(error);
     } else {
-      toast.success("Transaction submitted successfully! Awaiting admin approval.");
-      navigate("/dashboard");
+      const transactionId = data[0]?.id;
+      setTransactionIdForProof(transactionId);
+      toast.success("Transaction submitted! Please upload your payment proof.");
+      setShowPaymentInstructions(false);
     }
     setLoading(false);
   };
@@ -585,10 +632,10 @@ const Send = () => {
                 </Label>
                 <div className="flex gap-3 mt-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-foreground pointer-events-none">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-medium text-muted-foreground pointer-events-none">
                       +260
                     </span>
-                    <Input id="lookup" type="tel" placeholder="976 543 210" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="h-12 text-lg font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-20 pr-4 transition-all placeholder:text-muted-foreground/60" maxLength={9} />
+                    <Input id="lookup" type="tel" placeholder="976 543 210" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="h-12 text-base font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-16 pr-4 transition-all placeholder:text-muted-foreground/60" maxLength={9} />
                   </div>
                   
                 </div>
@@ -876,6 +923,63 @@ const Send = () => {
                       Go Back
                     </Button>
                   </div>}
+              </div>
+            </Card>
+          </div>}
+
+        {/* Upload Payment Proof Section */}
+        {transactionIdForProof && !showPaymentInstructions && <div className="space-y-6">
+            <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
+              <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Upload Payment Proof</h2>
+                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Please upload a screenshot of your payment confirmation</p>
+              </div>
+              
+              <div className="p-4 sm:p-8 space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="paymentProof" className="text-sm font-medium text-foreground mb-2 block">
+                    Payment Screenshot *
+                  </Label>
+                  <Input 
+                    id="paymentProof" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
+                    className="h-12 text-base cursor-pointer"
+                    disabled={uploadingProof}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Upload a clear screenshot showing the payment confirmation, amount, and transaction ID
+                  </p>
+                </div>
+
+                {paymentProof && (
+                  <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
+                    <p className="text-sm font-medium text-foreground mb-2">Selected file:</p>
+                    <p className="text-sm text-muted-foreground">{paymentProof.name}</p>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <Button 
+                    onClick={handleUploadProof} 
+                    className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
+                    disabled={uploadingProof || !paymentProof}
+                  >
+                    {uploadingProof ? "Uploading..." : "Submit Payment Proof"}
+                  </Button>
+
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setTransactionIdForProof(null);
+                      navigate("/transactions");
+                    }} 
+                    className="w-full h-10 sm:h-12 text-sm sm:text-base"
+                  >
+                    Skip for Now
+                  </Button>
+                </div>
               </div>
             </Card>
           </div>}
