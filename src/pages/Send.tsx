@@ -563,7 +563,7 @@ const Send = () => {
             Send Money
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
-            Send money to Zambia instantly via mobile money
+            Send money to Zambia  via mobile money
           </p>
         </div>
 
