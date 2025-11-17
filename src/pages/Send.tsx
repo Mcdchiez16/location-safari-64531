@@ -80,6 +80,8 @@ const Send = () => {
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [uploadingProof, setUploadingProof] = useState(false);
   const [transactionIdForProof, setTransactionIdForProof] = useState<string | null>(null);
+  const [proofMethod, setProofMethod] = useState<"screenshot" | "reference">("screenshot");
+  const [paymentReference, setPaymentReference] = useState("");
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -450,40 +452,64 @@ const Send = () => {
     }
   };
   const handleUploadProof = async () => {
-    if (!paymentProof || !transactionIdForProof) {
+    if (!transactionIdForProof) {
+      toast.error("Transaction ID not found");
+      return;
+    }
+
+    // Validate based on proof method
+    if (proofMethod === "screenshot" && !paymentProof) {
       toast.error("Please select a screenshot to upload");
       return;
     }
+
+    if (proofMethod === "reference" && !paymentReference.trim()) {
+      toast.error("Please enter a payment reference");
+      return;
+    }
+
     setUploadingProof(true);
     try {
-      // Upload to Supabase storage
-      const fileExt = paymentProof.name.split('.').pop();
-      const fileName = `${transactionIdForProof}-${Date.now()}.${fileExt}`;
-      const filePath = `payment-proofs/${fileName}`;
-      const {
-        error: uploadError
-      } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProof);
-      if (uploadError) throw uploadError;
+      if (proofMethod === "screenshot") {
+        // Upload screenshot to Supabase storage
+        const fileExt = paymentProof!.name.split('.').pop();
+        const fileName = `${transactionIdForProof}-${Date.now()}.${fileExt}`;
+        const filePath = `payment-proofs/${fileName}`;
+        const {
+          error: uploadError
+        } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProof!);
+        if (uploadError) throw uploadError;
 
-      // Get public URL
-      const {
-        data: {
-          publicUrl
-        }
-      } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
+        // Get public URL
+        const {
+          data: {
+            publicUrl
+          }
+        } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
 
-      // Update transaction with payment proof URL
-      const {
-        error: updateError
-      } = await supabase.from('transactions').update({
-        payment_proof_url: publicUrl
-      }).eq('id', transactionIdForProof);
-      if (updateError) throw updateError;
-      toast.success("Payment proof uploaded successfully!");
+        // Update transaction with payment proof URL
+        const {
+          error: updateError
+        } = await supabase.from('transactions').update({
+          payment_proof_url: publicUrl
+        }).eq('id', transactionIdForProof);
+        if (updateError) throw updateError;
+        toast.success("Payment proof uploaded successfully!");
+      } else {
+        // Update transaction with payment reference
+        const {
+          error: updateError
+        } = await supabase.from('transactions').update({
+          payment_reference: paymentReference.trim()
+        }).eq('id', transactionIdForProof);
+        if (updateError) throw updateError;
+        toast.success("Payment reference saved successfully!");
+      }
+      
       navigate("/transactions");
     } catch (error) {
       console.error('Error uploading proof:', error);
-      toast.error("Failed to upload payment proof. Please try again.");
+      toast.error(`Failed to ${proofMethod === "screenshot" ? "upload payment proof" : "save payment reference"}. Please try again.`);
     } finally {
       setUploadingProof(false);
     }
@@ -923,29 +949,63 @@ const Send = () => {
         {transactionIdForProof && !showPaymentInstructions && <div className="space-y-6">
             <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
               <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Upload Payment Proof</h2>
-                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Please upload a screenshot of your payment confirmation</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Submit Payment Proof</h2>
+                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Choose how you'd like to provide payment proof</p>
               </div>
               
               <div className="p-4 sm:p-8 space-y-6">
+                {/* Proof Method Selection */}
                 <div className="space-y-3">
-                  <Label htmlFor="paymentProof" className="text-sm font-medium text-foreground mb-2 block">
-                    Payment Screenshot *
+                  <Label className="text-sm font-medium text-foreground mb-2 block">
+                    Proof Method *
                   </Label>
-                  <Input id="paymentProof" type="file" accept="image/*" onChange={e => setPaymentProof(e.target.files?.[0] || null)} className="h-12 text-base cursor-pointer" disabled={uploadingProof} />
-                  <p className="text-xs text-muted-foreground">
-                    Upload a clear screenshot showing the payment confirmation, amount, and transaction ID
-                  </p>
+                  <RadioGroup value={proofMethod} onValueChange={(value: "screenshot" | "reference") => setProofMethod(value)} className="space-y-3">
+                    <div className="flex items-center space-x-3 bg-card border-2 border-border rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer">
+                      <RadioGroupItem value="screenshot" id="screenshot" />
+                      <Label htmlFor="screenshot" className="flex-1 cursor-pointer">
+                        <div className="font-medium text-foreground">Upload Screenshot</div>
+                        <div className="text-xs text-muted-foreground mt-1">Upload a payment confirmation screenshot</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-3 bg-card border-2 border-border rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer">
+                      <RadioGroupItem value="reference" id="reference" />
+                      <Label htmlFor="reference" className="flex-1 cursor-pointer">
+                        <div className="font-medium text-foreground">Enter Transaction ID</div>
+                        <div className="text-xs text-muted-foreground mt-1">Provide your payment transaction reference</div>
+                      </Label>
+                    </div>
+                  </RadioGroup>
                 </div>
 
-                {paymentProof && <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
-                    <p className="text-sm font-medium text-foreground mb-2">Selected file:</p>
-                    <p className="text-sm text-muted-foreground">{paymentProof.name}</p>
+                {/* Screenshot Upload */}
+                {proofMethod === "screenshot" && <div className="space-y-3">
+                    <Label htmlFor="paymentProof" className="text-sm font-medium text-foreground mb-2 block">
+                      Payment Screenshot *
+                    </Label>
+                    <Input id="paymentProof" type="file" accept="image/*" onChange={e => setPaymentProof(e.target.files?.[0] || null)} className="h-12 text-base cursor-pointer" disabled={uploadingProof} />
+                    <p className="text-xs text-muted-foreground">
+                      Upload a clear screenshot showing the payment confirmation, amount, and transaction ID
+                    </p>
+                    {paymentProof && <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
+                        <p className="text-sm font-medium text-foreground mb-2">Selected file:</p>
+                        <p className="text-sm text-muted-foreground">{paymentProof.name}</p>
+                      </div>}
+                  </div>}
+
+                {/* Transaction Reference Input */}
+                {proofMethod === "reference" && <div className="space-y-3">
+                    <Label htmlFor="paymentRef" className="text-sm font-medium text-foreground mb-2 block">
+                      Payment Transaction ID *
+                    </Label>
+                    <Input id="paymentRef" type="text" placeholder="e.g., CO250822.1552.F38050 or F38050" value={paymentReference} onChange={e => setPaymentReference(e.target.value)} className="h-12 text-base" disabled={uploadingProof} />
+                    <p className="text-xs text-muted-foreground">
+                      Enter the transaction ID or reference from your payment confirmation
+                    </p>
                   </div>}
 
                 <div className="space-y-3">
-                  <Button onClick={handleUploadProof} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={uploadingProof || !paymentProof}>
-                    {uploadingProof ? "Uploading..." : "Submit Payment Proof"}
+                  <Button onClick={handleUploadProof} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={uploadingProof || (proofMethod === "screenshot" && !paymentProof) || (proofMethod === "reference" && !paymentReference.trim())}>
+                    {uploadingProof ? (proofMethod === "screenshot" ? "Uploading..." : "Saving...") : "Submit Payment Proof"}
                   </Button>
 
                   <Button variant="outline" onClick={() => {
