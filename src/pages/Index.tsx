@@ -206,7 +206,7 @@ const Index = () => {
                 <div className="text-sm text-muted-foreground">Success Rate</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl sm:text-5xl font-bold text-primary">&lt;5min</div>
+                <div className="text-4xl sm:text-5xl font-bold text-primary"><30min</div>
                 <div className="text-sm text-muted-foreground">Avg. Transfer Time</div>
               </div>
             </div>
@@ -346,7 +346,7 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl font-bold text-primary font-mono">​Ticlapay</span>
+                <span className="text-2xl font-bold text-primary font-mono">​Ticla-Pay</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Fast and secure money transfers from Zimbabwe to Zambia. Your trusted cross-border payment partner.
@@ -382,7 +382,7 @@ const Index = () => {
           </div>
           
           <div className="border-t pt-8 text-center">
-            <p className="text-sm text-muted-foreground">© 2024 Ticlapay. All rights reserved. Secure cross-border payments made easy.</p>
+            <p className="text-sm text-muted-foreground">© 2024 Ticla-Pay. All rights reserved. Secure cross-border payments made easy.</p>
           </div>
         </div>
       </footer>
