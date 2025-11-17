@@ -912,6 +912,40 @@ const Send = () => {
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
+                        <h3 className="font-semibold text-foreground text-base sm:text-lg">Submit Payment Proof</h3>
+                      </div>
+                      <div className="ml-11 space-y-4">
+                        <p className="text-sm text-muted-foreground">
+                          After completing your payment, you'll need to provide proof using one of these methods:
+                        </p>
+                        
+                        <div className="bg-card border-2 border-border rounded-xl p-4 space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-xs font-bold">A</span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground text-sm">Upload Screenshot</p>
+                              <p className="text-xs text-muted-foreground mt-1">Take a screenshot of your payment confirmation and upload it</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-xs font-bold">B</span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground text-sm">Enter Transaction ID</p>
+                              <p className="text-xs text-muted-foreground mt-1">Provide your payment reference number from the confirmation message</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">4</div>
                         <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm & Submit</h3>
                       </div>
                       <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
