@@ -580,26 +580,38 @@ const Send = () => {
           <div className="p-8">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="lookup" className="text-sm font-medium text-foreground">
+                <Label htmlFor="lookup" className="text-base font-semibold text-foreground mb-3 block">
                   Phone Number (9 digits)
                 </Label>
-                <div className="flex gap-3 mt-2">
+                <div className="flex gap-4 mt-3">
                   <Select value={countryCode} onValueChange={setCountryCode}>
-                    <SelectTrigger className="w-[100px] bg-background border-input">
+                    <SelectTrigger className="w-[140px] h-16 bg-card border-2 border-primary/20 hover:border-primary/40 transition-colors text-xl font-semibold rounded-xl shadow-sm">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border-input z-50">
-                      <SelectItem value="+260" className="cursor-pointer hover:bg-accent">
+                    <SelectContent className="bg-card border-2 border-primary/20 z-50 rounded-xl shadow-lg">
+                      <SelectItem value="+260" className="cursor-pointer hover:bg-primary/10 text-lg py-3 rounded-lg">
                         +260
                       </SelectItem>
-                      <SelectItem value="+263" className="cursor-pointer hover:bg-accent">
+                      <SelectItem value="+263" className="cursor-pointer hover:bg-primary/10 text-lg py-3 rounded-lg">
                         +263
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input id="lookup" type="tel" placeholder="" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="flex-1 h-12 md:h-10 text-lg md:text-sm" maxLength={9} />
-                  <Button onClick={() => handleLookup()} disabled={loading} size="lg" className="min-w-[100px]">
-                    {loading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : "Search"}
+                  <Input 
+                    id="lookup" 
+                    type="tel" 
+                    placeholder="Enter 9 digits" 
+                    value={lookupValue} 
+                    onChange={e => handleLookupChange(e.target.value)} 
+                    className="flex-1 h-16 text-2xl font-semibold tracking-wide bg-card border-2 border-primary/20 hover:border-primary/40 focus:border-primary rounded-xl px-6 transition-all shadow-sm placeholder:text-muted-foreground/50" 
+                    maxLength={9} 
+                  />
+                  <Button 
+                    onClick={() => handleLookup()} 
+                    disabled={loading} 
+                    className="min-w-[140px] h-16 text-lg font-semibold rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-r from-primary to-accent"
+                  >
+                    {loading ? <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div> : "Search"}
                   </Button>
                 </div>
                 {lookupValue && <p className="text-xs text-muted-foreground mt-2">
