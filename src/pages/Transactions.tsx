@@ -132,7 +132,7 @@ const Transactions = () => {
 
     // Add title
     doc.setFontSize(18);
-    doc.text('TuraPay Complete Transaction History', 14, 22);
+    doc.text('Complete Transaction History', 14, 22);
 
     // Add date
     doc.setFontSize(11);
@@ -162,21 +162,17 @@ const Transactions = () => {
 
     // Save PDF
     const today = new Date().toISOString().slice(0, 10);
-    doc.save(`turapay-complete-history-${today}.pdf`);
+    doc.save(`transaction-history-${today}.pdf`);
     toast.success('Statement downloaded successfully');
   };
   if (loading) {
     return <div className="min-h-screen bg-gray-50">
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
           <div className="container mx-auto px-4 py-3 md:py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 md:space-x-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-base md:text-lg">T</span>
-                </div>
-                <span className="text-lg md:text-2xl font-bold text-gray-900">TuraPay</span>
-              </div>
-            </div>
+            <Button onClick={() => navigate("/dashboard")} variant="ghost" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
           </div>
         </header>
         <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -199,7 +195,12 @@ const Transactions = () => {
   }
   return <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        
+        <div className="container mx-auto px-4 py-3 md:py-4">
+          <Button onClick={() => navigate("/dashboard")} variant="ghost" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </div>
       </header>
 
       <div className="container mx-auto px-4 py-4 md:py-8 max-w-5xl">
