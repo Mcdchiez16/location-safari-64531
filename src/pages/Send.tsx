@@ -546,7 +546,7 @@ const Send = () => {
       const validatedData = transactionSchema.parse({
         amount: parseFloat(amount),
         senderNumber: senderNumber,
-        transactionId: transactionId
+        transactionId: proofMethod === "reference" ? paymentReference.trim() : "SCREENSHOT"
       });
     } catch (err: any) {
       const firstError = err?.issues?.[0]?.message || "Please fill all required fields correctly";
@@ -583,8 +583,7 @@ const Send = () => {
           status: "pending",
           payout_method: payoutMethod,
           sender_number: senderNumber,
-          transaction_id: transactionId,
-          ...(proofMethod === "reference" ? { payment_reference: paymentReference.trim() } : {})
+          ...(proofMethod === "reference" ? { transaction_id: paymentReference.trim(), payment_reference: paymentReference.trim() } : {})
         })
         .select()
         .single();
@@ -1004,7 +1003,7 @@ const Send = () => {
                       <Button 
                         onClick={handleConfirmPayment} 
                         className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
-                        disabled={loading || !senderNumber.trim() || !transactionId.trim() || (proofMethod === "screenshot" && !paymentProof) || (proofMethod === "reference" && !paymentReference.trim())}
+                        disabled={loading || !senderNumber.trim() || (proofMethod === "screenshot" && !paymentProof) || (proofMethod === "reference" && !paymentReference.trim())}
                       >
                         {loading ? "Processing..." : "Submit Transaction"}
                       </Button>
@@ -1026,7 +1025,7 @@ const Send = () => {
           </div>}
 
         {/* Upload Payment Proof Section */}
-        {transactionIdForProof && !showPaymentInstructions && <div className="space-y-6">
+        {false && transactionIdForProof && !showPaymentInstructions && <div className="space-y-6">
             <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
               <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Submit Payment Proof</h2>
