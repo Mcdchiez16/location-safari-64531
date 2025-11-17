@@ -584,28 +584,20 @@ const Send = () => {
                   Phone Number
                 </Label>
                 <div className="flex gap-3 mt-2">
-                  <Select value={countryCode} onValueChange={setCountryCode}>
-                    <SelectTrigger className="w-[110px] h-12 bg-card border border-primary/20 hover:border-primary/50 transition-colors text-base font-medium rounded-lg">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border border-primary/20 z-50 rounded-lg shadow-lg">
-                      <SelectItem value="+260" className="cursor-pointer hover:bg-primary/10 text-base">
-                        +260
-                      </SelectItem>
-                      <SelectItem value="+263" className="cursor-pointer hover:bg-primary/10 text-base">
-                        +263
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input 
-                    id="lookup" 
-                    type="tel" 
-                    placeholder="Enter 9 digits" 
-                    value={lookupValue} 
-                    onChange={e => handleLookupChange(e.target.value)} 
-                    className="flex-1 h-12 text-lg font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg px-4 transition-all placeholder:text-muted-foreground/60" 
-                    maxLength={9} 
-                  />
+                  <div className="relative flex-1">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-foreground pointer-events-none">
+                      +260
+                    </span>
+                    <Input 
+                      id="lookup" 
+                      type="tel" 
+                      placeholder="976 543 210" 
+                      value={lookupValue} 
+                      onChange={e => handleLookupChange(e.target.value)} 
+                      className="h-12 text-lg font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-20 pr-4 transition-all placeholder:text-muted-foreground/60" 
+                      maxLength={9} 
+                    />
+                  </div>
                   <Button 
                     onClick={() => handleLookup()} 
                     disabled={loading} 
