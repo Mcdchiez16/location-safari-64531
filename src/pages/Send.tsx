@@ -77,8 +77,9 @@ const Send = () => {
   const [cardholderName, setCardholderName] = useState("");
   const [cardType, setCardType] = useState<'visa' | 'mastercard' | 'unknown'>('unknown');
   const [cardPaymentsEnabled, setCardPaymentsEnabled] = useState(true);
-  const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
-  const [senderNameOnTransaction, setSenderNameOnTransaction] = useState("");
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [transactionIdForProof, setTransactionIdForProof] = useState<string | null>(null);
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -448,6 +449,45 @@ const Send = () => {
       setCardPaymentReference(null);
     }
   };
+  const handleUploadProof = async () => {
+    if (!paymentProof || !transactionIdForProof) {
+      toast.error("Please select a screenshot to upload");
+      return;
+    }
+    setUploadingProof(true);
+    try {
+      // Upload to Supabase storage
+      const fileExt = paymentProof.name.split('.').pop();
+      const fileName = `${transactionIdForProof}-${Date.now()}.${fileExt}`;
+      const filePath = `payment-proofs/${fileName}`;
+      const {
+        error: uploadError
+      } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProof);
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const {
+        data: {
+          publicUrl
+        }
+      } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
+
+      // Update transaction with payment proof URL
+      const {
+        error: updateError
+      } = await supabase.from('transactions').update({
+        payment_proof_url: publicUrl
+      }).eq('id', transactionIdForProof);
+      if (updateError) throw updateError;
+      toast.success("Payment proof uploaded successfully!");
+      navigate("/transactions");
+    } catch (error) {
+      console.error('Error uploading proof:', error);
+      toast.error("Failed to upload payment proof. Please try again.");
+    } finally {
+      setUploadingProof(false);
+    }
+  };
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
@@ -476,6 +516,70 @@ const Send = () => {
       return;
     }
     setShowPaymentInstructions(true);
+  };
+  const handleConfirmPayment = async () => {
+    // Validate inputs using zod schema
+    try {
+      const validatedData = transactionSchema.parse({
+        amount: parseFloat(amount),
+        senderNumber: senderNumber,
+        transactionId: transactionId
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+        return;
+      }
+      toast.error("Invalid input data");
+      return;
+    }
+
+    // Check against maximum transfer limit
+    const numAmount = parseFloat(amount);
+    if (numAmount > maxTransferLimit) {
+      toast.error(`Transfer amount cannot exceed $${maxTransferLimit.toLocaleString()} USD. Please contact support for larger transfers.`);
+      return;
+    }
+    if (!userId || !receiverProfile) {
+      toast.error("Please select a receiver first");
+      return;
+    }
+    setLoading(true);
+    const transferFee = calculateFee(parseFloat(amount));
+
+    // Fetch sender name from current user's profile
+    const {
+      data: senderProfile
+    } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
+    const {
+      error,
+      data
+    } = await supabase.from("transactions").insert({
+      sender_id: userId,
+      sender_name: senderProfile?.full_name || "",
+      receiver_name: receiverProfile.full_name,
+      receiver_phone: receiverProfile.phone_number,
+      receiver_country: "Zambia",
+      amount: parseFloat(amount),
+      currency: "USD",
+      fee: transferFee,
+      exchange_rate: exchangeRate,
+      payout_method: payoutMethod,
+      status: "pending",
+      sender_number: senderNumber,
+      transaction_id: transactionId
+    }).select();
+    if (error) {
+      toast.error("Failed to create transaction");
+      console.error(error);
+    } else {
+      const transactionId = data[0]?.id;
+      setTransactionIdForProof(transactionId);
+      toast.success("Transaction submitted! Please upload your payment proof.");
+      setShowPaymentInstructions(false);
+    }
+    setLoading(false);
   };
   const recipientGets = amount ? (parseFloat(amount) * exchangeRate).toFixed(2) : "0.00";
   return <div className="min-h-screen bg-background">
@@ -649,9 +753,212 @@ const Send = () => {
             </div>
           </form>}
 
+        {/* Payment Instructions */}
+        {receiverProfile && showPaymentInstructions && <div className="space-y-6">
+            <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
+              <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Payment Instructions</h2>
+                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Complete your transfer in 3 steps</p>
+              </div>
+              
+              <div className="p-4 sm:p-8 space-y-6">
+                {/* Step 1 - Different for mobile vs card */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">1</div>
+                    <h3 className="font-semibold text-foreground text-base sm:text-lg">
+                      {paymentMethod === "mobile" ? "Send Money" : "Pay with Card"}
+                    </h3>
+                  </div>
+                  <div className="ml-11 bg-secondary/10 rounded-xl p-4 sm:p-6 border-2 border-secondary/30">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">
+                      {paymentMethod === "mobile" ? "Send this amount:" : "Amount to pay:"}
+                    </p>
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}</p>
+                    
+                    {paymentMethod === "mobile" ? <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
+                        <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
+                        <p className="text-xs sm:text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
+                      </div> : <div className="bg-card rounded-lg p-3 sm:p-4 border border-border space-y-4">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-5 w-5 text-primary" />
+                          <p className="text-sm font-semibold text-primary">Secure Card Payment via Lipila</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Enter your card details below. Your payment will be processed securely.
+                        </p>
+                        
+                        {/* Cardholder Name */}
+                        <div>
+                          <Label htmlFor="cardholderName" className="text-sm font-medium text-foreground mb-2 block">
+                            Cardholder Name *
+                          </Label>
+                          <Input id="cardholderName" type="text" placeholder="John Doe" value={cardholderName} onChange={e => setCardholderName(e.target.value)} className="h-12 text-base" required disabled={processingCardPayment || cardPaymentReference !== null} />
+                        </div>
 
+                        {/* Card Number */}
+                        <div>
+                          <Label htmlFor="cardNumber" className="text-sm font-medium text-foreground mb-2 block">
+                            Card Number *
+                          </Label>
+                          <div className="relative">
+                            <Input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" value={cardNumber} onChange={e => {
+                        const formatted = formatCardNumber(e.target.value);
+                        setCardNumber(formatted);
+                        setCardType(detectCardType(formatted));
+                      }} maxLength={19} className="h-12 text-base pr-12" required disabled={processingCardPayment || cardPaymentReference !== null} />
+                            {cardType !== 'unknown' && <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                {cardType === 'visa' && <div className="flex items-center gap-1 text-xs font-semibold text-primary">
+                                    <BadgeCheck className="h-4 w-4" />
+                                    <span>Visa</span>
+                                  </div>}
+                                {cardType === 'mastercard' && <div className="flex items-center gap-1 text-xs font-semibold text-primary">
+                                    <BadgeCheck className="h-4 w-4" />
+                                    <span>Mastercard</span>
+                                  </div>}
+                              </div>}
+                          </div>
+                        </div>
+
+                        {/* Expiry and CVV */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="cardExpiry" className="text-sm font-medium text-foreground mb-2 block">
+                              Expiry Date *
+                            </Label>
+                            <Input id="cardExpiry" type="text" placeholder="MM/YY" value={cardExpiry} onChange={e => {
+                        const formatted = formatCardExpiry(e.target.value);
+                        setCardExpiry(formatted);
+                      }} maxLength={5} className="h-12 text-base" required disabled={processingCardPayment || cardPaymentReference !== null} />
+                          </div>
+                          <div>
+                            <Label htmlFor="cardCVV" className="text-sm font-medium text-foreground mb-2 block">
+                              CVV *
+                            </Label>
+                            <Input id="cardCVV" type="text" placeholder="123" value={cardCVV} onChange={e => setCardCVV(e.target.value.replace(/\D/g, ''))} maxLength={4} className="h-12 text-base" required disabled={processingCardPayment || cardPaymentReference !== null} />
+                          </div>
+                        </div>
+
+                        {!cardPaymentReference ? <Button onClick={handleCardPayment} className="w-full" disabled={processingCardPayment || !cardNumber || !cardExpiry || !cardCVV || !cardholderName}>
+                            {processingCardPayment ? "Processing..." : "Pay with Card"}
+                          </Button> : <div className="text-center text-sm">
+                            <p className="font-medium text-primary">Payment initiated</p>
+                            <p className="text-muted-foreground mt-1">Ref: {cardPaymentReference.slice(0, 8)}...</p>
+                            <p className="text-muted-foreground">Waiting for payment completion...</p>
+                          </div>}
+                      </div>}
+                  </div>
+                </div>
+
+                {/* Step 2 - Only for mobile money */}
+                {paymentMethod === "mobile" && <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
+                      <h3 className="font-semibold text-foreground text-base sm:text-lg">Enter Payment Details</h3>
+                    </div>
+                    <div className="ml-11 space-y-4">
+                      <div>
+                        <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
+                          Your Phone Number *
+                        </Label>
+                        <Input id="senderNumber" type="text" placeholder="e.g., +263 77 123 4567" value={senderNumber} onChange={e => setSenderNumber(e.target.value)} className="h-12 text-base" required />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Enter the phone number you used to send the payment
+                        </p>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="transactionId" className="text-sm font-medium text-foreground mb-2 block">
+                          Transaction ID *
+                        </Label>
+                        <Input id="transactionId" type="text" placeholder="e.g., CO250822.1552.F38050 or F38050" value={transactionId} onChange={e => setTransactionId(e.target.value)} className="h-12 text-base" required />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Enter the transaction ID from your payment confirmation
+                        </p>
+                      </div>
+                    </div>
+                  </div>}
+
+                {/* Step 3 - Only for mobile money */}
+                {paymentMethod === "mobile" && <>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
+                        <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm & Submit</h3>
+                      </div>
+                      <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
+                        <p className="text-xs sm:text-sm font-medium text-foreground mb-2">✅ Ready to submit:</p>
+                        <ul className="text-xs sm:text-sm text-muted-foreground space-y-1 ml-4 list-disc">
+                          <li>Your transaction will be reviewed by our admin team</li>
+                          <li>You'll be notified once the payment is confirmed</li>
+                          <li>The recipient will receive their funds shortly after</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-4">
+                      <Button onClick={handleConfirmPayment} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={loading || !senderNumber.trim() || !transactionId.trim()}>
+                        {loading ? "Processing..." : "Submit Transaction"}
+                      </Button>
+
+                      <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
+                        Go Back
+                      </Button>
+                    </div>
+                  </>}
+
+                {/* For card payment, just show a back button */}
+                {paymentMethod === "card" && !processingCardPayment && !cardPaymentReference && <div className="pt-4">
+                    <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
+                      Go Back
+                    </Button>
+                  </div>}
+              </div>
+            </Card>
+          </div>}
+
+        {/* Upload Payment Proof Section */}
+        {transactionIdForProof && !showPaymentInstructions && <div className="space-y-6">
+            <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
+              <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Upload Payment Proof</h2>
+                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Please upload a screenshot of your payment confirmation</p>
+              </div>
+              
+              <div className="p-4 sm:p-8 space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="paymentProof" className="text-sm font-medium text-foreground mb-2 block">
+                    Payment Screenshot *
+                  </Label>
+                  <Input id="paymentProof" type="file" accept="image/*" onChange={e => setPaymentProof(e.target.files?.[0] || null)} className="h-12 text-base cursor-pointer" disabled={uploadingProof} />
+                  <p className="text-xs text-muted-foreground">
+                    Upload a clear screenshot showing the payment confirmation, amount, and transaction ID
+                  </p>
+                </div>
+
+                {paymentProof && <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
+                    <p className="text-sm font-medium text-foreground mb-2">Selected file:</p>
+                    <p className="text-sm text-muted-foreground">{paymentProof.name}</p>
+                  </div>}
+
+                <div className="space-y-3">
+                  <Button onClick={handleUploadProof} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={uploadingProof || !paymentProof}>
+                    {uploadingProof ? "Uploading..." : "Submit Payment Proof"}
+                  </Button>
+
+                  <Button variant="outline" onClick={() => {
+                setTransactionIdForProof(null);
+                navigate("/transactions");
+              }} className="w-full h-10 sm:h-12 text-sm sm:text-base">
+                    Skip for Now
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>}
       </div>
     </div>;
 };
-
 export default Send;
