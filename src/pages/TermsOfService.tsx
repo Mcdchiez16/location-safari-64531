@@ -14,7 +14,7 @@ const TermsOfService = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">Tangila Pay</h1>
+          <h1 className="text-xl font-bold text-primary">Ticlapay</h1>
         </div>
       </header>
 
@@ -25,7 +25,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Acceptance of Terms</h2>
           <p className="text-muted-foreground leading-relaxed">
-            By accessing and using Tangila Pay's services, you accept and agree to be bound by these Terms of Service. 
+            By accessing and using Ticlapay's services, you accept and agree to be bound by these Terms of Service. 
             If you do not agree to these terms, please do not use our services.
           </p>
         </Card>
@@ -33,7 +33,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Eligibility</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            To use Tangila Pay, you must:
+            To use Ticlapay, you must:
           </p>
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
             <li>Be at least 18 years old</li>
@@ -62,7 +62,7 @@ const TermsOfService = () => {
         <Card className="p-8 mb-6">
           <h2 className="text-2xl font-bold mb-4">Service Description</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Tangila Pay provides money transfer services between Zimbabwe and Zambia. Our services include:
+            Ticlapay provides money transfer services between Zimbabwe and Zambia. Our services include:
           </p>
           <ul className="list-disc list-inside space-y-2 text-muted-foreground">
             <li>Cross-border money transfers</li>

@@ -112,14 +112,14 @@ const FAQs = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">Tangila Pay</h1>
+          <h1 className="text-xl font-bold text-primary">Ticlapay</h1>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Frequently Asked Questions</h1>
         <p className="text-lg text-muted-foreground mb-12 leading-relaxed">
-          Find quick answers to common questions about Tangila Pay.
+          Find quick answers to common questions about Ticlapay.
         </p>
 
         <div className="space-y-8">

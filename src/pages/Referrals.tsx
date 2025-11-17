@@ -238,7 +238,7 @@ const Referrals = () => {
               <div>
                 <p className="font-semibold">Share Your Code</p>
                 <p className="text-sm text-muted-foreground">
-                  Send your referral code to friends who want to use Tangila Pay
+                  Send your referral code to friends who want to use Ticlapay
                 </p>
               </div>
             </div>

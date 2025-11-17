@@ -55,7 +55,7 @@ const Send = () => {
   const [payoutMethod, setPayoutMethod] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"mobile" | "card" | "">("");
   const [paymentNumber, setPaymentNumber] = useState("+263 77 123 4567");
-  const [paymentRecipientName, setPaymentRecipientName] = useState("Tangila Pay");
+  const [paymentRecipientName, setPaymentRecipientName] = useState("Ticlapay");
   const [transferFeePercentage, setTransferFeePercentage] = useState(2);
   const [unverifiedLimit, setUnverifiedLimit] = useState(20);
   const [maxTransferLimit, setMaxTransferLimit] = useState(10000);

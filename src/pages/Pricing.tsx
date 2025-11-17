@@ -32,7 +32,7 @@ const Pricing = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">Tangila Pay</h1>
+          <h1 className="text-xl font-bold text-primary">Ticlapay</h1>
         </div>
       </header>
 
