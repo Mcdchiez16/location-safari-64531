@@ -600,29 +600,52 @@ const Send = () => {
           </div>
 
           {receiverProfile && <div className="p-8 pt-0">
-                <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl flex-shrink-0">
-                      {receiverProfile.full_name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <h3 className="text-base sm:text-lg font-bold text-foreground truncate">{receiverProfile.full_name}</h3>
-                        <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
-                        {receiverProfile.verified && <div className="flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full">
-                            <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="text-xs font-medium">Verified</span>
-                          </div>}
+                <div className="relative bg-gradient-to-br from-card via-card to-primary/5 border border-border/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  {/* Decorative corner accent */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl blur-2xl -z-10" />
+                  
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                    {/* Avatar with ring */}
+                    <div className="relative flex-shrink-0">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary via-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-2xl sm:text-3xl">
+                          {receiverProfile.full_name.charAt(0)}
+                        </span>
                       </div>
-                      <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 bg-background/80 px-4 py-2 rounded-lg border border-border/60">
-                          <User className="h-5 w-5 text-primary" />
-                          <span className="text-base sm:text-lg font-mono font-semibold text-foreground">{receiverProfile.phone_number}</span>
+                      {receiverProfile.verified && (
+                        <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1.5 shadow-md border-2 border-card">
+                          <Shield className="h-3 w-3 text-white" />
                         </div>
-                        <div className="inline-flex items-center gap-2 bg-accent/10 px-3 py-1.5 rounded-lg border border-accent/20">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Max transfer limit:</span>
-                          <span className="text-sm sm:text-base font-bold text-accent">${maxTransferLimit}</span>
-                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 space-y-3">
+                      {/* Name and verification */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
+                          {receiverProfile.full_name}
+                        </h3>
+                        <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                        {receiverProfile.verified && (
+                          <span className="inline-flex items-center gap-1 bg-green-500/10 text-green-600 px-2.5 py-1 rounded-full text-xs font-semibold border border-green-500/20">
+                            Verified
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Phone number - elegant pill */}
+                      <div className="inline-flex items-center gap-2.5 bg-background/60 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-primary/20 shadow-sm hover:border-primary/40 transition-colors">
+                        <User className="h-4 w-4 text-primary" />
+                        <span className="text-base font-mono font-medium text-foreground tracking-wide">
+                          {receiverProfile.phone_number}
+                        </span>
+                      </div>
+                      
+                      {/* Transfer limit - subtle badge */}
+                      <div className="inline-flex items-center gap-2 bg-accent/5 px-3 py-1.5 rounded-lg border border-accent/10">
+                        <span className="text-xs text-muted-foreground font-medium">Transfer limit</span>
+                        <span className="text-sm font-bold text-accent">${maxTransferLimit}</span>
                       </div>
                     </div>
                   </div>
