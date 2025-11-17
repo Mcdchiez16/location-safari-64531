@@ -588,23 +588,9 @@ const Send = () => {
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-foreground pointer-events-none">
                       +260
                     </span>
-                    <Input 
-                      id="lookup" 
-                      type="tel" 
-                      placeholder="976 543 210" 
-                      value={lookupValue} 
-                      onChange={e => handleLookupChange(e.target.value)} 
-                      className="h-12 text-lg font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-20 pr-4 transition-all placeholder:text-muted-foreground/60" 
-                      maxLength={9} 
-                    />
+                    <Input id="lookup" type="tel" placeholder="976 543 210" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="h-12 text-lg font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-20 pr-4 transition-all placeholder:text-muted-foreground/60" maxLength={9} />
                   </div>
-                  <Button 
-                    onClick={() => handleLookup()} 
-                    disabled={loading} 
-                    className="min-w-[110px] h-12 text-base font-medium rounded-lg shadow-sm hover:shadow-md transition-all"
-                  >
-                    {loading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div> : "Search"}
-                  </Button>
+                  
                 </div>
                 {lookupValue && <p className="text-xs text-muted-foreground mt-2">
                     {lookupValue.length}/9 digits • Full number: {getFullPhoneNumber()}
