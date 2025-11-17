@@ -548,61 +548,86 @@ const Send = () => {
         senderNumber: senderNumber,
         transactionId: transactionId
       });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const firstError = error.errors[0];
-        toast.error(firstError.message);
-        return;
-      }
-      toast.error("Invalid input data");
+    } catch (err: any) {
+      const firstError = err?.issues?.[0]?.message || "Please fill all required fields correctly";
+      toast.error(firstError);
       return;
     }
 
-    // Check against maximum transfer limit
-    const numAmount = parseFloat(amount);
-    if (numAmount > maxTransferLimit) {
-      toast.error(`Transfer amount cannot exceed $${maxTransferLimit.toLocaleString()} USD. Please contact support for larger transfers.`);
-      return;
-    }
-    if (!userId || !receiverProfile) {
-      toast.error("Please select a receiver first");
-      return;
-    }
     setLoading(true);
-    const transferFee = calculateFee(parseFloat(amount));
 
-    // Fetch sender name from current user's profile
-    const {
-      data: senderProfile
-    } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
-    const {
-      error,
-      data
-    } = await supabase.from("transactions").insert({
-      sender_id: userId,
-      sender_name: senderProfile?.full_name || "",
-      receiver_name: receiverProfile.full_name,
-      receiver_phone: receiverProfile.phone_number,
-      receiver_country: "Zambia",
-      amount: parseFloat(amount),
-      currency: "USD",
-      fee: transferFee,
-      exchange_rate: exchangeRate,
-      payout_method: payoutMethod,
-      status: "pending",
-      sender_number: senderNumber,
-      transaction_id: transactionId
-    }).select();
-    if (error) {
-      toast.error("Failed to create transaction");
-      console.error(error);
-    } else {
-      const transactionId = data[0]?.id;
-      setTransactionIdForProof(transactionId);
-      toast.success("Transaction submitted! Please upload your payment proof.");
+    try {
+      const transferFee = calculateFee(parseFloat(amount));
+
+      // Fetch sender name from current user's profile
+      const { data: senderProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", userId)
+        .single();
+
+      // Create transaction (include reference immediately if chosen)
+      const { error: insertError, data } = await supabase
+        .from("transactions")
+        .insert({
+          sender_id: userId,
+          sender_name: senderProfile?.full_name || "",
+          receiver_name: receiverProfile!.full_name,
+          receiver_phone: receiverProfile!.phone_number,
+          receiver_country: "Zambia",
+          amount: parseFloat(amount),
+          currency: "USD",
+          fee: transferFee,
+          exchange_rate: exchangeRate,
+          total_amount: parseFloat(amount) + transferFee,
+          status: "pending",
+          payout_method: payoutMethod,
+          sender_number: senderNumber,
+          transaction_id: transactionId,
+          ...(proofMethod === "reference" ? { payment_reference: paymentReference.trim() } : {})
+        })
+        .select()
+        .single();
+
+      if (insertError || !data) {
+        throw insertError || new Error("Failed to create transaction");
+      }
+
+      const newTxId = data.id as string;
+
+      // If screenshot selected, upload now and update transaction
+      if (proofMethod === "screenshot" && paymentProof) {
+        const fileExt = paymentProof.name.split('.').pop();
+        const fileName = `${newTxId}-${Date.now()}.${fileExt}`;
+        const filePath = `payment-proofs/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('payment-proofs')
+          .upload(filePath, paymentProof);
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('payment-proofs')
+          .getPublicUrl(filePath);
+
+        const { error: updateError } = await supabase
+          .from('transactions')
+          .update({ payment_proof_url: publicUrl })
+          .eq('id', newTxId);
+        if (updateError) throw updateError;
+      }
+
+      // Success - no extra upload step anymore
+      setTransactionIdForProof(null);
       setShowPaymentInstructions(false);
+      toast.success("Transaction submitted with proof. We'll review shortly.");
+      navigate("/transactions");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to submit transaction. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
   const recipientGets = amount ? (parseFloat(amount) * exchangeRate).toFixed(2) : "0.00";
   return <div className="min-h-screen bg-background">
