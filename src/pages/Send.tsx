@@ -602,7 +602,9 @@ const Send = () => {
           {receiverProfile && <div className="p-8 pt-0">
                 <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl flex-shrink-0">
+                      {receiverProfile.full_name.charAt(0)}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-3">
                         <h3 className="text-base sm:text-lg font-bold text-foreground truncate">{receiverProfile.full_name}</h3>
