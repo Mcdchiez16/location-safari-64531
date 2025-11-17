@@ -887,30 +887,76 @@ const Send = () => {
                       </div>
                       <div className="ml-11 space-y-4">
                         <p className="text-sm text-muted-foreground">
-                          After completing your payment, you'll need to provide proof using one of these methods:
+                          After completing your payment, provide proof using one of these methods:
                         </p>
                         
-                        <div className="bg-card border-2 border-border rounded-xl p-4 space-y-3">
-                          <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <span className="text-xs font-bold">A</span>
+                        {/* Proof Method Selection */}
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium text-foreground mb-2 block">
+                            Choose Proof Method *
+                          </Label>
+                          <RadioGroup value={proofMethod} onValueChange={(value: "screenshot" | "reference") => setProofMethod(value)} className="space-y-3">
+                            <div className="flex items-center space-x-3 bg-card border-2 border-border rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer">
+                              <RadioGroupItem value="screenshot" id="screenshot-payment" />
+                              <Label htmlFor="screenshot-payment" className="flex-1 cursor-pointer">
+                                <div className="font-medium text-foreground">Upload Screenshot</div>
+                                <div className="text-xs text-muted-foreground mt-1">Upload a payment confirmation screenshot</div>
+                              </Label>
                             </div>
-                            <div>
-                              <p className="font-medium text-foreground text-sm">Upload Screenshot</p>
-                              <p className="text-xs text-muted-foreground mt-1">Take a screenshot of your payment confirmation and upload it</p>
+                            <div className="flex items-center space-x-3 bg-card border-2 border-border rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer">
+                              <RadioGroupItem value="reference" id="reference-payment" />
+                              <Label htmlFor="reference-payment" className="flex-1 cursor-pointer">
+                                <div className="font-medium text-foreground">Enter Transaction ID</div>
+                                <div className="text-xs text-muted-foreground mt-1">Provide your payment transaction reference</div>
+                              </Label>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <span className="text-xs font-bold">B</span>
-                            </div>
-                            <div>
-                              <p className="font-medium text-foreground text-sm">Enter Transaction ID</p>
-                              <p className="text-xs text-muted-foreground mt-1">Provide your payment reference number from the confirmation message</p>
-                            </div>
-                          </div>
+                          </RadioGroup>
                         </div>
+
+                        {/* Screenshot Upload */}
+                        {proofMethod === "screenshot" && (
+                          <div className="space-y-3">
+                            <Label htmlFor="paymentProofInline" className="text-sm font-medium text-foreground mb-2 block">
+                              Payment Screenshot *
+                            </Label>
+                            <Input
+                              id="paymentProofInline"
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
+                              className="h-12 text-base cursor-pointer"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Upload a clear screenshot showing the payment confirmation, amount, and transaction ID
+                            </p>
+                            {paymentProof && (
+                              <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
+                                <p className="text-sm font-medium text-foreground mb-2">Selected file:</p>
+                                <p className="text-sm text-muted-foreground">{paymentProof.name}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Transaction Reference Input */}
+                        {proofMethod === "reference" && (
+                          <div className="space-y-3">
+                            <Label htmlFor="paymentRefInline" className="text-sm font-medium text-foreground mb-2 block">
+                              Payment Transaction ID *
+                            </Label>
+                            <Input
+                              id="paymentRefInline"
+                              type="text"
+                              placeholder="e.g., CO250822.1552.F38050 or F38050"
+                              value={paymentReference}
+                              onChange={(e) => setPaymentReference(e.target.value)}
+                              className="h-12 text-base"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Enter the transaction ID or reference from your payment confirmation
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -930,7 +976,11 @@ const Send = () => {
                     </div>
 
                     <div className="space-y-3 pt-4">
-                      <Button onClick={handleConfirmPayment} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={loading || !senderNumber.trim() || !transactionId.trim()}>
+                      <Button 
+                        onClick={handleConfirmPayment} 
+                        className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
+                        disabled={loading || !senderNumber.trim() || !transactionId.trim() || (proofMethod === "screenshot" && !paymentProof) || (proofMethod === "reference" && !paymentReference.trim())}
+                      >
                         {loading ? "Processing..." : "Submit Transaction"}
                       </Button>
 
