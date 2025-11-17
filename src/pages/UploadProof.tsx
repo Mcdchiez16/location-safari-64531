@@ -14,8 +14,8 @@ const UploadProof = () => {
   const [searchParams] = useSearchParams();
   const transactionId = searchParams.get("transaction");
   const [loading, setLoading] = useState(false);
-  const [senderNumber, setSenderNumber] = useState("");
-  const [transactionCode, setTransactionCode] = useState("");
+  const [senderName, setSenderName] = useState("");
+  const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -29,8 +29,8 @@ const UploadProof = () => {
   };
 
   const handleSubmit = async () => {
-    if (!senderNumber.trim() || !transactionCode.trim()) {
-      toast.error("Please fill in all fields");
+    if (!senderName.trim() || !paymentProofFile) {
+      toast.error("Please provide both your name and payment screenshot");
       return;
     }
 
@@ -41,23 +41,43 @@ const UploadProof = () => {
 
     setLoading(true);
 
-    const { error } = await supabase
-      .from("transactions")
-      .update({ 
-        sender_number: senderNumber,
-        transaction_id: transactionCode 
-      })
-      .eq("id", transactionId);
+    try {
+      // Upload the payment proof
+      const fileExt = paymentProofFile.name.split('.').pop();
+      const fileName = `${transactionId}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-    if (error) {
-      toast.error("Failed to submit payment details");
-      console.error(error);
-    } else {
-      toast.success("Payment details submitted successfully!");
-      navigate("/dashboard");
+      const { error: uploadError } = await supabase.storage
+        .from('payment-proofs')
+        .upload(filePath, paymentProofFile);
+
+      if (uploadError) throw uploadError;
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('payment-proofs')
+        .getPublicUrl(filePath);
+
+      // Update the transaction with payment proof and sender name
+      const { error: updateError } = await supabase
+        .from('transactions')
+        .update({ 
+          payment_proof_url: publicUrl,
+          sender_name: senderName,
+          status: 'pending'
+        })
+        .eq('id', transactionId);
+
+      if (updateError) throw updateError;
+
+      toast.success("Payment proof submitted successfully!");
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Error submitting proof:', error);
+      toast.error(error.message || "Failed to submit payment proof");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -77,60 +97,66 @@ const UploadProof = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-6 w-6" />
-              Payment Details
+              <CheckCircle className="h-6 w-6 text-primary" />
+              Upload Payment Proof
             </CardTitle>
             <CardDescription>
-              Enter your payment details for verification
+              Provide your transaction details to complete the payment
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="senderNumber">Your Sender Number</Label>
+              <Label htmlFor="senderName">Name on Transaction</Label>
               <Input
-                id="senderNumber"
+                id="senderName"
                 type="text"
-                placeholder="Enter your phone number used for payment"
-                value={senderNumber}
-                onChange={(e) => setSenderNumber(e.target.value)}
+                placeholder="Enter the name that appears on your transaction"
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
                 className="h-12"
               />
               <p className="text-xs text-muted-foreground">
-                The phone number you used to make the payment
+                Enter the exact name shown on your payment confirmation
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="transactionCode">Transaction ID or Approval Code</Label>
+              <Label htmlFor="paymentProof">Payment Screenshot</Label>
               <Input
-                id="transactionCode"
-                type="text"
-                placeholder="e.g., CO250822.1552.F38050 or F38050"
-                value={transactionCode}
-                onChange={(e) => setTransactionCode(e.target.value)}
-                className="h-12"
+                id="paymentProof"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setPaymentProofFile(e.target.files?.[0] || null)}
+                className="h-12 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
               />
               <p className="text-xs text-muted-foreground">
-                This is the confirmation code you received after making the payment
+                Upload a clear screenshot of your payment confirmation
               </p>
             </div>
 
+            {paymentProofFile && (
+              <div className="p-3 bg-primary/10 rounded-lg flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">{paymentProofFile.name}</span>
+              </div>
+            )}
+
             <div className="bg-muted p-4 rounded-lg">
-              <h4 className="font-medium mb-2">Important Information:</h4>
+              <h4 className="font-medium mb-2">Important:</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Ensure the transaction ID is correct</li>
-                <li>• Make sure the sender number matches the payment</li>
-                <li>• Admin will verify your payment details</li>
-                <li>• You will receive a TID after approval</li>
+                <li>• Make sure the screenshot is clear and readable</li>
+                <li>• Include the full transaction details</li>
+                <li>• Admin will verify your payment</li>
+                <li>• You'll receive your TID after approval</li>
               </ul>
             </div>
 
             <Button
               onClick={handleSubmit}
               className="w-full h-12"
-              disabled={loading || !senderNumber.trim() || !transactionCode.trim()}
+              disabled={loading || !senderName.trim() || !paymentProofFile}
             >
-              {loading ? "Submitting..." : "Submit Payment Details"}
+              {loading ? "Submitting..." : "Submit Payment Proof"}
             </Button>
           </CardContent>
         </Card>

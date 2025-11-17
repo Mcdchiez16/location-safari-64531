@@ -489,14 +489,9 @@ const Send = () => {
     setShowProofUpload(true);
   };
 
-  const handleSubmitProof = async () => {
-    if (!paymentProof) {
-      toast.error("Please upload a payment screenshot");
-      return;
-    }
-
-    if (!senderNameOnTransaction.trim()) {
-      toast.error("Please enter the name on your transaction");
+  const handleConfirmPaymentAndNavigate = async () => {
+    if (!userId || !receiverProfile || !amount) {
+      toast.error("Missing required information");
       return;
     }
 
@@ -508,8 +503,8 @@ const Send = () => {
         error: insertError
       } = await supabase.from("transactions").insert({
         sender_id: userId,
-        receiver_name: receiverProfile!.full_name,
-        receiver_phone: receiverProfile!.phone_number,
+        receiver_name: receiverProfile.full_name,
+        receiver_phone: receiverProfile.phone_number,
         receiver_country: "Zambia",
         amount: parseFloat(amount),
         currency: "USD",
@@ -517,44 +512,16 @@ const Send = () => {
         fee: calculateFee(parseFloat(amount)),
         total_amount: parseFloat(amount) + calculateFee(parseFloat(amount)),
         payout_method: payoutMethod,
-        sender_name: senderNameOnTransaction.trim(),
         status: "pending"
       }).select().single();
       
       if (insertError) throw insertError;
 
-      // Upload payment proof
-      const fileExt = paymentProof.name.split('.').pop();
-      const fileName = `${insertData.id}-${Date.now()}.${fileExt}`;
-      const filePath = `payment-proofs/${fileName}`;
-      
-      const {
-        error: uploadError
-      } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProof);
-      
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const {
-        data: {
-          publicUrl
-        }
-      } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
-
-      // Update transaction with payment proof URL
-      const {
-        error: updateError
-      } = await supabase.from('transactions').update({
-        payment_proof_url: publicUrl
-      }).eq('id', insertData.id);
-      
-      if (updateError) throw updateError;
-
-      toast.success("Transaction submitted successfully! We'll review your payment and notify you soon.");
-      navigate("/transactions");
+      // Navigate to upload proof page with transaction ID
+      navigate(`/upload-proof?transaction=${insertData.id}`);
     } catch (error: any) {
-      console.error('Error submitting transaction:', error);
-      toast.error(error.message || "Failed to submit transaction");
+      console.error('Error creating transaction:', error);
+      toast.error(error.message || "Failed to create transaction");
     } finally {
       setLoading(false);
     }
@@ -866,80 +833,51 @@ const Send = () => {
             </Card>
           </div>}
 
-        {/* Upload Payment Proof Section */}
+        {/* Payment Confirmation Section */}
         {showProofUpload && <div className="space-y-6">
             <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
               <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Upload Payment Proof</h2>
-                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Please provide proof of your payment to complete the transaction</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Confirm Payment</h2>
+                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Click below to upload your payment proof</p>
               </div>
               
               <div className="p-4 sm:p-8 space-y-6">
-                <div className="space-y-3">
-                  <Label htmlFor="senderNameOnTransaction" className="text-sm font-medium text-foreground mb-2 block">
-                    Name on Transaction *
-                  </Label>
-                  <Input 
-                    id="senderNameOnTransaction" 
-                    type="text" 
-                    placeholder="Enter the name shown on your payment receipt" 
-                    value={senderNameOnTransaction} 
-                    onChange={e => setSenderNameOnTransaction(e.target.value)} 
-                    className="h-12 text-base" 
-                    disabled={loading}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Enter exactly as it appears on your payment confirmation
-                  </p>
+                <div className="bg-muted/50 border border-border rounded-xl p-4 sm:p-6">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-1" />
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-foreground">Next Step</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        You'll be taken to a page where you can upload your payment screenshot and enter the name on your transaction.
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label htmlFor="paymentProof" className="text-sm font-medium text-foreground mb-2 block">
-                    Payment Screenshot *
-                  </Label>
-                  <Input 
-                    id="paymentProof" 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={e => setPaymentProof(e.target.files?.[0] || null)} 
-                    className="h-12 text-base cursor-pointer" 
-                    disabled={loading}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Upload a clear screenshot of your payment confirmation
-                  </p>
-                </div>
+                <Button 
+                  onClick={handleConfirmPaymentAndNavigate} 
+                  className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold"
+                  disabled={loading}
+                >
+                  {loading ? "Processing..." : "Continue to Upload Proof"}
+                </Button>
 
-                {paymentProof && <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
-                    <p className="text-sm font-medium text-foreground mb-2">Selected file:</p>
-                    <p className="text-sm text-muted-foreground">{paymentProof.name}</p>
-                  </div>}
-
-                <div className="space-y-3">
-                  <Button 
-                    onClick={handleSubmitProof} 
-                    className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
-                    disabled={loading || !paymentProof || !senderNameOnTransaction.trim()}
-                  >
-                    {loading ? "Submitting..." : "Submit Transaction"}
-                  </Button>
-
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setShowProofUpload(false);
-                      setShowPaymentInstructions(true);
-                    }} 
-                    className="w-full h-10 sm:h-12 text-sm sm:text-base"
-                    disabled={loading}
-                  >
-                    Go Back
-                  </Button>
-                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowProofUpload(false);
+                    setShowPaymentInstructions(true);
+                  }} 
+                  className="w-full h-10 sm:h-12 text-sm sm:text-base"
+                  disabled={loading}
+                >
+                  Go Back
+                </Button>
               </div>
             </Card>
           </div>}
       </div>
     </div>;
 };
+
 export default Send;
