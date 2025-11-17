@@ -78,8 +78,8 @@ const Send = () => {
   const [cardType, setCardType] = useState<'visa' | 'mastercard' | 'unknown'>('unknown');
   const [cardPaymentsEnabled, setCardPaymentsEnabled] = useState(true);
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
-  const [uploadingProof, setUploadingProof] = useState(false);
-  const [transactionIdForProof, setTransactionIdForProof] = useState<string | null>(null);
+  const [showProofUpload, setShowProofUpload] = useState(false);
+  const [senderNameOnTransaction, setSenderNameOnTransaction] = useState("");
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -449,45 +449,6 @@ const Send = () => {
       setCardPaymentReference(null);
     }
   };
-  const handleUploadProof = async () => {
-    if (!paymentProof || !transactionIdForProof) {
-      toast.error("Please select a screenshot to upload");
-      return;
-    }
-    setUploadingProof(true);
-    try {
-      // Upload to Supabase storage
-      const fileExt = paymentProof.name.split('.').pop();
-      const fileName = `${transactionIdForProof}-${Date.now()}.${fileExt}`;
-      const filePath = `payment-proofs/${fileName}`;
-      const {
-        error: uploadError
-      } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProof);
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const {
-        data: {
-          publicUrl
-        }
-      } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
-
-      // Update transaction with payment proof URL
-      const {
-        error: updateError
-      } = await supabase.from('transactions').update({
-        payment_proof_url: publicUrl
-      }).eq('id', transactionIdForProof);
-      if (updateError) throw updateError;
-      toast.success("Payment proof uploaded successfully!");
-      navigate("/transactions");
-    } catch (error) {
-      console.error('Error uploading proof:', error);
-      toast.error("Failed to upload payment proof. Please try again.");
-    } finally {
-      setUploadingProof(false);
-    }
-  };
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
@@ -518,68 +479,85 @@ const Send = () => {
     setShowPaymentInstructions(true);
   };
   const handleConfirmPayment = async () => {
-    // Validate inputs using zod schema
-    try {
-      const validatedData = transactionSchema.parse({
-        amount: parseFloat(amount),
-        senderNumber: senderNumber,
-        transactionId: transactionId
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const firstError = error.errors[0];
-        toast.error(firstError.message);
-        return;
-      }
-      toast.error("Invalid input data");
+    if (!receiverProfile || !userId) {
+      toast.error("Missing required information");
       return;
     }
 
-    // Check against maximum transfer limit
-    const numAmount = parseFloat(amount);
-    if (numAmount > maxTransferLimit) {
-      toast.error(`Transfer amount cannot exceed $${maxTransferLimit.toLocaleString()} USD. Please contact support for larger transfers.`);
+    // Show upload proof dialog
+    setShowPaymentInstructions(false);
+    setShowProofUpload(true);
+  };
+
+  const handleSubmitProof = async () => {
+    if (!paymentProof) {
+      toast.error("Please upload a payment screenshot");
       return;
     }
-    if (!userId || !receiverProfile) {
-      toast.error("Please select a receiver first");
+
+    if (!senderNameOnTransaction.trim()) {
+      toast.error("Please enter the name on your transaction");
       return;
     }
+
     setLoading(true);
-    const transferFee = calculateFee(parseFloat(amount));
+    try {
+      // Create the transaction first
+      const {
+        data: insertData,
+        error: insertError
+      } = await supabase.from("transactions").insert({
+        sender_id: userId,
+        receiver_name: receiverProfile!.full_name,
+        receiver_phone: receiverProfile!.phone_number,
+        receiver_country: "Zambia",
+        amount: parseFloat(amount),
+        currency: "USD",
+        exchange_rate: exchangeRate,
+        fee: calculateFee(parseFloat(amount)),
+        total_amount: parseFloat(amount) + calculateFee(parseFloat(amount)),
+        payout_method: payoutMethod,
+        sender_name: senderNameOnTransaction.trim(),
+        status: "pending"
+      }).select().single();
+      
+      if (insertError) throw insertError;
 
-    // Fetch sender name from current user's profile
-    const {
-      data: senderProfile
-    } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
-    const {
-      error,
-      data
-    } = await supabase.from("transactions").insert({
-      sender_id: userId,
-      sender_name: senderProfile?.full_name || "",
-      receiver_name: receiverProfile.full_name,
-      receiver_phone: receiverProfile.phone_number,
-      receiver_country: "Zambia",
-      amount: parseFloat(amount),
-      currency: "USD",
-      fee: transferFee,
-      exchange_rate: exchangeRate,
-      payout_method: payoutMethod,
-      status: "pending",
-      sender_number: senderNumber,
-      transaction_id: transactionId
-    }).select();
-    if (error) {
-      toast.error("Failed to create transaction");
-      console.error(error);
-    } else {
-      const transactionId = data[0]?.id;
-      setTransactionIdForProof(transactionId);
-      toast.success("Transaction submitted! Please upload your payment proof.");
-      setShowPaymentInstructions(false);
+      // Upload payment proof
+      const fileExt = paymentProof.name.split('.').pop();
+      const fileName = `${insertData.id}-${Date.now()}.${fileExt}`;
+      const filePath = `payment-proofs/${fileName}`;
+      
+      const {
+        error: uploadError
+      } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProof);
+      
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const {
+        data: {
+          publicUrl
+        }
+      } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
+
+      // Update transaction with payment proof URL
+      const {
+        error: updateError
+      } = await supabase.from('transactions').update({
+        payment_proof_url: publicUrl
+      }).eq('id', insertData.id);
+      
+      if (updateError) throw updateError;
+
+      toast.success("Transaction submitted successfully! We'll review your payment and notify you soon.");
+      navigate("/transactions");
+    } catch (error: any) {
+      console.error('Error submitting transaction:', error);
+      toast.error(error.message || "Failed to submit transaction");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
   const recipientGets = amount ? (parseFloat(amount) * exchangeRate).toFixed(2) : "0.00";
   return <div className="min-h-screen bg-background">
@@ -767,20 +745,20 @@ const Send = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">1</div>
                     <h3 className="font-semibold text-foreground text-base sm:text-lg">
-                      {paymentMethod === "mobile" ? "Send Money" : "Pay with Card"}
+                      {paymentMethod === "mobile" ? "Where to Send the Money" : "Pay with Card"}
                     </h3>
                   </div>
                   <div className="ml-11 bg-secondary/10 rounded-xl p-4 sm:p-6 border-2 border-secondary/30">
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">
-                      {paymentMethod === "mobile" ? "Send this amount:" : "Amount to pay:"}
+                      {paymentMethod === "mobile" ? "Send this exact amount:" : "Amount to pay:"}
                     </p>
                     <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-secondary mb-3">${(parseFloat(amount) + calculateFee(parseFloat(amount))).toFixed(2)}</p>
                     
                     {paymentMethod === "mobile" ? <div className="bg-card rounded-lg p-3 sm:p-4 border border-border">
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-1">To this number:</p>
+                        <p className="text-xs sm:text-sm font-semibold text-primary mb-2">📱 Send money to:</p>
                         <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2">{paymentNumber}</p>
-                        <p className="text-xs sm:text-sm font-semibold text-primary mb-1">{paymentRecipientName}</p>
-                        <p className="text-xs sm:text-sm text-muted-foreground">Via: EcoCash</p>
+                        <p className="text-xs sm:text-sm font-semibold text-foreground mb-1">Recipient: {paymentRecipientName}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Method: EcoCash</p>
                       </div> : <div className="bg-card rounded-lg p-3 sm:p-4 border border-border space-y-4">
                         <div className="flex items-center gap-2">
                           <CreditCard className="h-5 w-5 text-primary" />
@@ -852,62 +830,31 @@ const Send = () => {
                   </div>
                 </div>
 
-                {/* Step 2 - Only for mobile money */}
+                {/* Step 2 - Confirm Payment */}
                 {paymentMethod === "mobile" && <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
-                      <h3 className="font-semibold text-foreground text-base sm:text-lg">Enter Payment Details</h3>
+                      <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm Payment</h3>
                     </div>
-                    <div className="ml-11 space-y-4">
-                      <div>
-                        <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
-                          Your Phone Number *
-                        </Label>
-                        <Input id="senderNumber" type="text" placeholder="e.g., +263 77 123 4567" value={senderNumber} onChange={e => setSenderNumber(e.target.value)} className="h-12 text-base" required />
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Enter the phone number you used to send the payment
-                        </p>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="transactionId" className="text-sm font-medium text-foreground mb-2 block">
-                          Transaction ID *
-                        </Label>
-                        <Input id="transactionId" type="text" placeholder="e.g., CO250822.1552.F38050 or F38050" value={transactionId} onChange={e => setTransactionId(e.target.value)} className="h-12 text-base" required />
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Enter the transaction ID from your payment confirmation
-                        </p>
-                      </div>
-                    </div>
-                  </div>}
-
-                {/* Step 3 - Only for mobile money */}
-                {paymentMethod === "mobile" && <>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
-                        <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm & Submit</h3>
-                      </div>
-                      <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
-                        <p className="text-xs sm:text-sm font-medium text-foreground mb-2">✅ Ready to submit:</p>
-                        <ul className="text-xs sm:text-sm text-muted-foreground space-y-1 ml-4 list-disc">
-                          <li>Your transaction will be reviewed by our admin team</li>
-                          <li>You'll be notified once the payment is confirmed</li>
-                          <li>The recipient will receive their funds shortly after</li>
-                        </ul>
-                      </div>
+                    <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
+                      <p className="text-xs sm:text-sm font-medium text-foreground mb-2">After sending the money:</p>
+                      <ul className="text-xs sm:text-sm text-muted-foreground space-y-1 ml-4 list-disc">
+                        <li>Click the "I've Sent the Money" button below</li>
+                        <li>You'll be asked to upload a screenshot of your payment</li>
+                        <li>Our admin team will review and confirm your payment</li>
+                      </ul>
                     </div>
 
                     <div className="space-y-3 pt-4">
-                      <Button onClick={handleConfirmPayment} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={loading || !senderNumber.trim() || !transactionId.trim()}>
-                        {loading ? "Processing..." : "Submit Transaction"}
+                      <Button onClick={handleConfirmPayment} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={loading}>
+                        {loading ? "Processing..." : "I've Sent the Money"}
                       </Button>
 
                       <Button variant="outline" onClick={() => setShowPaymentInstructions(false)} className="w-full h-10 sm:h-12 text-sm sm:text-base">
                         Go Back
                       </Button>
                     </div>
-                  </>}
+                  </div>}
 
                 {/* For card payment, just show a back button */}
                 {paymentMethod === "card" && !processingCardPayment && !cardPaymentReference && <div className="pt-4">
@@ -920,21 +867,46 @@ const Send = () => {
           </div>}
 
         {/* Upload Payment Proof Section */}
-        {transactionIdForProof && !showPaymentInstructions && <div className="space-y-6">
+        {showProofUpload && <div className="space-y-6">
             <Card className="overflow-hidden shadow-lg border-2 border-primary/20">
               <div className="bg-gradient-to-r from-primary to-accent px-4 sm:px-8 py-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-primary-foreground">Upload Payment Proof</h2>
-                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Please upload a screenshot of your payment confirmation</p>
+                <p className="text-sm sm:text-base text-primary-foreground/90 mt-1">Please provide proof of your payment to complete the transaction</p>
               </div>
               
               <div className="p-4 sm:p-8 space-y-6">
                 <div className="space-y-3">
+                  <Label htmlFor="senderNameOnTransaction" className="text-sm font-medium text-foreground mb-2 block">
+                    Name on Transaction *
+                  </Label>
+                  <Input 
+                    id="senderNameOnTransaction" 
+                    type="text" 
+                    placeholder="Enter the name shown on your payment receipt" 
+                    value={senderNameOnTransaction} 
+                    onChange={e => setSenderNameOnTransaction(e.target.value)} 
+                    className="h-12 text-base" 
+                    disabled={loading}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter exactly as it appears on your payment confirmation
+                  </p>
+                </div>
+
+                <div className="space-y-3">
                   <Label htmlFor="paymentProof" className="text-sm font-medium text-foreground mb-2 block">
                     Payment Screenshot *
                   </Label>
-                  <Input id="paymentProof" type="file" accept="image/*" onChange={e => setPaymentProof(e.target.files?.[0] || null)} className="h-12 text-base cursor-pointer" disabled={uploadingProof} />
+                  <Input 
+                    id="paymentProof" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={e => setPaymentProof(e.target.files?.[0] || null)} 
+                    className="h-12 text-base cursor-pointer" 
+                    disabled={loading}
+                  />
                   <p className="text-xs text-muted-foreground">
-                    Upload a clear screenshot showing the payment confirmation, amount, and transaction ID
+                    Upload a clear screenshot of your payment confirmation
                   </p>
                 </div>
 
@@ -944,15 +916,24 @@ const Send = () => {
                   </div>}
 
                 <div className="space-y-3">
-                  <Button onClick={handleUploadProof} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={uploadingProof || !paymentProof}>
-                    {uploadingProof ? "Uploading..." : "Submit Payment Proof"}
+                  <Button 
+                    onClick={handleSubmitProof} 
+                    className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
+                    disabled={loading || !paymentProof || !senderNameOnTransaction.trim()}
+                  >
+                    {loading ? "Submitting..." : "Submit Transaction"}
                   </Button>
 
-                  <Button variant="outline" onClick={() => {
-                setTransactionIdForProof(null);
-                navigate("/transactions");
-              }} className="w-full h-10 sm:h-12 text-sm sm:text-base">
-                    Skip for Now
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowProofUpload(false);
+                      setShowPaymentInstructions(true);
+                    }} 
+                    className="w-full h-10 sm:h-12 text-sm sm:text-base"
+                    disabled={loading}
+                  >
+                    Go Back
                   </Button>
                 </div>
               </div>
