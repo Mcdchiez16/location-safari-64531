@@ -553,7 +553,7 @@ const Send = () => {
               className="gap-2 hover:bg-primary/10 transition-all hover-scale border-primary/20"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              Back
             </Button>
           </div>
         </div>
