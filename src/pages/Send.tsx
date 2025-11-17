@@ -462,12 +462,10 @@ const Send = () => {
       toast.error("Please select a screenshot to upload");
       return;
     }
-
     if (proofMethod === "reference" && !paymentReference.trim()) {
       toast.error("Please enter a payment reference");
       return;
     }
-
     setUploadingProof(true);
     try {
       if (proofMethod === "screenshot") {
@@ -505,7 +503,6 @@ const Send = () => {
         if (updateError) throw updateError;
         toast.success("Payment reference saved successfully!");
       }
-      
       navigate("/transactions");
     } catch (error) {
       console.error('Error uploading proof:', error);
@@ -879,39 +876,13 @@ const Send = () => {
                 </div>
 
                 {/* Step 2 - Only for mobile money */}
-                {paymentMethod === "mobile" && <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
-                      <h3 className="font-semibold text-foreground text-base sm:text-lg">Enter Payment Details</h3>
-                    </div>
-                    <div className="ml-11 space-y-4">
-                      <div>
-                        <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
-                          Your Phone Number *
-                        </Label>
-                        <Input id="senderNumber" type="text" placeholder="e.g., +263 77 123 4567" value={senderNumber} onChange={e => setSenderNumber(e.target.value)} className="h-12 text-base" required />
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Enter the phone number you used to send the payment
-                        </p>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="transactionId" className="text-sm font-medium text-foreground mb-2 block">
-                          Transaction ID *
-                        </Label>
-                        <Input id="transactionId" type="text" placeholder="e.g., CO250822.1552.F38050 or F38050" value={transactionId} onChange={e => setTransactionId(e.target.value)} className="h-12 text-base" required />
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Enter the transaction ID from your payment confirmation
-                        </p>
-                      </div>
-                    </div>
-                  </div>}
+                {paymentMethod === "mobile"}
 
                 {/* Step 3 - Only for mobile money */}
                 {paymentMethod === "mobile" && <>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">2</div>
                         <h3 className="font-semibold text-foreground text-base sm:text-lg">Submit Payment Proof</h3>
                       </div>
                       <div className="ml-11 space-y-4">
@@ -945,7 +916,7 @@ const Send = () => {
 
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">4</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">3</div>
                         <h3 className="font-semibold text-foreground text-base sm:text-lg">Confirm & Submit</h3>
                       </div>
                       <div className="ml-11 bg-success/10 border border-success/30 rounded-xl p-3 sm:p-4">
@@ -1038,8 +1009,8 @@ const Send = () => {
                   </div>}
 
                 <div className="space-y-3">
-                  <Button onClick={handleUploadProof} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={uploadingProof || (proofMethod === "screenshot" && !paymentProof) || (proofMethod === "reference" && !paymentReference.trim())}>
-                    {uploadingProof ? (proofMethod === "screenshot" ? "Uploading..." : "Saving...") : "Submit Payment Proof"}
+                  <Button onClick={handleUploadProof} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={uploadingProof || proofMethod === "screenshot" && !paymentProof || proofMethod === "reference" && !paymentReference.trim()}>
+                    {uploadingProof ? proofMethod === "screenshot" ? "Uploading..." : "Saving..." : "Submit Payment Proof"}
                   </Button>
 
                   <Button variant="outline" onClick={() => {
