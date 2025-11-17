@@ -547,7 +547,12 @@ const Send = () => {
               <img src={logo} alt="Tangila Pay Logo" className="w-8 h-8 rounded-lg object-cover shadow-lg" />
               <span className="font-mono text-blue-500 text-lg font-bold">Ticla-Pay</span>
             </div>
-            <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2">Back <ArrowLeft className="h-4 w-4" />
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/dashboard')} 
+              className="gap-2 hover:bg-primary/10 transition-all hover-scale border-primary/20"
+            >
+              <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
             </Button>
           </div>
