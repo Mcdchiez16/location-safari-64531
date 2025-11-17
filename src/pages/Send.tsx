@@ -563,7 +563,7 @@ const Send = () => {
             Send Money
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
-            Send money to Zambia  via mobile money
+            Send money to Zambia instantly via mobile money
           </p>
         </div>
 
@@ -649,20 +649,7 @@ const Send = () => {
                   <p className="text-xs text-muted-foreground mt-2">This is the amount your recipient will receive before conversion to ZMW</p>
                 </div>
 
-                <div className="mb-6">
-                  <Label htmlFor="payoutMethod" className="text-sm font-medium text-foreground block mb-2">
-                    Recipient will receive via
-                  </Label>
-                  <Select value={payoutMethod} onValueChange={setPayoutMethod} required>
-                    <SelectTrigger className="h-12 text-base">
-                      <SelectValue placeholder="Select payout method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="MTN Money">MTN Money</SelectItem>
-                      <SelectItem value="Airtel Money">Airtel Money</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                
 
                 <div className="mb-6">
                   <Label className="text-sm font-medium text-foreground block mb-3">
