@@ -35,7 +35,7 @@ const ContactUs = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">Tangila Pay</h1>
+          <h1 className="text-xl font-bold text-primary">Ticlapay</h1>
         </div>
       </header>
 
@@ -106,8 +106,8 @@ const ContactUs = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Email Us</h3>
-                  <p className="text-sm text-muted-foreground">support@tangilapay.com</p>
-                  <p className="text-sm text-muted-foreground">info@tangilapay.com</p>
+                  <p className="text-sm text-muted-foreground">support@ticlapay.com</p>
+                  <p className="text-sm text-muted-foreground">info@ticlapay.com</p>
                 </div>
               </div>
 

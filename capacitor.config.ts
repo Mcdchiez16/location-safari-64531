@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.c7c3648c124c4f04980e1fa9876fcf34',
-  appName: 'Tangila Pay',
+  appName: 'Ticlapay',
   webDir: 'dist',
   server: {
     url: 'https://c7c3648c-124c-4f04-980e-1fa9876fcf34.lovableproject.com?forceHideBadge=true',

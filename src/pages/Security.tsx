@@ -14,12 +14,12 @@ const Security = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-xl font-bold text-primary">Tangila Pay</h1>
+          <h1 className="text-xl font-bold text-primary">Ticlapay</h1>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Security at Tangila Pay</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Security at Ticlapay</h1>
         <p className="text-lg text-muted-foreground mb-12 leading-relaxed">
           Your security is our top priority. Learn how we protect your money and personal information.
         </p>
@@ -105,14 +105,14 @@ const Security = () => {
           <h2 className="text-2xl font-bold mb-4">How You Can Stay Safe</h2>
           <ul className="space-y-3">
             {[
-              "Use a strong, unique password for your Tangila Pay account",
+              "Use a strong, unique password for your Ticlapay account",
               "Never share your password or verification codes with anyone",
               "Enable two-factor authentication for extra security",
               "Verify recipient details carefully before sending money",
               "Log out of your account on shared devices",
               "Report suspicious activity to our support team immediately",
               "Keep your contact information up to date",
-              "Be cautious of phishing emails claiming to be from Tangila Pay"
+              "Be cautious of phishing emails claiming to be from Ticlapay"
             ].map((tip, index) => (
               <li key={index} className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">

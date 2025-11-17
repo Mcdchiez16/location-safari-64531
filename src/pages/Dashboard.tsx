@@ -157,7 +157,7 @@ const Dashboard = () => {
 
     // Add title
     doc.setFontSize(18);
-    doc.text('Tangila Pay Transaction Statement', 14, 22);
+    doc.text('Ticlapay Transaction Statement', 14, 22);
 
     // Add date
     doc.setFontSize(11);
@@ -189,7 +189,7 @@ const Dashboard = () => {
 
     // Save PDF
     const today = new Date().toISOString().slice(0, 10);
-    doc.save(`tangilapay-statement-${today}.pdf`);
+    doc.save(`ticlapay-statement-${today}.pdf`);
     toast.success('Statement downloaded successfully');
   };
   if (loading) {
