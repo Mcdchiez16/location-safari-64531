@@ -449,39 +449,36 @@ const Send = () => {
       setCardPaymentReference(null);
     }
   };
-  
   const handleUploadProof = async () => {
     if (!paymentProof || !transactionIdForProof) {
       toast.error("Please select a screenshot to upload");
       return;
     }
-
     setUploadingProof(true);
     try {
       // Upload to Supabase storage
       const fileExt = paymentProof.name.split('.').pop();
       const fileName = `${transactionIdForProof}-${Date.now()}.${fileExt}`;
       const filePath = `payment-proofs/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('payment-proofs')
-        .upload(filePath, paymentProof);
-
+      const {
+        error: uploadError
+      } = await supabase.storage.from('payment-proofs').upload(filePath, paymentProof);
       if (uploadError) throw uploadError;
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('payment-proofs')
-        .getPublicUrl(filePath);
+      const {
+        data: {
+          publicUrl
+        }
+      } = supabase.storage.from('payment-proofs').getPublicUrl(filePath);
 
       // Update transaction with payment proof URL
-      const { error: updateError } = await supabase
-        .from('transactions')
-        .update({ payment_proof_url: publicUrl })
-        .eq('id', transactionIdForProof);
-
+      const {
+        error: updateError
+      } = await supabase.from('transactions').update({
+        payment_proof_url: publicUrl
+      }).eq('id', transactionIdForProof);
       if (updateError) throw updateError;
-
       toast.success("Payment proof uploaded successfully!");
       navigate("/transactions");
     } catch (error) {
@@ -649,9 +646,7 @@ const Send = () => {
           {receiverProfile && <div className="p-8 pt-0">
                 <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-xl sm:text-2xl flex-shrink-0">
-                      {receiverProfile.full_name.charAt(0)}
-                    </div>
+                    
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-3">
                         <h3 className="text-lg sm:text-xl font-bold text-foreground">{receiverProfile.full_name}</h3>
@@ -666,10 +661,7 @@ const Send = () => {
                           <User className="h-5 w-5 text-primary" />
                           <span className="text-base sm:text-lg font-mono font-semibold text-foreground">{receiverProfile.phone_number}</span>
                         </div>
-                        <div className="inline-flex items-center gap-2 bg-accent/10 px-3 py-1.5 rounded-lg border border-accent/20">
-                          <span className="text-xs sm:text-sm text-muted-foreground">Max transfer limit:</span>
-                          <span className="text-sm sm:text-base font-bold text-accent">${maxTransferLimit}</span>
-                        </div>
+                        
                       </div>
                     </div>
                   </div>
@@ -940,43 +932,26 @@ const Send = () => {
                   <Label htmlFor="paymentProof" className="text-sm font-medium text-foreground mb-2 block">
                     Payment Screenshot *
                   </Label>
-                  <Input 
-                    id="paymentProof" 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={(e) => setPaymentProof(e.target.files?.[0] || null)}
-                    className="h-12 text-base cursor-pointer"
-                    disabled={uploadingProof}
-                  />
+                  <Input id="paymentProof" type="file" accept="image/*" onChange={e => setPaymentProof(e.target.files?.[0] || null)} className="h-12 text-base cursor-pointer" disabled={uploadingProof} />
                   <p className="text-xs text-muted-foreground">
                     Upload a clear screenshot showing the payment confirmation, amount, and transaction ID
                   </p>
                 </div>
 
-                {paymentProof && (
-                  <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
+                {paymentProof && <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
                     <p className="text-sm font-medium text-foreground mb-2">Selected file:</p>
                     <p className="text-sm text-muted-foreground">{paymentProof.name}</p>
-                  </div>
-                )}
+                  </div>}
 
                 <div className="space-y-3">
-                  <Button 
-                    onClick={handleUploadProof} 
-                    className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" 
-                    disabled={uploadingProof || !paymentProof}
-                  >
+                  <Button onClick={handleUploadProof} className="w-full h-12 sm:h-14 text-sm sm:text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg font-bold" disabled={uploadingProof || !paymentProof}>
                     {uploadingProof ? "Uploading..." : "Submit Payment Proof"}
                   </Button>
 
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setTransactionIdForProof(null);
-                      navigate("/transactions");
-                    }} 
-                    className="w-full h-10 sm:h-12 text-sm sm:text-base"
-                  >
+                  <Button variant="outline" onClick={() => {
+                setTransactionIdForProof(null);
+                navigate("/transactions");
+              }} className="w-full h-10 sm:h-12 text-sm sm:text-base">
                     Skip for Now
                   </Button>
                 </div>
