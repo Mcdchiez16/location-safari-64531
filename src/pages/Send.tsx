@@ -549,7 +549,7 @@ const Send = () => {
             </div>
             <Button variant="outline" onClick={() => navigate('/dashboard')} className="gap-2 transition-all hover-scale border-primary/20 bg-blue-600 hover:bg-blue-500">
               <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              Back
             </Button>
           </div>
         </div>
