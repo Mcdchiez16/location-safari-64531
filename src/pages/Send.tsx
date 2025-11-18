@@ -913,6 +913,24 @@ const Send = () => {
                         <p className="text-sm text-muted-foreground">
                           After completing your payment, provide proof using one of these methods:
                         </p>
+
+                        {/* Your Mobile Number (used for payment) */}
+                        <div className="space-y-3">
+                          <Label htmlFor="senderNumber" className="text-sm font-medium text-foreground mb-2 block">
+                            Your Mobile Number (used for payment) *
+                          </Label>
+                          <Input
+                            id="senderNumber"
+                            type="tel"
+                            placeholder="e.g., +263 77 123 4567"
+                            value={senderNumber}
+                            onChange={(e) => setSenderNumber(e.target.value)}
+                            className="h-12 text-base"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            We'll use this to match your payment to this transaction
+                          </p>
+                        </div>
                         
                         {/* Proof Method Selection */}
                         <div className="space-y-3">
