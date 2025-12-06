@@ -58,7 +58,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center group cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logo} alt="TiclaPay Logo" className="h-16 sm:h-20 md:h-24 object-contain transition-all duration-300 group-hover:scale-105" />
+              <img src={logo} alt="TiclaPay Logo" className="h-20 sm:h-24 md:h-28 object-contain transition-all duration-300 group-hover:scale-105" />
             </div>
 
             {/* Right Side Actions */}
@@ -96,14 +96,14 @@ const Index = () => {
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                Bridge The Gap
+                Send Money
                 <span className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mt-2">
-                  Zimbabwe to Zambia
+                  Across Borders
                 </span>
               </h1>
 
               <p className="text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed md:text-base font-semibold text-slate-950">
-                Send money instantly with competitive rates and zero hassle. Your trusted partner for seamless cross-border payments.
+                Fast, secure, and affordable international transfers. Send money to loved ones anywhere with competitive rates and zero hassle.
               </p>
 
               {/* Key Benefits */}
@@ -325,7 +325,7 @@ const Index = () => {
             Ready to Get Started?
           </h2>
           <p className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Join thousands of people sending money across borders with Ticlapay. Fast, secure, and reliable.
+            Join thousands of people sending money across borders with TiclaPay. Fast, secure, and reliable transfers worldwide.
           </p>
           <Button size="lg" onClick={() => navigate("/auth")} className="h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-bold bg-background text-primary hover:bg-background/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
             Create Free Account
@@ -343,7 +343,7 @@ const Index = () => {
                 <img src={logo} alt="TiclaPay Logo" className="h-16 md:h-20 object-contain" />
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Fast and secure money transfers from Zimbabwe to Zambia. Your trusted cross-border payment partner.
+                Fast and secure international money transfers. Your trusted partner for seamless cross-border payments worldwide.
               </p>
             </div>
             
@@ -376,7 +376,7 @@ const Index = () => {
           </div>
           
           <div className="border-t pt-8 text-center">
-            <p className="text-sm text-muted-foreground">© 2024 Ticla-Pay. All rights reserved. Secure cross-border payments made easy.</p>
+            <p className="text-sm text-muted-foreground">© 2024 TiclaPay. All rights reserved. Secure cross-border payments made easy.</p>
           </div>
         </div>
       </footer>
