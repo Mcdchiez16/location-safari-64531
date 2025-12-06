@@ -85,23 +85,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-background/95 backdrop-blur-xl shadow-lg' 
-          : 'bg-background/80 backdrop-blur-md'
-      }`}>
-        <div className="flex items-center justify-between px-3 sm:px-6 md:px-12 py-2 sm:py-4">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background shadow-md border-b border-border">
+        <div className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-3 sm:py-4">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
             <img 
               src={logo} 
               alt="TiclaPay Logo" 
-              className="h-10 sm:h-16 md:h-20 object-contain transition-transform duration-300 hover:scale-105" 
+              className="h-12 sm:h-16 md:h-20 object-contain" 
             />
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-3 sm:gap-4">
             {exchangeRate && (
               <div className="hidden sm:flex clay-badge items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-primary animate-pulse" />
@@ -113,7 +109,8 @@ const Index = () => {
 
             <Button 
               onClick={() => navigate("/auth")} 
-              className="clay-button px-4 sm:px-6 h-9 sm:h-11 text-xs sm:text-sm font-semibold text-primary-foreground"
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 h-10 sm:h-11 text-sm font-semibold rounded-xl shadow-md"
             >
               Get Started
             </Button>
