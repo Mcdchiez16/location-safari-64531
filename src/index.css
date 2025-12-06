@@ -2,32 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Claymorphism Design System - Soft, 3D, Professional */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    --background: 220 20% 97%;
+    --foreground: 220 30% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 220 30% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 220 30% 15%;
 
     /* Professional Blue Theme */
-    --primary: 217 91% 60%; /* Primary Blue */
+    --primary: 217 91% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 70% 50%; /* Secondary Blue */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 60% 96%;
+    --secondary-foreground: 220 30% 25%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 220 20% 94%;
+    --muted-foreground: 220 15% 45%;
 
-    --accent: 210 100% 45%; /* Accent Blue */
+    --accent: 210 100% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -39,42 +37,59 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 217 91% 60%;
+    --border: 220 20% 88%;
+    --input: 220 20% 92%;
+    --ring: 217 91% 55%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(210 100% 45%));
-    --gradient-secondary: linear-gradient(135deg, hsl(220 70% 50%), hsl(220 70% 40%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(220 70% 50%));
-    --shadow-glow: 0 10px 40px -10px hsl(217 91% 60% / 0.3);
-    --shadow-card: 0 4px 20px -2px hsl(0 0% 10% / 0.08);
+    /* Claymorphism shadows */
+    --shadow-clay: 
+      8px 8px 16px hsl(220 20% 85%),
+      -8px -8px 16px hsl(0 0% 100%);
+    --shadow-clay-sm: 
+      4px 4px 8px hsl(220 20% 88%),
+      -4px -4px 8px hsl(0 0% 100%);
+    --shadow-clay-lg: 
+      12px 12px 24px hsl(220 20% 82%),
+      -12px -12px 24px hsl(0 0% 100%);
+    --shadow-clay-inset: 
+      inset 4px 4px 8px hsl(220 20% 88%),
+      inset -4px -4px 8px hsl(0 0% 100%);
+    --shadow-clay-primary: 
+      8px 8px 20px hsl(217 91% 55% / 0.25),
+      -4px -4px 12px hsl(0 0% 100%);
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(145deg, hsl(217 91% 58%), hsl(217 91% 48%));
+    --gradient-secondary: linear-gradient(145deg, hsl(220 60% 98%), hsl(220 60% 94%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 20% 97%), hsl(217 30% 94%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 20% 98%));
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 98%;
+    --background: 220 25% 10%;
+    --foreground: 220 10% 95%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 220 25% 14%;
+    --card-foreground: 220 10% 95%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 220 25% 14%;
+    --popover-foreground: 220 10% 95%;
 
     --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 40% 25%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 25% 18%;
+    --secondary-foreground: 220 10% 90%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 64%;
+    --muted: 220 25% 16%;
+    --muted-foreground: 220 10% 60%;
 
-    --accent: 210 100% 50%;
+    --accent: 210 100% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 63% 45%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 142 71% 45%;
@@ -83,9 +98,19 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
+    --border: 220 25% 20%;
+    --input: 220 25% 18%;
     --ring: 217 91% 60%;
+
+    --shadow-clay: 
+      8px 8px 16px hsl(220 25% 6%),
+      -8px -8px 16px hsl(220 25% 18%);
+    --shadow-clay-sm: 
+      4px 4px 8px hsl(220 25% 6%),
+      -4px -4px 8px hsl(220 25% 18%);
+    --shadow-clay-lg: 
+      12px 12px 24px hsl(220 25% 5%),
+      -12px -12px 24px hsl(220 25% 20%);
   }
 }
 
@@ -95,60 +120,111 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    position: relative;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Claymorphism Card */
+  .clay-card {
+    @apply bg-card rounded-2xl border-0;
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(220 20% 98%));
+    box-shadow: var(--shadow-clay);
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-      radial-gradient(ellipse at 20% 20%, hsl(217 91% 60% / 0.15), transparent 50%),
-      radial-gradient(ellipse at 80% 80%, hsl(210 100% 45% / 0.12), transparent 50%),
-      radial-gradient(ellipse at 50% 50%, hsl(220 70% 50% / 0.08), transparent 70%),
-      linear-gradient(135deg, hsl(217 91% 98% / 0.5), hsl(210 100% 98% / 0.3));
-    animation: gradient-shift 20s ease infinite;
-    z-index: -1;
-    pointer-events: none;
+  .clay-card-sm {
+    @apply bg-card rounded-xl border-0;
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(220 20% 98%));
+    box-shadow: var(--shadow-clay-sm);
   }
 
-  @keyframes gradient-shift {
-    0%, 100% {
-      background-position: 0% 50%;
-      background-size: 200% 200%;
-    }
-    50% {
-      background-position: 100% 50%;
-      background-size: 200% 200%;
-    }
+  .clay-card-lg {
+    @apply bg-card rounded-3xl border-0;
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(220 20% 98%));
+    box-shadow: var(--shadow-clay-lg);
   }
 
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0) translateX(0);
-    }
-    25% {
-      transform: translateY(-20px) translateX(10px);
-    }
-    50% {
-      transform: translateY(-10px) translateX(-10px);
-    }
-    75% {
-      transform: translateY(-30px) translateX(5px);
-    }
+  /* Claymorphism Button */
+  .clay-button {
+    @apply rounded-xl font-semibold transition-all duration-300;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-clay-primary);
   }
 
-  @keyframes grid-flow {
-    0% {
-      transform: translateY(0);
-    }
-    100% {
-      transform: translateY(50px);
-    }
+  .clay-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      10px 10px 24px hsl(217 91% 55% / 0.3),
+      -6px -6px 14px hsl(0 0% 100%);
+  }
+
+  .clay-button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-clay-inset);
+  }
+
+  /* Claymorphism Input */
+  .clay-input {
+    @apply rounded-xl border-0 bg-muted;
+    box-shadow: var(--shadow-clay-inset);
+  }
+
+  .clay-input:focus {
+    box-shadow: 
+      inset 2px 2px 4px hsl(220 20% 90%),
+      inset -2px -2px 4px hsl(0 0% 100%),
+      0 0 0 3px hsl(var(--primary) / 0.2);
+  }
+
+  /* Claymorphism Icon Container */
+  .clay-icon {
+    @apply rounded-2xl flex items-center justify-center;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-clay-primary);
+  }
+
+  /* Claymorphism Badge */
+  .clay-badge {
+    @apply rounded-full px-4 py-2 font-medium;
+    background: linear-gradient(145deg, hsl(var(--muted)), hsl(220 20% 96%));
+    box-shadow: var(--shadow-clay-sm);
+  }
+
+  /* Stat Counter */
+  .clay-stat {
+    @apply rounded-2xl p-6 text-center;
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(220 20% 98%));
+    box-shadow: var(--shadow-clay);
+  }
+
+  /* Floating animation for hero elements */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .float-animation-delayed {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: -3s;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  .bg-gradient-subtle {
+    background: linear-gradient(135deg, hsl(220 20% 97%), hsl(217 30% 95%));
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(2deg);
   }
 }
