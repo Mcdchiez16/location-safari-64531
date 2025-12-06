@@ -87,10 +87,10 @@ const Index = () => {
       {/* Header */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled 
-          ? 'bg-background/90 backdrop-blur-xl' 
-          : 'bg-transparent'
+          ? 'bg-background/95 backdrop-blur-xl shadow-lg' 
+          : 'bg-background/80 backdrop-blur-md'
       }`}>
-        <div className="flex items-center justify-between px-6 sm:px-8 md:px-12 py-4">
+        <div className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-3 sm:py-4">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
             <img 
