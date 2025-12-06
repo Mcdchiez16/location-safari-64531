@@ -345,7 +345,7 @@ const Auth = () => {
               to="/" 
               className="flex items-center justify-center group transition-all duration-300"
             >
-              <img src={logo} alt="TiclaPay Logo" className="h-10 sm:h-12 md:h-14 object-contain group-hover:scale-105 transition-transform duration-300" />
+              <img src={logo} alt="TiclaPay Logo" className="h-10 object-contain group-hover:scale-105 transition-transform duration-300" />
             </Link>
             
             <div className="space-y-1.5 sm:space-y-2">
