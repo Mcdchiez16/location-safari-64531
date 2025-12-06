@@ -90,20 +90,20 @@ const Index = () => {
           ? 'bg-background/95 backdrop-blur-xl shadow-lg' 
           : 'bg-background/80 backdrop-blur-md'
       }`}>
-        <div className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-3 sm:py-4">
+        <div className="flex items-center justify-between px-3 sm:px-6 md:px-12 py-2 sm:py-4">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
             <img 
               src={logo} 
               alt="TiclaPay Logo" 
-              className="h-16 sm:h-20 md:h-24 object-contain transition-transform duration-300 hover:scale-105" 
+              className="h-10 sm:h-16 md:h-20 object-contain transition-transform duration-300 hover:scale-105" 
             />
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             {exchangeRate && (
-              <div className="clay-badge flex items-center gap-2">
+              <div className="hidden sm:flex clay-badge items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-primary animate-pulse" />
                 <span className="text-sm font-bold text-gradient">
                   ${exchangeRate.toFixed(2)}
@@ -113,7 +113,7 @@ const Index = () => {
 
             <Button 
               onClick={() => navigate("/auth")} 
-              className="clay-button px-5 sm:px-6 h-10 sm:h-11 text-sm font-semibold text-primary-foreground"
+              className="clay-button px-4 sm:px-6 h-9 sm:h-11 text-xs sm:text-sm font-semibold text-primary-foreground"
             >
               Get Started
             </Button>
