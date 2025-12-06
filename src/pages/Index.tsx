@@ -92,7 +92,7 @@ const Index = () => {
             <img 
               src={logo} 
               alt="TiclaPay Logo" 
-              className="h-12 sm:h-16 md:h-20 object-contain" 
+              className="h-8 sm:h-12 md:h-16 object-contain" 
             />
           </div>
 
