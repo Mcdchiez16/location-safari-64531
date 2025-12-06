@@ -54,24 +54,22 @@ const Index = () => {
   return <div className="min-h-screen bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10">
       {/* Elegant Header */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-background/80 backdrop-blur-xl shadow-lg border-b border-primary/10' : 'bg-transparent backdrop-blur-md border-b border-white/5'}`}>
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center group cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logo} alt="TiclaPay Logo" className="h-20 sm:h-24 md:h-28 object-contain transition-all duration-300 group-hover:scale-105" />
-            </div>
+        <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 py-4">
+          {/* Logo */}
+          <div className="flex items-center group cursor-pointer" onClick={() => navigate("/")}>
+            <img src={logo} alt="TiclaPay Logo" className="h-20 sm:h-24 md:h-28 object-contain transition-all duration-300 group-hover:scale-105" />
+          </div>
 
-            {/* Right Side Actions */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              {exchangeRate && <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
-                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse flex-shrink-0" />
-                  <span className="text-[10px] sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
-                    ${exchangeRate.toFixed(2)}
-                  </span>
-                </div>}
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {exchangeRate && <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse flex-shrink-0" />
+                <span className="text-[10px] sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
+                  ${exchangeRate.toFixed(2)}
+                </span>
+              </div>}
 
-              <Button onClick={() => navigate("/auth")} className="px-3 sm:px-5 h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap">​Get Started </Button>
-            </div>
+            <Button onClick={() => navigate("/auth")} className="px-3 sm:px-5 h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap">Get Started</Button>
           </div>
         </div>
       </header>
