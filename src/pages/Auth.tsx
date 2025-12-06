@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Upload, Lock, Mail, User as UserIcon, Phone, Globe, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
-import logo from "@/assets/ticlapay-logo.jpg";
+import logo from "@/assets/ticlapay-logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -345,7 +345,7 @@ const Auth = () => {
               to="/" 
               className="flex items-center justify-center group transition-all duration-300"
             >
-              <img src={logo} alt="TiclaPay Logo" className="h-12 sm:h-14 object-contain group-hover:scale-105 transition-transform duration-300" />
+              <img src={logo} alt="TiclaPay Logo" className="h-14 sm:h-16 md:h-20 object-contain group-hover:scale-105 transition-transform duration-300" />
             </Link>
             
             <div className="space-y-1.5 sm:space-y-2">
