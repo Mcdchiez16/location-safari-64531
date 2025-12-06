@@ -85,7 +85,7 @@ const Index = () => {
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-3 sm:py-4">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-            <img src={logo} alt="TiclaPay Logo" className="h-6 sm:h-10 md:h-14 object-contain" />
+            <img src={logo} alt="TiclaPay Logo" className="h-8 object-contain" />
           </div>
 
           {/* Right Side Actions */}
@@ -315,7 +315,7 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center mb-4">
-                <img src={logo} alt="TiclaPay Logo" className="h-10 md:h-12 object-contain rounded-lg" />
+                <img src={logo} alt="TiclaPay Logo" className="h-8 object-contain rounded-lg" />
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Fast and secure international money transfers. Your trusted partner for seamless cross-border payments worldwide.
