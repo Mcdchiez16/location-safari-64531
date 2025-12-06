@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock, User, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import InteractiveBackground from "@/components/InteractiveBackground";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/ticlapay-logo.jpg";
 const Index = () => {
   const navigate = useNavigate();
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
@@ -57,9 +57,8 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logo} alt="Ticlapay Logo" className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl object-cover shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105" />
-              <span className="text-xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-bold font-mono text-center sm:text-xl">Ticla-Pay</span>
+            <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => navigate("/")}>
+              <img src={logo} alt="TiclaPay Logo" className="h-10 sm:h-12 object-contain transition-all duration-300 group-hover:scale-105" />
             </div>
 
             {/* Right Side Actions */}
@@ -340,8 +339,8 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl font-bold text-primary font-mono">​Ticla-Pay</span>
+              <div className="flex items-center mb-4">
+                <img src={logo} alt="TiclaPay Logo" className="h-10 object-contain" />
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Fast and secure money transfers from Zimbabwe to Zambia. Your trusted cross-border payment partner.
