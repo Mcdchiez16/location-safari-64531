@@ -119,7 +119,7 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 md:pt-48 md:pb-32 overflow-hidden">
+      <section className="relative pt-20 pb-12 sm:pt-28 sm:pb-20 md:pt-32 md:pb-24 overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl float-animation" />
         <div className="absolute bottom-20 right-10 w-48 h-48 bg-accent/10 rounded-full blur-3xl float-animation-delayed" />
