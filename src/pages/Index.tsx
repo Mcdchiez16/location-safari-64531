@@ -5,14 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock, User, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/ticlapay-logo.png";
-
 const Index = () => {
   const navigate = useNavigate();
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [amount, setAmount] = useState(100);
   const [transferFeePercentage, setTransferFeePercentage] = useState(12);
   const [isScrolled, setIsScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -20,7 +18,6 @@ const Index = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,13 +29,11 @@ const Index = () => {
       } catch (error) {
         console.error('Error fetching exchange rate:', error);
       }
-
       try {
-        const { data, error } = await supabase
-          .from('settings')
-          .select('value')
-          .eq('key', 'transfer_fee_percentage')
-          .single();
+        const {
+          data,
+          error
+        } = await supabase.from('settings').select('value').eq('key', 'transfer_fee_percentage').single();
         if (!error && data) {
           setTransferFeePercentage(parseFloat(data.value));
         }
@@ -50,68 +45,59 @@ const Index = () => {
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
-
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
-
-  const features = [
-    {
-      icon: Zap,
-      title: "Lightning Fast",
-      description: "Instant transfers to mobile money wallets. Your recipient gets funds in minutes, not days."
-    },
-    {
-      icon: Shield,
-      title: "Bank-Level Security",
-      description: "Advanced encryption and fraud protection. Your money and data are always safe with us."
-    },
-    {
-      icon: Globe2,
-      title: "Competitive Rates",
-      description: "Best exchange rates with transparent pricing. No hidden fees, ever."
-    },
-    {
-      icon: Smartphone,
-      title: "Mobile Money",
-      description: "Direct to Airtel and MTN Money wallets. Simple, convenient, and reliable."
-    }
-  ];
-
-  const steps = [
-    { step: "1", title: "Create Your Account", description: "Sign up in seconds with your phone and email. Quick verification process.", icon: User },
-    { step: "2", title: "Enter Transfer Details", description: "Choose your recipient and enter the amount you want to send.", icon: Wallet },
-    { step: "3", title: "Complete Payment", description: "Pay securely via mobile money and your recipient gets funds instantly.", icon: CheckCircle }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-subtle">
+  const features = [{
+    icon: Zap,
+    title: "Lightning Fast",
+    description: "Instant transfers to mobile money wallets. Your recipient gets funds in minutes, not days."
+  }, {
+    icon: Shield,
+    title: "Bank-Level Security",
+    description: "Advanced encryption and fraud protection. Your money and data are always safe with us."
+  }, {
+    icon: Globe2,
+    title: "Competitive Rates",
+    description: "Best exchange rates with transparent pricing. No hidden fees, ever."
+  }, {
+    icon: Smartphone,
+    title: "Mobile Money",
+    description: "Direct to Airtel and MTN Money wallets. Simple, convenient, and reliable."
+  }];
+  const steps = [{
+    step: "1",
+    title: "Create Your Account",
+    description: "Sign up in seconds with your phone and email. Quick verification process.",
+    icon: User
+  }, {
+    step: "2",
+    title: "Enter Transfer Details",
+    description: "Choose your recipient and enter the amount you want to send.",
+    icon: Wallet
+  }, {
+    step: "3",
+    title: "Complete Payment",
+    description: "Pay securely via mobile money and your recipient gets funds instantly.",
+    icon: CheckCircle
+  }];
+  return <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background shadow-md border-b border-border">
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-12 py-3 sm:py-4">
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-            <img 
-              src={logo} 
-              alt="TiclaPay Logo" 
-              className="h-6 sm:h-10 md:h-14 object-contain" 
-            />
+            <img src={logo} alt="TiclaPay Logo" className="h-6 sm:h-10 md:h-14 object-contain" />
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {exchangeRate && (
-              <div className="flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-2 bg-muted rounded-full border border-border">
+            {exchangeRate && <div className="flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-2 bg-muted rounded-full border border-border">
                 <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                 <span className="text-xs sm:text-sm font-bold text-primary">
                   ${exchangeRate.toFixed(2)}
                 </span>
-              </div>
-            )}
+              </div>}
 
-            <Button 
-              onClick={() => navigate("/auth")} 
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 sm:px-5 h-8 sm:h-10 text-xs sm:text-sm font-semibold rounded-lg"
-            >
+            <Button onClick={() => navigate("/auth")} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 sm:px-5 h-8 sm:h-10 text-xs sm:text-sm font-semibold rounded-lg">
               Get Started
             </Button>
           </div>
@@ -158,11 +144,7 @@ const Index = () => {
               </div>
 
               <div className="pt-4">
-                <Button 
-                  size="lg" 
-                  onClick={() => navigate("/auth")} 
-                  className="clay-button h-14 px-10 text-lg font-bold text-primary-foreground"
-                >
+                <Button size="lg" onClick={() => navigate("/auth")} className="clay-button h-14 px-10 text-lg font-bold text-primary-foreground">
                   Start Sending Now
                   <ArrowRight className="ml-3 h-5 w-5" />
                 </Button>
@@ -184,13 +166,7 @@ const Index = () => {
                       You send
                     </label>
                     <div className="relative">
-                      <Input 
-                        type="number" 
-                        value={amount} 
-                        onChange={e => setAmount(Number(e.target.value) || 0)} 
-                        className="clay-input pr-20 h-14 text-xl font-bold" 
-                        min="1" 
-                      />
+                      <Input type="number" value={amount} onChange={e => setAmount(Number(e.target.value) || 0)} className="clay-input pr-20 h-14 text-xl font-bold" min="1" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-lg text-primary">USD</span>
                     </div>
                   </div>
@@ -201,12 +177,7 @@ const Index = () => {
                       They receive
                     </label>
                     <div className="relative">
-                      <Input 
-                        type="text" 
-                        value={recipientGets} 
-                        readOnly 
-                        className="clay-input pr-20 h-14 text-xl font-bold bg-muted/30" 
-                      />
+                      <Input type="text" value={recipientGets} readOnly className="clay-input pr-20 h-14 text-xl font-bold bg-muted/30" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-lg text-primary">ZMW</span>
                     </div>
                   </div>
@@ -218,10 +189,7 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={() => navigate("/auth")} 
-                    className="clay-button w-full h-14 text-base font-bold text-primary-foreground"
-                  >
+                  <Button onClick={() => navigate("/auth")} className="clay-button w-full h-14 text-base font-bold text-primary-foreground">
                     Continue to Send
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
@@ -241,17 +209,22 @@ const Index = () => {
               <p className="text-lg text-muted-foreground">Join our growing community of satisfied users</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { value: "10K+", label: "Active Users" },
-                { value: "$2M+", label: "Transferred" },
-                { value: "99.9%", label: "Success Rate" },
-                { value: "<30min", label: "Avg. Transfer Time" }
-              ].map((stat, index) => (
-                <div key={index} className="clay-stat">
+              {[{
+              value: "10K+",
+              label: "Active Users"
+            }, {
+              value: "$2M+",
+              label: "Transferred"
+            }, {
+              value: "99.9%",
+              label: "Success Rate"
+            }, {
+              value: "<30min",
+              label: "Avg. Transfer Time"
+            }].map((stat, index) => <div key={index} className="clay-stat">
                   <div className="text-3xl sm:text-4xl font-bold text-gradient mb-2">{stat.value}</div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -269,12 +242,8 @@ const Index = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {features.map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <div 
-                  key={index} 
-                  className="clay-card p-8 transition-all duration-300 hover:-translate-y-2 group"
-                >
+            const IconComponent = feature.icon;
+            return <div key={index} className="clay-card p-8 transition-all duration-300 hover:-translate-y-2 group">
                   <div className="clay-icon w-16 h-16 mb-6 group-hover:scale-110 transition-transform">
                     <IconComponent className="h-8 w-8 text-primary-foreground" />
                   </div>
@@ -282,9 +251,8 @@ const Index = () => {
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {feature.description}
                   </p>
-                </div>
-              );
-            })}
+                </div>;
+          })}
           </div>
         </div>
       </section>
@@ -299,9 +267,8 @@ const Index = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {steps.map((item, index) => {
-              const IconComponent = item.icon;
-              return (
-                <div key={index} className="relative">
+            const IconComponent = item.icon;
+            return <div key={index} className="relative">
                   <div className="clay-card p-8 text-center h-full transition-all duration-300 hover:-translate-y-2">
                     <div className="clay-icon w-16 h-16 mx-auto mb-6">
                       <IconComponent className="w-8 h-8 text-primary-foreground" />
@@ -312,14 +279,11 @@ const Index = () => {
                     <h3 className="text-xl font-bold mb-3 text-foreground">{item.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
                   </div>
-                  {index < 2 && (
-                    <div className="hidden md:block absolute top-1/2 left-full w-8 -translate-y-1/2 -translate-x-4">
+                  {index < 2 && <div className="hidden md:block absolute top-1/2 left-full w-8 -translate-y-1/2 -translate-x-4">
                       <ArrowRight className="h-8 w-8 text-primary/40" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                    </div>}
+                </div>;
+          })}
           </div>
         </div>
       </section>
@@ -338,11 +302,7 @@ const Index = () => {
           <p className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl mx-auto leading-relaxed">
             Join thousands of people sending money across borders with TiclaPay. Fast, secure, and reliable transfers worldwide.
           </p>
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/auth")} 
-            className="h-14 sm:h-16 px-10 sm:px-14 text-base sm:text-lg font-bold bg-background text-primary hover:bg-background/95 shadow-2xl transition-all hover:scale-105"
-          >
+          <Button size="lg" onClick={() => navigate("/auth")} className="h-14 sm:h-16 px-10 sm:px-14 text-base sm:text-lg font-bold bg-background text-primary hover:bg-background/95 shadow-2xl transition-all hover:scale-105">
             Create Free Account
             <ArrowRight className="ml-2 h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
@@ -355,7 +315,7 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center mb-4">
-                <img src={logo} alt="TiclaPay Logo" className="h-16 md:h-20 object-contain" />
+                <img src={logo} alt="TiclaPay Logo" className="h-16 md:h-20 object-contain rounded-lg" />
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Fast and secure international money transfers. Your trusted partner for seamless cross-border payments worldwide.
@@ -395,8 +355,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
