@@ -92,16 +92,16 @@ const Index = () => {
             <img 
               src={logo} 
               alt="TiclaPay Logo" 
-              className="h-8 sm:h-12 md:h-16 object-contain" 
+              className="h-6 sm:h-10 md:h-14 object-contain" 
             />
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             {exchangeRate && (
-              <div className="hidden sm:flex clay-badge items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary animate-pulse" />
-                <span className="text-sm font-bold text-gradient">
+              <div className="flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-2 bg-muted rounded-full border border-border">
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                <span className="text-xs sm:text-sm font-bold text-primary">
                   ${exchangeRate.toFixed(2)}
                 </span>
               </div>
@@ -110,7 +110,7 @@ const Index = () => {
             <Button 
               onClick={() => navigate("/auth")} 
               size="sm"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 sm:px-6 h-10 sm:h-11 text-sm font-semibold rounded-xl shadow-md"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 sm:px-5 h-8 sm:h-10 text-xs sm:text-sm font-semibold rounded-lg"
             >
               Get Started
             </Button>
