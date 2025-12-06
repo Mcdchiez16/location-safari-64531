@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeftRight, Upload, Lock, Mail, User as UserIcon, Phone, Globe, Shield } from "lucide-react";
+import { Upload, Lock, Mail, User as UserIcon, Phone, Globe, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
+import logo from "@/assets/ticlapay-logo.jpg";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -342,17 +343,9 @@ const Auth = () => {
           <CardHeader className="space-y-4 sm:space-y-6 pb-6 sm:pb-8 px-4 sm:px-6 pt-6 sm:pt-8">
             <Link 
               to="/" 
-              className="flex items-center gap-2 sm:gap-3 justify-center group transition-all duration-300"
+              className="flex items-center justify-center group transition-all duration-300"
             >
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500" />
-                <div className="relative bg-gradient-to-br from-primary to-accent p-2 sm:p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <ArrowLeftRight className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
-                </div>
-              </div>
-              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-                Ticlapay
-              </span>
+              <img src={logo} alt="TiclaPay Logo" className="h-12 sm:h-14 object-contain group-hover:scale-105 transition-transform duration-300" />
             </Link>
             
             <div className="space-y-1.5 sm:space-y-2">
