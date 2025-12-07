@@ -58,7 +58,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center group cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logo} alt="TiclaPay Logo" className="h-12 sm:h-14 md:h-16 object-contain transition-all duration-300 group-hover:scale-105" />
+              <img src={logo} alt="TiclaPay Logo" className="h-8 object-contain transition-all duration-300 group-hover:scale-105" />
             </div>
 
             {/* Right Side Actions */}
@@ -340,7 +340,7 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center mb-4">
-                <img src={logo} alt="TiclaPay Logo" className="h-12 md:h-14 object-contain" />
+                <img src={logo} alt="TiclaPay Logo" className="h-8 object-contain" />
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Fast and secure money transfers from Zimbabwe to Zambia. Your trusted cross-border payment partner.
