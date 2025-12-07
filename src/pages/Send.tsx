@@ -634,9 +634,8 @@ const Send = () => {
       <header className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <img src={logo} alt="Tangila Pay Logo" className="w-8 h-8 rounded-lg object-cover shadow-lg" />
-              <span className="font-mono text-blue-500 text-lg font-bold">Ticla-Pay</span>
+            <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+              <img src={logo} alt="TiclaPay Logo" className="h-7 sm:h-8 object-contain" />
             </div>
             <Button variant="outline" onClick={() => navigate('/dashboard')} className="gap-2 transition-all hover-scale border-primary/20 bg-blue-600 hover:bg-blue-500 text-slate-50">
               <ArrowLeft className="h-4 w-4" />
