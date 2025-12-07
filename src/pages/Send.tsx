@@ -48,8 +48,9 @@ const Send = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [countryCode, setCountryCode] = useState("+263");
+  const [countryCode, setCountryCode] = useState<string>("");
   const [senderCountry, setSenderCountry] = useState<string | null>(null);
+  const [countryLoaded, setCountryLoaded] = useState(false);
   const [lookupValue, setLookupValue] = useState("");
   const [receiverProfile, setReceiverProfile] = useState<ReceiverProfile | null>(null);
   const [autoLookupTimer, setAutoLookupTimer] = useState<NodeJS.Timeout | null>(null);
@@ -134,10 +135,19 @@ const Send = () => {
           setCountryCode("+263");
         } else if (data.country === "Zimbabwe") {
           setCountryCode("+260");
+        } else {
+          // Default to +260 if country is unknown
+          setCountryCode("+260");
         }
+      } else {
+        // Default to +260 if no profile data
+        setCountryCode("+260");
       }
     } catch (error) {
       console.error('Error fetching sender profile:', error);
+      setCountryCode("+260");
+    } finally {
+      setCountryLoaded(true);
     }
   };
   const fetchPaymentNumber = async () => {
@@ -681,18 +691,26 @@ const Send = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="lookup" className="text-sm font-medium text-foreground mb-2 block">
-                  Phone Number
+                  Phone Number {senderCountry && <span className="text-muted-foreground font-normal">({senderCountry === "Zimbabwe" ? "Zambia" : senderCountry === "Zambia" ? "Zimbabwe" : "Receiver"})</span>}
                 </Label>
                 <div className="flex gap-3 mt-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-medium text-muted-foreground pointer-events-none">
-                      {countryCode}
-                    </span>
-                    <Input id="lookup" type="tel" placeholder="976 543 210" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="h-12 text-base font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-16 pr-4 transition-all placeholder:text-muted-foreground/60" maxLength={9} />
+                    {countryLoaded ? (
+                      <>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-medium text-muted-foreground pointer-events-none">
+                          {countryCode}
+                        </span>
+                        <Input id="lookup" type="tel" placeholder="976 543 210" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="h-12 text-base font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-16 pr-4 transition-all placeholder:text-muted-foreground/60" maxLength={9} />
+                      </>
+                    ) : (
+                      <div className="h-12 bg-muted/50 rounded-lg animate-pulse flex items-center px-4">
+                        <span className="text-muted-foreground text-sm">Loading...</span>
+                      </div>
+                    )}
                   </div>
                   
                 </div>
-                {lookupValue && <p className="text-xs text-muted-foreground mt-2">
+                {lookupValue && countryLoaded && <p className="text-xs text-muted-foreground mt-2">
                     {lookupValue.length}/9 digits • Full number: {getFullPhoneNumber()}
                   </p>}
               </div>
