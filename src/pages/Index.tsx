@@ -335,48 +335,84 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-card border-t py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center mb-4">
-                <img src={logo} alt="TiclaPay Logo" className="h-20 object-contain" />
+      <footer className="relative bg-gradient-to-br from-primary/95 via-primary to-primary/90 text-primary-foreground overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/3 rounded-full blur-3xl" />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Top section with wave separator */}
+          <div className="pt-16 pb-12">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-12">
+              {/* Brand section */}
+              <div className="lg:max-w-sm">
+                <div className="inline-flex items-center gap-3 mb-6 bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3">
+                  <img src={logo} alt="TiclaPay Logo" className="h-8 object-contain brightness-0 invert" />
+                </div>
+                <p className="text-primary-foreground/80 leading-relaxed mb-6">
+                  Fast and secure cross-border money transfers. Your trusted payment partner for seamless international remittances.
+                </p>
+                <div className="flex gap-3">
+                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all hover:scale-110">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                  </a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all hover:scale-110">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
+                  </a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all hover:scale-110">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                  </a>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Fast and secure money transfers from Zimbabwe to Zambia. Your trusted cross-border payment partner.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-base mb-3 text-foreground">Company</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li onClick={() => navigate("/about-us")} className="hover:text-primary cursor-pointer transition-colors">About Us</li>
-                <li onClick={() => navigate("/how-it-works")} className="hover:text-primary cursor-pointer transition-colors">How It Works</li>
-                <li onClick={() => navigate("/pricing")} className="hover:text-primary cursor-pointer transition-colors">Pricing</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-base mb-3 text-foreground">Support</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li onClick={() => navigate("/help-center")} className="hover:text-primary cursor-pointer transition-colors">Help Center</li>
-                <li onClick={() => navigate("/contact-us")} className="hover:text-primary cursor-pointer transition-colors">Contact Us</li>
-                <li onClick={() => navigate("/faqs")} className="hover:text-primary cursor-pointer transition-colors">FAQs</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-base mb-3 text-foreground">Legal</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li onClick={() => navigate("/privacy-policy")} className="hover:text-primary cursor-pointer transition-colors">Privacy Policy</li>
-                <li onClick={() => navigate("/terms-of-service")} className="hover:text-primary cursor-pointer transition-colors">Terms of Service</li>
-                <li onClick={() => navigate("/security")} className="hover:text-primary cursor-pointer transition-colors">Security</li>
-              </ul>
+
+              {/* Links sections */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 lg:gap-16">
+                <div>
+                  <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary-foreground/60">Company</h3>
+                  <ul className="space-y-3">
+                    <li><span onClick={() => navigate("/about-us")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />About Us</span></li>
+                    <li><span onClick={() => navigate("/how-it-works")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />How It Works</span></li>
+                    <li><span onClick={() => navigate("/pricing")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />Pricing</span></li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary-foreground/60">Support</h3>
+                  <ul className="space-y-3">
+                    <li><span onClick={() => navigate("/help-center")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />Help Center</span></li>
+                    <li><span onClick={() => navigate("/contact-us")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />Contact Us</span></li>
+                    <li><span onClick={() => navigate("/faqs")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />FAQs</span></li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary-foreground/60">Legal</h3>
+                  <ul className="space-y-3">
+                    <li><span onClick={() => navigate("/privacy-policy")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />Privacy Policy</span></li>
+                    <li><span onClick={() => navigate("/terms-of-service")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />Terms of Service</span></li>
+                    <li><span onClick={() => navigate("/security")} className="text-primary-foreground/80 hover:text-primary-foreground cursor-pointer transition-colors inline-flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary-foreground transition-all" />Security</span></li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="border-t pt-8 text-center">
-            <p className="text-sm text-muted-foreground">© 2024 Ticla-Pay. All rights reserved. Secure cross-border payments made easy.</p>
+          {/* Bottom bar */}
+          <div className="border-t border-white/10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-primary-foreground/60">© 2024 TiclaPay. All rights reserved.</p>
+            <div className="flex items-center gap-6 text-sm text-primary-foreground/60">
+              <span className="flex items-center gap-2">
+                <Shield className="w-4 h-4" />
+                Secure Payments
+              </span>
+              <span className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Fast Transfers
+              </span>
+            </div>
           </div>
         </div>
       </footer>
