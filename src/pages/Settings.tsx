@@ -206,7 +206,7 @@ const Settings = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 md:space-x-3">
               <img src={logo} alt="TuraPay Logo" className="w-8 h-8 md:w-10 md:h-10 rounded-xl object-cover shadow-md hover:shadow-lg transition-shadow" />
-              <span className="text-lg md:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">TuraPay</span>
+              
             </div>
             <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-1 md:gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-xs md:text-sm px-2 md:px-4 rounded-lg transition-all">
               <ArrowLeft className="h-3 w-3 md:h-4 md:w-4" />
