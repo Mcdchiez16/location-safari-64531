@@ -11,7 +11,7 @@ import { detectCardType, formatCardNumber, formatCardExpiry } from "@/lib/cardUt
 import Navbar from "@/components/Navbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { z } from "zod";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/ticlapay-logo.png";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Validation schemas
@@ -48,7 +48,8 @@ const Send = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const [countryCode, setCountryCode] = useState("+260");
+  const [countryCode, setCountryCode] = useState("+263");
+  const [senderCountry, setSenderCountry] = useState<string | null>(null);
   const [lookupValue, setLookupValue] = useState("");
   const [receiverProfile, setReceiverProfile] = useState<ReceiverProfile | null>(null);
   const [autoLookupTimer, setAutoLookupTimer] = useState<NodeJS.Timeout | null>(null);
@@ -122,9 +123,18 @@ const Send = () => {
       const {
         data,
         error
-      } = await supabase.from("profiles").select("verified").eq("id", userId).single();
+      } = await supabase.from("profiles").select("verified, country").eq("id", userId).single();
       if (!error && data) {
         setSenderVerified(data.verified || false);
+        setSenderCountry(data.country || null);
+        // Set receiver country code based on sender's country
+        // If sender is in Zambia, receiver is in Zimbabwe (+263)
+        // If sender is in Zimbabwe, receiver is in Zambia (+260)
+        if (data.country === "Zambia") {
+          setCountryCode("+263");
+        } else if (data.country === "Zimbabwe") {
+          setCountryCode("+260");
+        }
       }
     } catch (error) {
       console.error('Error fetching sender profile:', error);
@@ -676,7 +686,7 @@ const Send = () => {
                 <div className="flex gap-3 mt-2">
                   <div className="relative flex-1">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-medium text-muted-foreground pointer-events-none">
-                      +260
+                      {countryCode}
                     </span>
                     <Input id="lookup" type="tel" placeholder="976 543 210" value={lookupValue} onChange={e => handleLookupChange(e.target.value)} className="h-12 text-base font-medium tracking-wide bg-card border border-primary/20 hover:border-primary/50 focus:border-primary rounded-lg pl-16 pr-4 transition-all placeholder:text-muted-foreground/60" maxLength={9} />
                   </div>
