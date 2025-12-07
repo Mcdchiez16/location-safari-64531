@@ -58,7 +58,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center group cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logo} alt="TiclaPay Logo" className="h-9 object-contain transition-all duration-300 group-hover:scale-105 rounded-md" />
+              <img src={logo} alt="TiclaPay Logo" className="h-7 sm:h-8 object-contain transition-all duration-300 group-hover:scale-105 rounded-md" />
             </div>
 
             {/* Right Side Actions */}
