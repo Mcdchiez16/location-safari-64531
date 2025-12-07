@@ -199,160 +199,224 @@ const Settings = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  return <div className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-muted/20">
       {/* Professional Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-lg bg-white/95">
-        <div className="container mx-auto px-4 py-3 md:py-4">
+      <header className="bg-card/80 backdrop-blur-xl border-b border-border/50 sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-4 md:py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-              <img src={logo} alt="TiclaPay Logo" className="h-7 sm:h-12 md:h-14 object-contain" />
+            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+              <div className="relative">
+                <img src={logo} alt="TiclaPay Logo" className="h-10 sm:h-12 md:h-14 object-contain transition-transform group-hover:scale-105" />
+              </div>
             </div>
-            <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-1 md:gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-xs md:text-sm px-2 md:px-4 rounded-lg transition-all">
-              <ArrowLeft className="h-3 w-3 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Back to Dashboard</span>
-              <span className="sm:hidden">Back</span>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/dashboard')} 
+              className="gap-2 border-border/50 hover:bg-muted/50 hover:border-primary/30 text-foreground/80 hover:text-foreground text-sm px-4 py-2 rounded-xl transition-all duration-200"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Dashboard</span>
             </Button>
           </div>
         </div>
       </header>
       
-      <div className="container mx-auto px-4 py-6 md:py-8 max-w-5xl">
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
-            Account Settings
-          </h1>
-          <p className="text-sm md:text-base text-gray-600">
-            Manage your profile, security, and account preferences
+      <div className="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
+        {/* Page Header */}
+        <div className="mb-8 md:mb-10">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 bg-primary/10 rounded-xl">
+              <SettingsIcon className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+              Settings
+            </h1>
+          </div>
+          <p className="text-sm md:text-base text-muted-foreground ml-0 md:ml-14">
+            Manage your profile, security, and preferences
           </p>
         </div>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white border border-gray-200 rounded-xl p-1.5 mb-6 shadow-sm">
-            <TabsTrigger value="profile" className="flex gap-2 items-center data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg py-2.5 md:py-3 font-medium transition-all text-xs md:text-sm">
-              <User className="h-3 w-3 md:h-4 md:w-4" /> <span className="hidden sm:inline">Profile</span>
+          <TabsList className="grid w-full grid-cols-3 bg-card border border-border/50 rounded-2xl p-1.5 mb-8 shadow-sm h-auto">
+            <TabsTrigger 
+              value="profile" 
+              className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm"
+            >
+              <User className="h-4 w-4" /> 
+              <span className="hidden sm:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="flex gap-2 items-center data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg py-2.5 md:py-3 font-medium transition-all text-xs md:text-sm">
-              <Lock className="h-3 w-3 md:h-4 md:w-4" /> <span className="hidden sm:inline">Security</span>
+            <TabsTrigger 
+              value="security" 
+              className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm"
+            >
+              <Lock className="h-4 w-4" /> 
+              <span className="hidden sm:inline">Security</span>
             </TabsTrigger>
-            <TabsTrigger value="support" className="flex gap-2 items-center data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg py-2.5 md:py-3 font-medium transition-all text-xs md:text-sm">
-              <HelpCircle className="h-3 w-3 md:h-4 md:w-4" /> <span className="hidden sm:inline">Support</span>
+            <TabsTrigger 
+              value="support" 
+              className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm"
+            >
+              <HelpCircle className="h-4 w-4" /> 
+              <span className="hidden sm:inline">Support</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile">
-            <div className="space-y-4 md:space-y-6">
-              <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow rounded-xl overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 p-4 md:p-6">
-                  <CardTitle className="text-lg md:text-xl font-semibold text-gray-900 flex items-center gap-2">
-                    <User className="h-5 w-5 text-blue-600" />
-                    Personal Information
-                  </CardTitle>
-                  <p className="text-xs md:text-sm text-gray-600">Manage your account details and preferences</p>
+          <TabsContent value="profile" className="animate-fade-in">
+            <div className="space-y-6">
+              {/* Personal Information Card */}
+              <Card className="border border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
+                <CardHeader className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/30 p-5 md:p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-xl">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold text-foreground">Personal Information</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-0.5">Your account details</p>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Full Name</p>
-                      <p className="text-sm md:text-base font-semibold text-gray-900">{profile?.full_name}</p>
+                <CardContent className="p-5 md:p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="group p-4 bg-muted/30 hover:bg-muted/50 rounded-xl border border-border/30 transition-all duration-200">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Full Name</p>
+                      <p className="text-base font-semibold text-foreground">{profile?.full_name}</p>
                     </div>
                     
-                    <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</p>
-                      <p className="text-sm md:text-base font-semibold text-gray-900">{profile?.email}</p>
+                    <div className="group p-4 bg-muted/30 hover:bg-muted/50 rounded-xl border border-border/30 transition-all duration-200">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Email</p>
+                      <p className="text-base font-semibold text-foreground truncate">{profile?.email}</p>
                     </div>
                     
-                    <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Phone Number</p>
-                      <p className="text-sm md:text-base font-semibold text-gray-900">{profile?.phone_number}</p>
+                    <div className="group p-4 bg-muted/30 hover:bg-muted/50 rounded-xl border border-border/30 transition-all duration-200">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Phone Number</p>
+                      <p className="text-base font-semibold text-foreground">{profile?.phone_number}</p>
                     </div>
                     
-                    <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Country</p>
-                      <p className="text-sm md:text-base font-semibold text-gray-900">{profile?.country}</p>
-                    </div>
-                    
-                    <div className="space-y-2 p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Verification Status</p>
-                      <div className="flex items-center gap-2">
-                        {profile?.verified ? <>
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                            <span className="text-sm md:text-base font-semibold text-green-600">Verified</span>
-                          </> : <>
-                            <AlertCircle className="h-5 w-5 text-orange-500" />
-                            <span className="text-sm md:text-base font-semibold text-orange-500">Please Verify</span>
-                          </>}
-                      </div>
+                    <div className="group p-4 bg-muted/30 hover:bg-muted/50 rounded-xl border border-border/30 transition-all duration-200">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Country</p>
+                      <p className="text-base font-semibold text-foreground">{profile?.country}</p>
                     </div>
                   </div>
                   
-                  {!profile?.verified && <>
-                      <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                        <p className="text-sm text-orange-800">
-                          Your account is not yet verified. Please complete the verification process to access all features.
-                        </p>
-                      </div>
-                      
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <Button onClick={() => navigate('/verification')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium">
-                          Complete Verification
-                        </Button>
-                      </div>
-                    </>}
-                  
-                  {profile?.verified && <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                        <p className="text-sm font-medium text-green-800">
-                          Your account is fully verified and ready to use all features.
-                        </p>
-                      </div>
-                    </div>}
+                  {/* Verification Status */}
+                  <div className="mt-5 pt-5 border-t border-border/30">
+                    <div className={`flex items-center gap-3 p-4 rounded-xl ${profile?.verified ? 'bg-success/10 border border-success/20' : 'bg-warning/10 border border-warning/20'}`}>
+                      {profile?.verified ? (
+                        <>
+                          <div className="p-2 bg-success/20 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-success" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-success">Account Verified</p>
+                            <p className="text-sm text-success/80">You have full access to all features</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="p-2 bg-warning/20 rounded-lg">
+                            <AlertCircle className="h-5 w-5 text-warning" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-warning">Verification Required</p>
+                            <p className="text-sm text-warning/80">Complete verification to unlock all features</p>
+                          </div>
+                          <Button 
+                            onClick={() => navigate('/verification')} 
+                            size="sm"
+                            className="bg-warning hover:bg-warning/90 text-warning-foreground rounded-lg font-medium shadow-sm"
+                          >
+                            Verify Now
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              {isReceiver && profile?.verified && <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow rounded-xl overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-white border-b border-gray-200 p-4 md:p-6">
-                    <CardTitle className="text-lg md:text-xl font-semibold text-gray-900 flex items-center gap-2">
-                      <QrCode className="h-5 w-5 text-blue-600" />
-                      Payment Settings
-                    </CardTitle>
-                    <p className="text-xs md:text-sm text-gray-600">Configure your payment links and QR codes</p>
+              {/* Payment Settings Card - Only for verified receivers */}
+              {isReceiver && profile?.verified && (
+                <Card className="border border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-border/30 p-5 md:p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-xl">
+                        <QrCode className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg font-semibold text-foreground">Payment Settings</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-0.5">Manage your payment links and QR codes</p>
+                      </div>
+                    </div>
                   </CardHeader>
-                  <CardContent className="p-4 md:p-6">
-                    <Button onClick={() => navigate('/payment-link')} className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all">
+                  <CardContent className="p-5 md:p-6">
+                    <Button 
+                      onClick={() => navigate('/payment-link')} 
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      <QrCode className="h-4 w-4 mr-2" />
                       Manage Payment Link & QR Code
                     </Button>
                   </CardContent>
-                </Card>}
+                </Card>
+              )}
             </div>
           </TabsContent>
 
-          <TabsContent value="security">
-            <div className="space-y-4 md:space-y-6">
-              <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow rounded-xl overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 p-4 md:p-6">
-                  <CardTitle className="text-lg md:text-xl font-semibold text-gray-900 flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-blue-600" />
-                    Account Security
-                  </CardTitle>
-                  <p className="text-xs md:text-sm text-gray-600">Protect your account with additional security measures</p>
+          <TabsContent value="security" className="animate-fade-in">
+            <div className="space-y-6">
+              {/* Security Overview Card */}
+              <Card className="border border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
+                <CardHeader className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/30 p-5 md:p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-xl">
+                      <Shield className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold text-foreground">Account Security</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-0.5">Protect your account with security measures</p>
+                    </div>
+                  </div>
                 </CardHeader>
-                
+                <CardContent className="p-5 md:p-6">
+                  <div className="p-4 bg-muted/30 rounded-xl border border-border/30">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-success/10 rounded-lg">
+                        <Lock className="h-4 w-4 text-success" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">Password Protected</p>
+                        <p className="text-sm text-muted-foreground">Your account is secured with a password</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
 
-              <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow rounded-xl overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-red-50 to-white border-b border-red-200 p-4 md:p-6">
-                  <CardTitle className="text-lg md:text-xl font-semibold text-gray-900 flex items-center gap-2">
-                    <LogOut className="h-5 w-5 text-red-600" />
-                    Sign Out
-                  </CardTitle>
-                  <p className="text-xs md:text-sm text-gray-600">End your current session securely</p>
+              {/* Sign Out Card */}
+              <Card className="border border-destructive/20 shadow-lg rounded-2xl overflow-hidden bg-card">
+                <CardHeader className="bg-gradient-to-r from-destructive/5 to-transparent border-b border-destructive/10 p-5 md:p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-destructive/10 rounded-xl">
+                      <LogOut className="h-5 w-5 text-destructive" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold text-foreground">Sign Out</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-0.5">End your current session</p>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="p-4 md:p-6">
-                  <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">
-                    You will be logged out of your account and redirected to the login page.
+                <CardContent className="p-5 md:p-6">
+                  <p className="text-sm text-muted-foreground mb-5">
+                    You will be logged out and redirected to the login page. Make sure to save any unsaved changes.
                   </p>
-                  <Button onClick={handleLogout} className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all">
+                  <Button 
+                    onClick={handleLogout} 
+                    variant="destructive"
+                    className="w-full py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
                     Sign Out of Your Account
                   </Button>
                 </CardContent>
@@ -360,52 +424,68 @@ const Settings = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="support">
-            <Card className="border border-gray-200 shadow-lg hover:shadow-xl transition-shadow rounded-xl overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-white border-b border-gray-200 p-4 md:p-6">
-                <CardTitle className="text-lg md:text-xl font-semibold text-gray-900 flex items-center gap-2">
-                  <HelpCircle className="h-5 w-5 text-blue-600" />
-                  Help & Support
-                </CardTitle>
-                <p className="text-xs md:text-sm text-gray-600">Get assistance and find answers to your questions</p>
+          <TabsContent value="support" className="animate-fade-in">
+            <Card className="border border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
+              <CardHeader className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/30 p-5 md:p-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <HelpCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-foreground">Help & Support</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-0.5">Get assistance when you need it</p>
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent className="p-4 md:p-6 space-y-4 md:space-y-6">
-                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
-                  <div className="p-4 md:p-5 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-200 hover:shadow-md transition-all">
+              <CardContent className="p-5 md:p-6 space-y-5">
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Email Support */}
+                  <div className="group p-5 bg-primary/5 hover:bg-primary/10 rounded-xl border border-primary/10 hover:border-primary/20 transition-all duration-200">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg shadow-sm">
-                        <Mail className="h-4 w-4 md:h-5 md:w-5 text-white" />
+                      <div className="p-2.5 bg-primary rounded-xl shadow-sm">
+                        <Mail className="h-4 w-4 text-primary-foreground" />
                       </div>
-                      <h3 className="font-semibold text-sm md:text-base text-gray-900">Email Support</h3>
+                      <h3 className="font-semibold text-foreground">Email Support</h3>
                     </div>
-                    <p className="text-xs md:text-sm text-gray-600 mb-2">Get help via email</p>
-                    <p className="font-semibold text-sm md:text-base text-blue-600 break-all">{supportSettings?.email || 'support@turapay.com'}</p>
+                    <p className="text-sm text-muted-foreground mb-2">Get help via email</p>
+                    <p className="font-medium text-primary break-all">{supportSettings?.email || 'support@ticlapay.com'}</p>
                   </div>
                   
-                  <div className="p-4 md:p-5 bg-gradient-to-br from-green-50 to-white rounded-xl border border-green-200 hover:shadow-md transition-all">
+                  {/* Phone Support */}
+                  <div className="group p-5 bg-success/5 hover:bg-success/10 rounded-xl border border-success/10 hover:border-success/20 transition-all duration-200">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-gradient-to-br from-green-600 to-green-700 rounded-lg shadow-sm">
-                        <Phone className="h-4 w-4 md:h-5 md:w-5 text-white" />
+                      <div className="p-2.5 bg-success rounded-xl shadow-sm">
+                        <Phone className="h-4 w-4 text-success-foreground" />
                       </div>
-                      <h3 className="font-semibold text-sm md:text-base text-gray-900">Phone Support</h3>
+                      <h3 className="font-semibold text-foreground">Phone Support</h3>
                     </div>
-                    <p className="text-xs md:text-sm text-gray-600 mb-2">Call us for assistance</p>
-                    <p className="font-semibold text-sm md:text-base text-gray-900">{supportSettings?.phone || 'Contact via email'}</p>
+                    <p className="text-sm text-muted-foreground mb-2">Call us for assistance</p>
+                    <p className="font-medium text-foreground">{supportSettings?.phone || 'Contact via email'}</p>
                   </div>
                 </div>
                 
-                {supportSettings?.additional_info && <div className="p-4 bg-gradient-to-r from-blue-50 to-white border border-blue-200 rounded-xl shadow-sm">
-                    <div className="flex items-start gap-2">
-                      <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-sm md:text-base text-gray-900 mb-1">Support Hours</h4>
-                        <p className="text-xs md:text-sm text-gray-700">{supportSettings.additional_info}</p>
+                {/* Support Hours */}
+                {supportSettings?.additional_info && (
+                  <div className="p-4 bg-muted/40 border border-border/30 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-muted rounded-lg mt-0.5">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-foreground mb-1">Support Hours</h4>
+                        <p className="text-sm text-muted-foreground">{supportSettings.additional_info}</p>
                       </div>
                     </div>
-                  </div>}
+                  </div>
+                )}
                 
-                <div className="pt-4 border-t border-gray-200">
-                  <Button onClick={() => toast.info(`Contact support at: ${supportSettings?.email || 'support@turapay.com'}`)} className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all">
+                {/* Contact Button */}
+                <div className="pt-4 border-t border-border/30">
+                  <Button 
+                    onClick={() => toast.info(`Contact support at: ${supportSettings?.email || 'support@ticlapay.com'}`)} 
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
                     Contact Customer Support
                   </Button>
                 </div>
