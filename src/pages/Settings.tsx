@@ -205,7 +205,7 @@ const Settings = () => {
         <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 md:space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-              <img src={logo} alt="TiclaPay Logo" className="h-10 sm:h-12 md:h-14 object-contain" />
+              <img src={logo} alt="TiclaPay Logo" className="h-7 sm:h-12 md:h-14 object-contain" />
             </div>
             <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-1 md:gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-xs md:text-sm px-2 md:px-4 rounded-lg transition-all">
               <ArrowLeft className="h-3 w-3 md:h-4 md:w-4" />
