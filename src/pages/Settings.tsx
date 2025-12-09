@@ -206,14 +206,10 @@ const Settings = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
               <div className="relative">
-                <img src={logo} alt="TiclaPay Logo" className="h-10 sm:h-12 md:h-14 object-contain transition-transform group-hover:scale-105" />
+                <img src={logo} alt="TiclaPay Logo" className="h-8 sm:h-12 md:h-14 object-contain transition-transform group-hover:scale-105" />
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/dashboard')} 
-              className="gap-2 border-border/50 hover:bg-muted/50 hover:border-primary/30 text-foreground/80 hover:text-foreground text-sm px-4 py-2 rounded-xl transition-all duration-200"
-            >
+            <Button variant="outline" onClick={() => navigate('/dashboard')} className="gap-2 border-border/50 hover:bg-muted/50 hover:border-primary/30 text-foreground/80 hover:text-foreground text-sm px-4 py-2 rounded-xl transition-all duration-200">
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
             </Button>
@@ -239,24 +235,15 @@ const Settings = () => {
 
         <Tabs defaultValue="profile" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-card border border-border/50 rounded-2xl p-1.5 mb-8 shadow-sm h-auto">
-            <TabsTrigger 
-              value="profile" 
-              className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm"
-            >
+            <TabsTrigger value="profile" className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm">
               <User className="h-4 w-4" /> 
               <span className="hidden sm:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="security" 
-              className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm"
-            >
+            <TabsTrigger value="security" className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm">
               <Lock className="h-4 w-4" /> 
               <span className="hidden sm:inline">Security</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="support" 
-              className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm"
-            >
+            <TabsTrigger value="support" className="flex gap-2 items-center justify-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg rounded-xl py-3 md:py-3.5 font-medium transition-all duration-200 text-sm">
               <HelpCircle className="h-4 w-4" /> 
               <span className="hidden sm:inline">Support</span>
             </TabsTrigger>
@@ -303,8 +290,7 @@ const Settings = () => {
                   {/* Verification Status */}
                   <div className="mt-5 pt-5 border-t border-border/30">
                     <div className={`flex items-center gap-3 p-4 rounded-xl ${profile?.verified ? 'bg-success/10 border border-success/20' : 'bg-warning/10 border border-warning/20'}`}>
-                      {profile?.verified ? (
-                        <>
+                      {profile?.verified ? <>
                           <div className="p-2 bg-success/20 rounded-lg">
                             <CheckCircle className="h-5 w-5 text-success" />
                           </div>
@@ -312,9 +298,7 @@ const Settings = () => {
                             <p className="font-semibold text-success">Account Verified</p>
                             <p className="text-sm text-success/80">You have full access to all features</p>
                           </div>
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <div className="p-2 bg-warning/20 rounded-lg">
                             <AlertCircle className="h-5 w-5 text-warning" />
                           </div>
@@ -322,23 +306,17 @@ const Settings = () => {
                             <p className="font-semibold text-warning">Verification Required</p>
                             <p className="text-sm text-warning/80">Complete verification to unlock all features</p>
                           </div>
-                          <Button 
-                            onClick={() => navigate('/verification')} 
-                            size="sm"
-                            className="bg-warning hover:bg-warning/90 text-warning-foreground rounded-lg font-medium shadow-sm"
-                          >
+                          <Button onClick={() => navigate('/verification')} size="sm" className="bg-warning hover:bg-warning/90 text-warning-foreground rounded-lg font-medium shadow-sm">
                             Verify Now
                           </Button>
-                        </>
-                      )}
+                        </>}
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Payment Settings Card - Only for verified receivers */}
-              {isReceiver && profile?.verified && (
-                <Card className="border border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
+              {isReceiver && profile?.verified && <Card className="border border-border/50 shadow-lg rounded-2xl overflow-hidden bg-card">
                   <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-border/30 p-5 md:p-6">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-primary/10 rounded-xl">
@@ -351,16 +329,12 @@ const Settings = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="p-5 md:p-6">
-                    <Button 
-                      onClick={() => navigate('/payment-link')} 
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
-                    >
+                    <Button onClick={() => navigate('/payment-link')} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200">
                       <QrCode className="h-4 w-4 mr-2" />
                       Manage Payment Link & QR Code
                     </Button>
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
             </div>
           </TabsContent>
 
@@ -411,11 +385,7 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground mb-5">
                     You will be logged out and redirected to the login page. Make sure to save any unsaved changes.
                   </p>
-                  <Button 
-                    onClick={handleLogout} 
-                    variant="destructive"
-                    className="w-full py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
-                  >
+                  <Button onClick={handleLogout} variant="destructive" className="w-full py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200">
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out of Your Account
                   </Button>
@@ -465,8 +435,7 @@ const Settings = () => {
                 </div>
                 
                 {/* Support Hours */}
-                {supportSettings?.additional_info && (
-                  <div className="p-4 bg-muted/40 border border-border/30 rounded-xl">
+                {supportSettings?.additional_info && <div className="p-4 bg-muted/40 border border-border/30 rounded-xl">
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-muted rounded-lg mt-0.5">
                         <Info className="h-4 w-4 text-muted-foreground" />
@@ -476,15 +445,11 @@ const Settings = () => {
                         <p className="text-sm text-muted-foreground">{supportSettings.additional_info}</p>
                       </div>
                     </div>
-                  </div>
-                )}
+                  </div>}
                 
                 {/* Contact Button */}
                 <div className="pt-4 border-t border-border/30">
-                  <Button 
-                    onClick={() => toast.info(`Contact support at: ${supportSettings?.email || 'support@ticlapay.com'}`)} 
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200"
-                  >
+                  <Button onClick={() => toast.info(`Contact support at: ${supportSettings?.email || 'support@ticlapay.com'}`)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200">
                     <Mail className="h-4 w-4 mr-2" />
                     Contact Customer Support
                   </Button>
