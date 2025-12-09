@@ -1,18 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Shield, Zap, Globe2, TrendingUp, ArrowRight, Smartphone, CheckCircle, Clock, Lock, User, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import InteractiveBackground from "@/components/InteractiveBackground";
 import logo from "@/assets/ticlapay-logo.png";
-
 const Index = () => {
   const navigate = useNavigate();
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [amount, setAmount] = useState(100);
   const [transferFeePercentage, setTransferFeePercentage] = useState(12);
   const [isScrolled, setIsScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -20,10 +20,10 @@ const Index = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fetch exchange rate
         const response = await fetch('https://open.er-api.com/v6/latest/USD');
         const data = await response.json();
         if (data.rates && data.rates.ZMW) {
@@ -33,8 +33,12 @@ const Index = () => {
         console.error('Error fetching exchange rate:', error);
       }
 
+      // Fetch transfer fee from database
       try {
-        const { data, error } = await supabase.from('settings').select('value').eq('key', 'transfer_fee_percentage').single();
+        const {
+          data,
+          error
+        } = await supabase.from('settings').select('value').eq('key', 'transfer_fee_percentage').single();
         if (!error && data) {
           setTransferFeePercentage(parseFloat(data.value));
         }
@@ -46,253 +50,274 @@ const Index = () => {
     const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
-
   const recipientGets = exchangeRate ? (amount * exchangeRate).toFixed(2) : "0.00";
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(217_91%_98%)] via-[hsl(210_100%_99%)] to-[hsl(220_70%_98%)]">
-      {/* Claymorphism Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled 
-        ? 'bg-[hsl(0_0%_100%/0.85)] backdrop-blur-xl shadow-[0_8px_32px_hsl(217_91%_60%/0.08)] border-b border-[hsl(0_0%_100%/0.6)]' 
-        : 'bg-transparent backdrop-blur-sm'}`}>
+  return <div className="min-h-screen bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10">
+      {/* Elegant Header */}
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-background/80 backdrop-blur-xl shadow-lg border-b border-primary/10' : 'bg-transparent backdrop-blur-md border-b border-white/5'}`}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
+            {/* Logo */}
             <div className="flex items-center group cursor-pointer" onClick={() => navigate("/")}>
               <img src={logo} alt="TiclaPay Logo" className="h-7 sm:h-8 object-contain transition-all duration-300 group-hover:scale-105 rounded-md" />
             </div>
 
+            {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {exchangeRate && (
-                <div className="clay-badge flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2">
+              {exchangeRate && <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-gradient-to-r from-primary/20 to-accent/20 backdrop-blur-sm rounded-full border border-primary/30 shadow-lg">
                   <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-primary animate-pulse flex-shrink-0" />
-                  <span className="text-[10px] sm:text-sm font-bold text-primary whitespace-nowrap">
+                  <span className="text-[10px] sm:text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent whitespace-nowrap">
                     ${exchangeRate.toFixed(2)}
                   </span>
-                </div>
-              )}
+                </div>}
 
-              <button 
-                onClick={() => navigate("/auth")} 
-                className="clay-button px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm text-primary-foreground font-bold whitespace-nowrap"
-              >
-                Get Started
-              </button>
+              <Button onClick={() => navigate("/auth")} className="px-3 sm:px-5 h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg hover:shadow-xl transition-all font-semibold whitespace-nowrap">​Get Started </Button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Hero Section with Claymorphism */}
-      <section className="relative overflow-hidden py-24 sm:py-28 md:py-36 lg:py-44 clay-section">
+      {/* Hero Section with Interactive 3D Background */}
+      <section className="relative overflow-hidden py-20 sm:py-24 md:py-32 lg:py-40">
+        {/* Interactive 3D Background */}
+        <InteractiveBackground />
+        
+        {/* Gradient Base Layer */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/5 to-background pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-background/80 pointer-events-none"></div>
+        
+        {/* Content */}
         <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-7xl mx-auto">
             {/* Left Content */}
-            <div className="space-y-8 text-center lg:text-left order-2 lg:order-1">
-              <div className="clay-badge inline-flex items-center gap-2 px-5 py-2.5">
-                <div className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />
-                <span className="text-sm sm:text-base font-bold text-primary">Instant Cross-Border Transfers</span>
+            <div className="space-y-6 sm:space-y-8 text-center lg:text-left order-2 lg:order-1">
+              <div className="inline-flex items-center gap-2 bg-primary/20 backdrop-blur-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-primary/30">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                <span className="text-sm sm:text-base font-semibold text-primary">Instant Cross-Border Transfers</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-foreground">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
                 Bridge The Gap
                 <span className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mt-2">
                   Zimbabwe to Zambia
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed font-semibold text-muted-foreground">
+              <p className="text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed md:text-base font-semibold text-slate-950">
                 Send money instantly with competitive rates and zero hassle. Your trusted partner for seamless cross-border payments.
               </p>
 
-              {/* Key Benefits - Clay Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto lg:mx-0">
-                <div className="clay-card flex items-center gap-3 p-4">
-                  <div className="clay-icon w-10 h-10 flex items-center justify-center shrink-0">
-                    <Lock className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <span className="text-sm font-bold text-foreground">100% Secure</span>
+              {/* Key Benefits */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto lg:mx-0">
+                
+                <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm p-3 rounded-lg border">
+                  <Lock className="h-5 w-5 text-primary shrink-0" />
+                  <span className="text-sm font-medium">100% Secure</span>
                 </div>
-                <div className="clay-card flex items-center gap-3 p-4">
-                  <div className="clay-icon w-10 h-10 flex items-center justify-center shrink-0">
-                    <Clock className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <span className="text-sm font-bold text-foreground">24/7 Support</span>
+                <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm p-3 rounded-lg border">
+                  <Clock className="h-5 w-5 text-primary shrink-0" />
+                  <span className="text-sm font-medium">24/7 Support</span>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                <button 
-                  onClick={() => navigate("/auth")} 
-                  className="clay-button h-14 sm:h-16 px-8 sm:px-10 text-base sm:text-lg font-bold text-primary-foreground flex items-center justify-center gap-2"
-                >
+                <Button size="lg" onClick={() => navigate("/auth")} className="h-12 sm:h-14 px-8 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                   Start Sending Now
-                  <ArrowRight className="h-5 w-5" />
-                </button>
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               </div>
             </div>
 
-            {/* Right - Calculator Card with Claymorphism */}
+            {/* Right - Calculator Card */}
             <div className="order-1 lg:order-2">
-              <div className="clay-hero-card p-8 sm:p-10 max-w-md mx-auto">
+              <Card className="bg-card/95 backdrop-blur-sm shadow-2xl rounded-3xl border-2 p-6 sm:p-8 max-w-md mx-auto">
                 <div className="space-y-6">
-                  <div className="text-center pb-5 border-b border-[hsl(217_91%_60%/0.1)]">
-                    <h3 className="text-xl sm:text-2xl text-foreground font-bold">Calculate Transfer</h3>
-                    <p className="text-sm text-muted-foreground mt-2">See what you'll send and they'll receive</p>
+                  <div className="text-center pb-4 border-b">
+                    <h3 className="text-lg sm:text-xl text-foreground font-bold">Calculate Transfer</h3>
+                    <p className="text-sm text-muted-foreground mt-1">See what you'll send and they'll receive</p>
                   </div>
 
-                  <div className="space-y-3">
-                    <label className="text-sm font-bold text-foreground flex items-center gap-2">
-                      <span className="clay-icon w-7 h-7 flex items-center justify-center text-xs text-primary-foreground font-bold">1</span>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs text-primary">1</span>
                       You send
                     </label>
                     <div className="relative">
-                      <input 
-                        type="number" 
-                        value={amount} 
-                        onChange={e => setAmount(Number(e.target.value) || 0)} 
-                        className="clay-input w-full pr-20 h-14 text-lg sm:text-xl font-bold px-5 focus:outline-none" 
-                        min="1" 
-                      />
-                      <span className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-primary">USD</span>
+                      <Input type="number" value={amount} onChange={e => setAmount(Number(e.target.value) || 0)} className="pr-20 h-12 text-lg sm:h-14 sm:text-xl font-bold border-2 focus:border-primary" min="1" />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-primary">USD</span>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <label className="text-sm font-bold text-foreground flex items-center gap-2">
-                      <span className="clay-icon w-7 h-7 flex items-center justify-center text-xs text-primary-foreground font-bold">2</span>
+                  
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs text-primary">2</span>
                       They receive
                     </label>
                     <div className="relative">
-                      <input 
-                        type="text" 
-                        value={recipientGets} 
-                        readOnly 
-                        className="clay-input w-full pr-20 h-14 text-lg sm:text-xl font-bold px-5 bg-[hsl(0_0%_97%)]" 
-                      />
-                      <span className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-primary">ZMW</span>
+                      <Input type="text" value={recipientGets} readOnly className="pr-20 h-12 text-lg sm:h-14 sm:text-xl font-bold bg-muted/50 border-2" />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-base sm:text-lg text-primary">ZMW</span>
                     </div>
                   </div>
 
-                  <div className="clay-card p-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground font-medium">Exchange rate</span>
-                      <span className="font-bold text-foreground">1 USD = {exchangeRate?.toFixed(2)} ZMW</span>
+                  <div className="rounded-xl p-4 bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Exchange rate</span>
+                      <span className="font-semibold text-foreground">1 USD = {exchangeRate?.toFixed(2)} ZMW</span>
                     </div>
+                    
                   </div>
 
-                  <button 
-                    onClick={() => navigate("/auth")} 
-                    className="clay-button w-full h-14 text-base font-bold text-primary-foreground flex items-center justify-center gap-2"
-                  >
+                  <Button onClick={() => navigate("/auth")} className="w-full h-14 text-base font-bold shadow-lg hover:shadow-xl transition-all">
                     Continue to Send
-                    <ArrowRight className="h-5 w-5" />
-                  </button>
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
                 </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Indicators */}
+      <section className="relative py-12 sm:py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1),transparent_70%)]" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">Trusted by Thousands</h2>
+              <p className="text-lg text-muted-foreground">Join our growing community of satisfied users</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="space-y-2">
+                <div className="text-4xl sm:text-5xl font-bold text-primary">10K+</div>
+                <div className="text-sm text-muted-foreground">Active Users</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-4xl sm:text-5xl font-bold text-primary">$2M+</div>
+                <div className="text-sm text-muted-foreground">Transferred</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-4xl sm:text-5xl font-bold text-primary">99.9%</div>
+                <div className="text-sm text-muted-foreground">Success Rate</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-4xl sm:text-5xl font-bold text-primary">{"<30min"}</div>
+                <div className="text-sm text-muted-foreground">Avg. Transfer Time</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Indicators with Claymorphism */}
-      <section className="relative py-16 sm:py-20 overflow-hidden">
+      {/* Features Section */}
+      <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-foreground">Trusted by Thousands</h2>
-              <p className="text-lg text-muted-foreground">Join our growing community of satisfied users</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { value: "10K+", label: "Active Users" },
-                { value: "$2M+", label: "Transferred" },
-                { value: "99.9%", label: "Success Rate" },
-                { value: "<30min", label: "Avg. Transfer Time" }
-              ].map((stat, index) => (
-                <div key={index} className="clay-stat p-6 text-center">
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
-                  <div className="text-sm font-medium text-muted-foreground">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section with Claymorphism */}
-      <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden clay-section">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-foreground">Why Choose Ticlapay?</h2>
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Why Choose Ticlapay?</h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Experience the future of cross-border payments
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: Zap, title: "Lightning Fast", description: "Instant transfers to mobile money wallets. Your recipient gets funds in minutes, not days.", gradient: "from-primary to-accent" },
-              { icon: Shield, title: "Bank-Level Security", description: "Advanced encryption and fraud protection. Your money and data are always safe with us.", gradient: "from-secondary to-primary" },
-              { icon: Globe2, title: "Competitive Rates", description: "Best exchange rates with transparent pricing. No hidden fees, ever.", gradient: "from-accent to-secondary" },
-              { icon: Smartphone, title: "Mobile Money", description: "Direct to Airtel and MTN Money wallets. Simple, convenient, and reliable.", gradient: "from-primary to-secondary" }
-            ].map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <div key={index} className="clay-card p-8 group">
-                  <div className={`clay-icon w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className="h-8 w-8 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 text-foreground">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                </div>
-              );
-            })}
+            <Card className="p-8 hover:shadow-2xl transition-all duration-300 group hover:-translate-y-2 border-2 hover:border-primary/50 bg-gradient-to-br from-card to-card/50">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-primary to-accent shadow-lg">
+                <Zap className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground">Lightning Fast</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Instant transfers to mobile money wallets. Your recipient gets funds in minutes, not days.
+              </p>
+            </Card>
+
+            <Card className="p-8 hover:shadow-2xl transition-all duration-300 group hover:-translate-y-2 border-2 hover:border-primary/50 bg-gradient-to-br from-card to-card/50">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-secondary to-primary shadow-lg">
+                <Shield className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground">Bank-Level Security</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Advanced encryption and fraud protection. Your money and data are always safe with us.
+              </p>
+            </Card>
+
+            <Card className="p-8 hover:shadow-2xl transition-all duration-300 group hover:-translate-y-2 border-2 hover:border-primary/50 bg-gradient-to-br from-card to-card/50">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-accent to-secondary shadow-lg">
+                <Globe2 className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground">Competitive Rates</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Best exchange rates with transparent pricing. No hidden fees, ever.
+              </p>
+            </Card>
+
+            <Card className="p-8 hover:shadow-2xl transition-all duration-300 group hover:-translate-y-2 border-2 hover:border-primary/50 bg-gradient-to-br from-card to-card/50">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-gradient-to-br from-primary to-secondary shadow-lg">
+                <Smartphone className="h-8 w-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground">Mobile Money</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Direct to Airtel and MTN Money wallets. Simple, convenient, and reliable.
+              </p>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* How It Works with Claymorphism */}
+      {/* How It Works */}
       <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-primary/5 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.1),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-14 md:mb-18">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-foreground">How It Works</h2>
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
             <p className="text-lg md:text-xl text-muted-foreground">Send money in 3 simple steps</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              { step: "1", title: "Create Your Account", description: "Sign up in seconds with your phone and email. Quick verification process.", icon: User },
-              { step: "2", title: "Enter Transfer Details", description: "Choose your recipient and enter the amount you want to send.", icon: Wallet },
-              { step: "3", title: "Complete Payment", description: "Pay securely via mobile money and your recipient gets funds instantly.", icon: CheckCircle }
-            ].map((item, index) => {
-              const IconComponent = item.icon;
-              return (
-                <div key={index} className="relative group">
-                  <div className="clay-card-elevated p-8 text-center h-full">
-                    <div className="clay-icon inline-flex w-16 h-16 items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                      <IconComponent className="w-8 h-8 text-primary-foreground" />
-                    </div>
-                    <div className="absolute -top-4 -left-4 clay-button w-12 h-12 flex items-center justify-center font-bold text-lg text-primary-foreground">
-                      {item.step}
-                    </div>
-                    <h3 className="text-xl font-bold mb-3 text-foreground">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+            {[{
+            step: "1",
+            title: "Create Your Account",
+            description: "Sign up in seconds with your phone and email. Quick verification process.",
+            icon: User
+          }, {
+            step: "2",
+            title: "Enter Transfer Details",
+            description: "Choose your recipient and enter the amount you want to send.",
+            icon: Wallet
+          }, {
+            step: "3",
+            title: "Complete Payment",
+            description: "Pay securely via mobile money and your recipient gets funds instantly.",
+            icon: CheckCircle
+          }].map((item, index) => {
+            const IconComponent = item.icon;
+            return <div key={index} className="relative group">
+                <Card className="p-8 text-center hover:shadow-2xl transition-all duration-500 border hover:border-primary/30 bg-card/50 backdrop-blur-sm h-full">
+                  <div className="inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-6 bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+                    <IconComponent className="w-8 h-8 text-primary" />
                   </div>
-                  {index < 2 && (
-                    <div className="hidden md:block absolute top-1/2 left-full w-full h-1 -translate-x-4 -translate-y-1/2">
-                      <div className="w-8 h-8 absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <ArrowRight className="h-8 w-8 text-primary/40" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  <div className="absolute -top-3 -left-3 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-lg">
+                    {item.step}
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-foreground">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                </Card>
+                {index < 2 && <div className="hidden md:block absolute top-1/2 left-full w-full h-1 -translate-x-4 -translate-y-1/2">
+                    <div className="w-8 h-8 absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
+                      <ArrowRight className="h-8 w-8 text-primary/40" />
+                     </div>
+                  </div>}
+              </div>;
+          })}
           </div>
         </div>
       </section>
 
-      {/* CTA Section with Claymorphism */}
+      {/* CTA Section */}
       <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-primary opacity-95" />
         <div className="container mx-auto px-4 text-center relative z-10">
@@ -302,26 +327,27 @@ const Index = () => {
           <p className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl mx-auto leading-relaxed">
             Join thousands of people sending money across borders with Ticlapay. Fast, secure, and reliable.
           </p>
-          <button 
-            onClick={() => navigate("/auth")} 
-            className="clay-card h-16 sm:h-18 px-10 sm:px-14 text-base sm:text-lg font-bold text-primary bg-background inline-flex items-center gap-3 hover:scale-105 transition-transform duration-300"
-          >
+          <Button size="lg" onClick={() => navigate("/auth")} className="h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-bold bg-background text-primary hover:bg-background/90 shadow-2xl hover:shadow-3xl transition-all hover:scale-105">
             Create Free Account
-            <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6" />
-          </button>
+            <ArrowRight className="ml-2 h-5 w-5 sm:h-6 sm:w-6" />
+          </Button>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="relative bg-gradient-to-br from-primary/95 via-primary to-primary/90 text-primary-foreground overflow-hidden">
+        {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/3 rounded-full blur-3xl" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
+          {/* Top section with wave separator */}
           <div className="pt-16 pb-12">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-12">
+              {/* Brand section */}
               <div className="lg:max-w-sm">
                 <div className="inline-flex items-center gap-3 mb-6 bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3">
                   <img src={logo} alt="TiclaPay Logo" className="h-8 object-contain brightness-0 invert" />
@@ -342,6 +368,7 @@ const Index = () => {
                 </div>
               </div>
 
+              {/* Links sections */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 lg:gap-16">
                 <div>
                   <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-primary-foreground/60">Company</h3>
@@ -373,6 +400,7 @@ const Index = () => {
             </div>
           </div>
           
+          {/* Bottom bar */}
           <div className="border-t border-white/10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-primary-foreground/60">© 2024 TiclaPay. All rights reserved.</p>
             <div className="flex items-center gap-6 text-sm text-primary-foreground/60">
@@ -388,8 +416,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
