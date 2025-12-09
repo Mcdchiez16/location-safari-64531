@@ -23,6 +23,7 @@ interface Transaction {
   sender_name?: string;
   receiver_name: string;
   receiver_phone: string;
+  receiver_country?: string;
   amount: number;
   currency: string;
   fee: number;
@@ -30,6 +31,7 @@ interface Transaction {
   created_at: string;
   tid?: string;
   rejection_reason?: string;
+  exchange_rate?: number;
   profiles?: {
     full_name: string;
     phone_number: string;
@@ -294,7 +296,9 @@ const Dashboard = () => {
                     </div>
                     <div className="text-left sm:text-right shrink-0">
                       <p className="font-bold text-base md:text-lg text-foreground">
-                        {isSender ? '-' : '+'} {transaction.currency} {transaction.amount.toFixed(2)}
+                        {isSender ? '-' : '+'} {!isSender && profile?.country === 'Zambia' && transaction.currency === 'USD' 
+                          ? `ZMW ${(transaction.amount * (transaction.exchange_rate || 27.5)).toFixed(2)}` 
+                          : `${transaction.currency} ${transaction.amount.toFixed(2)}`}
                       </p>
                     </div>
                   </div>;

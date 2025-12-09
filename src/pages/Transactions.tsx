@@ -17,6 +17,7 @@ interface Transaction {
   sender_name?: string;
   receiver_name: string;
   receiver_phone: string;
+  receiver_country?: string;
   amount: number;
   currency: string;
   fee: number;
@@ -24,6 +25,7 @@ interface Transaction {
   created_at: string;
   tid?: string;
   rejection_reason?: string;
+  exchange_rate?: number;
   profiles?: {
     full_name: string;
     phone_number: string;
@@ -35,6 +37,7 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userCountry, setUserCountry] = useState("");
   useEffect(() => {
     supabase.auth.getSession().then(({
       data: {
@@ -64,7 +67,9 @@ const Transactions = () => {
   const loadTransactions = async (userId: string) => {
     const {
       data: profileData
-    } = await supabase.from("profiles").select("phone_number, full_name").eq("id", userId).maybeSingle();
+    } = await supabase.from("profiles").select("phone_number, full_name, country").eq("id", userId).maybeSingle();
+    
+    setUserCountry(profileData?.country || '');
 
     // Load sent and received transactions in parallel with profiles joined
     const [sentResult, receivedResult] = await Promise.all([supabase.from("transactions").select(`
@@ -271,7 +276,9 @@ const Transactions = () => {
                       </div>
                       <div className="text-left sm:text-right flex-shrink-0">
                         <p className={`font-bold text-base md:text-lg ${isSender ? 'text-red-600' : 'text-green-600'}`}>
-                          {isSender ? '-' : '+'} {transaction.currency} {transaction.amount.toFixed(2)}
+                          {isSender ? '-' : '+'} {!isSender && userCountry === 'Zambia' && transaction.currency === 'USD' 
+                            ? `ZMW ${(transaction.amount * (transaction.exchange_rate || 27.5)).toFixed(2)}` 
+                            : `${transaction.currency} ${transaction.amount.toFixed(2)}`}
                         </p>
                         {transaction.fee > 0 && isSender && <p className="text-xs text-gray-500 mt-1">
                             Fee: {transaction.currency} {transaction.fee.toFixed(2)}
