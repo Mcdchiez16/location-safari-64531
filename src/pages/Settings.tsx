@@ -87,10 +87,14 @@ const Settings = () => {
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
               <img src={logo} alt="TiclaPay Logo" className="h-8 sm:h-12 object-contain transition-transform group-hover:scale-105" />
             </div>
-            <Button variant="ghost" onClick={() => navigate('/dashboard')} className="gap-2 hover:bg-muted/50 text-muted-foreground hover:text-foreground rounded-xl">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Back</span>
-            </Button>
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className="group relative flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10"
+            >
+              <span className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <ArrowLeft className="h-4 w-4 text-primary transition-transform duration-300 group-hover:-translate-x-1" />
+              <span className="relative text-sm font-medium text-foreground">Dashboard</span>
+            </button>
           </div>
         </div>
       </header>
