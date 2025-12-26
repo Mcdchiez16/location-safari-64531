@@ -50,6 +50,14 @@ All colors MUST be HSL.
     --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(220 70% 50%));
     --shadow-glow: 0 10px 40px -10px hsl(217 91% 60% / 0.3);
     --shadow-card: 0 4px 20px -2px hsl(0 0% 10% / 0.08);
+    
+    /* Admin Dark Theme */
+    --admin-bg: 220 20% 10%;
+    --admin-surface: 220 18% 13%;
+    --admin-surface-elevated: 220 16% 16%;
+    --admin-border: 220 15% 22%;
+    --admin-text: 0 0% 98%;
+    --admin-text-muted: 220 10% 60%;
   }
 
   .dark {
@@ -150,5 +158,73 @@ All colors MUST be HSL.
     100% {
       transform: translateY(50px);
     }
+  }
+}
+
+/* Glassmorphism Utilities for Admin Dashboard */
+@layer components {
+  .glass-card {
+    background: hsl(var(--admin-surface) / 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--admin-border) / 0.5);
+    box-shadow: 
+      0 8px 32px hsl(0 0% 0% / 0.12),
+      inset 0 1px 0 hsl(0 0% 100% / 0.05);
+  }
+
+  .glass-card-elevated {
+    background: hsl(var(--admin-surface-elevated) / 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(var(--admin-border) / 0.6);
+    box-shadow: 
+      0 12px 40px hsl(0 0% 0% / 0.15),
+      inset 0 1px 0 hsl(0 0% 100% / 0.08);
+  }
+
+  .glass-input {
+    background: hsl(var(--admin-surface) / 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--admin-border) / 0.4);
+  }
+
+  .glass-input:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
+  }
+
+  .admin-stat-card {
+    background: hsl(var(--admin-surface) / 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--admin-border) / 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .admin-stat-card:hover {
+    background: hsl(var(--admin-surface) / 0.7);
+    border-color: hsl(var(--admin-border) / 0.6);
+    transform: translateY(-2px);
+  }
+
+  .admin-sidebar {
+    background: hsl(var(--admin-surface) / 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid hsl(var(--admin-border) / 0.5);
+  }
+
+  .admin-topnav {
+    background: hsl(var(--admin-bg) / 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid hsl(var(--admin-border) / 0.4);
+  }
+
+  .admin-badge {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 }
