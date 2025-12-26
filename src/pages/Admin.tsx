@@ -533,9 +533,9 @@ const Admin = () => {
           onSearchChange={setSearchQuery}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8">
           {/* Stats Grid */}
-          <div className="mb-8">
+          <div className="mb-4 sm:mb-6 md:mb-8">
             <AdminStatsGrid stats={stats} />
           </div>
 
@@ -549,27 +549,40 @@ const Admin = () => {
                 initial="hidden"
                 animate="visible"
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
               >
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-admin-text flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-yellow-400" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <h2 className="text-lg sm:text-xl font-semibold text-admin-text flex items-center gap-2">
+                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
                     Pending Transactions
                   </h2>
-                  <Badge className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                  <Badge className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 self-start sm:self-auto text-xs">
                     {stats.pending} awaiting
                   </Badge>
                 </div>
 
-                <div className="grid gap-4">
+                {/* Mobile Search */}
+                <div className="md:hidden">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-admin-text-muted" />
+                    <Input
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 glass-input text-admin-text placeholder:text-admin-text-muted text-sm h-9"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:gap-4">
                   {transactions.filter(t => t.status === "pending").filter(t => 
                     t.receiver_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     t.receiver_phone.includes(searchQuery) ||
                     (t.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase())
                   ).length === 0 ? (
-                    <motion.div variants={itemVariants} className="glass-card rounded-2xl p-12 text-center">
-                      <CheckCircle className="h-12 w-12 text-emerald-400 mx-auto mb-4" />
-                      <p className="text-admin-text-muted">No pending transactions</p>
+                    <motion.div variants={itemVariants} className="glass-card rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center">
+                      <CheckCircle className="h-10 w-10 sm:h-12 sm:w-12 text-emerald-400 mx-auto mb-3 sm:mb-4" />
+                      <p className="text-admin-text-muted text-sm">No pending transactions</p>
                     </motion.div>
                   ) : (
                     transactions.filter(t => t.status === "pending").filter(t => 
@@ -580,21 +593,21 @@ const Admin = () => {
                       <motion.div
                         key={transaction.id}
                         variants={itemVariants}
-                        className="glass-card rounded-2xl p-5 space-y-4"
+                        className="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-5 space-y-3 sm:space-y-4"
                       >
                         {/* Header */}
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-admin-surface flex items-center justify-center">
-                              <User className="h-5 w-5 text-admin-text-muted" />
+                        <div className="flex items-start justify-between gap-2 sm:gap-4">
+                          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl bg-admin-surface flex items-center justify-center flex-shrink-0">
+                              <User className="h-4 w-4 sm:h-5 sm:w-5 text-admin-text-muted" />
                             </div>
-                            <div>
-                              <h4 className="font-semibold text-admin-text">
+                            <div className="min-w-0">
+                              <h4 className="font-semibold text-admin-text text-sm sm:text-base truncate">
                                 {transaction.profiles?.full_name || "Unknown Sender"}
                               </h4>
-                              <p className="text-xs text-admin-text-muted flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {new Date(transaction.created_at).toLocaleString()}
+                              <p className="text-[10px] sm:text-xs text-admin-text-muted flex items-center gap-1">
+                                <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                                {new Date(transaction.created_at).toLocaleDateString()}
                               </p>
                             </div>
                           </div>
@@ -602,29 +615,29 @@ const Admin = () => {
                         </div>
 
                         {/* Details Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          <div className="space-y-1">
-                            <p className="text-xs text-admin-text-muted">Recipient</p>
-                            <p className="text-sm font-medium text-admin-text">{transaction.receiver_name}</p>
+                        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <p className="text-[10px] sm:text-xs text-admin-text-muted">Recipient</p>
+                            <p className="text-xs sm:text-sm font-medium text-admin-text truncate">{transaction.receiver_name}</p>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-xs text-admin-text-muted">Phone</p>
-                            <p className="text-sm font-medium text-admin-text">{transaction.receiver_phone}</p>
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <p className="text-[10px] sm:text-xs text-admin-text-muted">Phone</p>
+                            <p className="text-xs sm:text-sm font-medium text-admin-text">{transaction.receiver_phone}</p>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-xs text-admin-text-muted">Country</p>
-                            <p className="text-sm font-medium text-admin-text">{transaction.receiver_country}</p>
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <p className="text-[10px] sm:text-xs text-admin-text-muted">Country</p>
+                            <p className="text-xs sm:text-sm font-medium text-admin-text">{transaction.receiver_country}</p>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-xs text-admin-text-muted">Amount</p>
-                            <p className="text-sm font-bold text-primary">${transaction.amount.toFixed(2)} USD</p>
+                          <div className="space-y-0.5 sm:space-y-1">
+                            <p className="text-[10px] sm:text-xs text-admin-text-muted">Amount</p>
+                            <p className="text-xs sm:text-sm font-bold text-primary">${transaction.amount.toFixed(2)}</p>
                           </div>
                         </div>
 
                         {/* Recipient Gets */}
-                        <div className="glass-card-elevated rounded-xl p-3">
-                          <p className="text-xs text-admin-text-muted mb-1">Recipient Gets</p>
-                          <p className="text-lg font-bold text-emerald-400">
+                        <div className="glass-card-elevated rounded-lg sm:rounded-xl p-2.5 sm:p-3">
+                          <p className="text-[10px] sm:text-xs text-admin-text-muted mb-0.5 sm:mb-1">Recipient Gets</p>
+                          <p className="text-base sm:text-lg font-bold text-emerald-400">
                             {transaction.receiver_country === 'Zambia' 
                               ? `${(transaction.amount * (transaction.exchange_rate || 22)).toFixed(2)} ZMW`
                               : `$${transaction.amount.toFixed(2)} USD`}
@@ -632,55 +645,55 @@ const Admin = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="grid md:grid-cols-2 gap-4 pt-2">
-                          <div className="space-y-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-                            <Label className="text-sm text-admin-text">Approve Transaction</Label>
+                        <div className="grid gap-3 sm:gap-4 pt-2">
+                          <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                            <Label className="text-xs sm:text-sm text-admin-text">Approve Transaction</Label>
                             <div className="grid grid-cols-2 gap-2">
                               <Input
-                                placeholder="TID Number"
+                                placeholder="TID"
                                 value={selectedTransaction?.id === transaction.id ? manualTid : ""}
                                 onChange={(e) => {
                                   setSelectedTransaction(transaction);
                                   setManualTid(e.target.value);
                                 }}
-                                className="glass-input text-admin-text placeholder:text-admin-text-muted text-sm"
+                                className="glass-input text-admin-text placeholder:text-admin-text-muted text-xs sm:text-sm h-8 sm:h-9"
                               />
                               <Input
-                                placeholder="Sender Name"
+                                placeholder="Sender"
                                 value={selectedTransaction?.id === transaction.id ? senderName : ""}
                                 onChange={(e) => {
                                   setSelectedTransaction(transaction);
                                   setSenderName(e.target.value);
                                 }}
-                                className="glass-input text-admin-text placeholder:text-admin-text-muted text-sm"
+                                className="glass-input text-admin-text placeholder:text-admin-text-muted text-xs sm:text-sm h-8 sm:h-9"
                               />
                             </div>
                             <Button
                               onClick={() => updateTransactionStatus(transaction.id, "deposited", undefined, undefined, undefined, manualTid, senderName)}
-                              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 sm:gap-2 h-8 sm:h-9 text-xs sm:text-sm"
                             >
-                              <CheckCircle className="h-4 w-4" />
+                              <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               Approve
                             </Button>
                           </div>
 
-                          <div className="space-y-3 p-4 rounded-xl bg-red-500/5 border border-red-500/20">
-                            <Label className="text-sm text-admin-text">Reject Transaction</Label>
+                          <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 rounded-lg sm:rounded-xl bg-red-500/5 border border-red-500/20">
+                            <Label className="text-xs sm:text-sm text-admin-text">Reject Transaction</Label>
                             <Textarea
-                              placeholder="Rejection reason..."
+                              placeholder="Reason..."
                               value={selectedTransaction?.id === transaction.id ? rejectionReason : ""}
                               onChange={(e) => {
                                 setSelectedTransaction(transaction);
                                 setRejectionReason(e.target.value);
                               }}
-                              className="glass-input text-admin-text placeholder:text-admin-text-muted min-h-[60px] text-sm"
+                              className="glass-input text-admin-text placeholder:text-admin-text-muted min-h-[50px] sm:min-h-[60px] text-xs sm:text-sm"
                             />
                             <Button
                               onClick={() => updateTransactionStatus(transaction.id, "rejected", undefined, undefined, undefined, undefined, undefined, rejectionReason)}
                               variant="destructive"
-                              className="w-full gap-2"
+                              className="w-full gap-1.5 sm:gap-2 h-8 sm:h-9 text-xs sm:text-sm"
                             >
-                              <XCircle className="h-4 w-4" />
+                              <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               Reject
                             </Button>
                           </div>

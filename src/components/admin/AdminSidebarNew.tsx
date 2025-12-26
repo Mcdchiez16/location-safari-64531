@@ -6,11 +6,11 @@ import {
   Users, 
   Settings as SettingsIcon, 
   HelpCircle,
-  X,
-  CreditCard
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import ticlapayLogo from "@/assets/ticlapay-logo.png";
 
 interface AdminSidebarNewProps {
   activeTab: string;
@@ -104,7 +104,7 @@ export function AdminSidebarNew({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
         />
       )}
@@ -120,24 +120,26 @@ export function AdminSidebarNew({
           !isOpen && "hidden lg:flex"
         )}
       >
-        {/* Header */}
-        <div className="h-16 flex items-center justify-between px-5 border-b border-admin-border/40">
+        {/* Header with Logo */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-admin-border/40">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-primary/20 flex items-center justify-center">
-              <CreditCard className="h-5 w-5 text-primary" />
-            </div>
+            <img 
+              src={ticlapayLogo} 
+              alt="Ticlapay" 
+              className="h-8 w-auto object-contain"
+            />
             <div>
-              <h2 className="font-semibold text-admin-text text-sm">Admin Panel</h2>
-              <p className="text-xs text-admin-text-muted">Ticlapay</p>
+              <h2 className="font-semibold text-admin-text text-sm">Admin</h2>
+              <p className="text-[10px] text-admin-text-muted">Management</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="lg:hidden text-admin-text-muted hover:text-admin-text"
+            className="lg:hidden text-admin-text-muted hover:text-admin-text h-8 w-8"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
 

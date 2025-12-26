@@ -18,7 +18,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08
+      staggerChildren: 0.06
     }
   }
 };
@@ -42,30 +42,42 @@ interface StatCardProps {
   icon: React.ElementType;
   iconColor: string;
   bgColor: string;
+  accentBorder: string;
 }
 
-function StatCard({ title, value, icon: Icon, iconColor, bgColor }: StatCardProps) {
+function StatCard({ title, value, icon: Icon, iconColor, bgColor, accentBorder }: StatCardProps) {
   return (
     <motion.div
       variants={cardVariants}
-      whileHover={{ y: -4, scale: 1.02 }}
+      whileHover={{ y: -2 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      className="admin-stat-card rounded-2xl p-5"
+      className={cn(
+        "relative overflow-hidden rounded-xl p-4 sm:p-5",
+        "bg-admin-surface/60 backdrop-blur-xl",
+        "border border-admin-border/30",
+        "shadow-lg shadow-black/5"
+      )}
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-admin-text-muted uppercase tracking-wide">
-            {title}
-          </p>
-          <p className="text-2xl md:text-3xl font-bold text-admin-text">
-            {value}
-          </p>
-        </div>
+      {/* Accent Line */}
+      <div className={cn("absolute top-0 left-0 right-0 h-1", accentBorder)} />
+      
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Icon */}
         <div className={cn(
-          "p-3 rounded-xl",
+          "flex-shrink-0 p-2.5 sm:p-3 rounded-xl",
           bgColor
         )}>
-          <Icon className={cn("h-5 w-5", iconColor)} />
+          <Icon className={cn("h-4 w-4 sm:h-5 sm:w-5", iconColor)} />
+        </div>
+        
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] sm:text-xs font-medium text-admin-text-muted uppercase tracking-wider truncate">
+            {title}
+          </p>
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-admin-text mt-0.5">
+            {value}
+          </p>
         </div>
       </div>
     </motion.div>
@@ -75,46 +87,52 @@ function StatCard({ title, value, icon: Icon, iconColor, bgColor }: StatCardProp
 export function AdminStatsGrid({ stats }: StatsGridProps) {
   const statItems = [
     {
-      title: "Total Transactions",
+      title: "Total Trans.",
       value: stats.total,
       icon: TrendingUp,
       iconColor: "text-blue-400",
-      bgColor: "bg-blue-500/10"
+      bgColor: "bg-blue-500/15",
+      accentBorder: "bg-blue-500"
     },
     {
       title: "Pending",
       value: stats.pending,
       icon: Clock,
       iconColor: "text-yellow-400",
-      bgColor: "bg-yellow-500/10"
+      bgColor: "bg-yellow-500/15",
+      accentBorder: "bg-yellow-500"
     },
     {
       title: "Completed",
       value: stats.completed,
       icon: CheckCircle,
       iconColor: "text-emerald-400",
-      bgColor: "bg-emerald-500/10"
+      bgColor: "bg-emerald-500/15",
+      accentBorder: "bg-emerald-500"
     },
     {
-      title: "Total Users",
+      title: "Users",
       value: stats.totalUsers,
       icon: Users,
       iconColor: "text-indigo-400",
-      bgColor: "bg-indigo-500/10"
+      bgColor: "bg-indigo-500/15",
+      accentBorder: "bg-indigo-500"
     },
     {
-      title: "Pending KYC",
+      title: "KYC Queue",
       value: stats.pendingKyc,
       icon: FileText,
       iconColor: "text-orange-400",
-      bgColor: "bg-orange-500/10"
+      bgColor: "bg-orange-500/15",
+      accentBorder: "bg-orange-500"
     },
     {
-      title: "Revenue (Fees)",
+      title: "Revenue",
       value: `$${stats.revenue.toFixed(2)}`,
       icon: DollarSign,
       iconColor: "text-emerald-400",
-      bgColor: "bg-emerald-500/10"
+      bgColor: "bg-emerald-500/15",
+      accentBorder: "bg-emerald-500"
     },
   ];
 
@@ -123,7 +141,7 @@ export function AdminStatsGrid({ stats }: StatsGridProps) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
+      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4"
     >
       {statItems.map((stat) => (
         <StatCard key={stat.title} {...stat} />
