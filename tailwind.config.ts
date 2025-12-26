@@ -58,6 +58,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        admin: {
+          bg: "hsl(var(--admin-bg))",
+          surface: "hsl(var(--admin-surface))",
+          "surface-elevated": "hsl(var(--admin-surface-elevated))",
+          border: "hsl(var(--admin-border))",
+          text: "hsl(var(--admin-text))",
+          "text-muted": "hsl(var(--admin-text-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -81,10 +89,15 @@ export default {
             height: "0",
           },
         },
+        "pulse-soft": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.7" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-soft": "pulse-soft 2s ease-in-out infinite",
       },
     },
   },
